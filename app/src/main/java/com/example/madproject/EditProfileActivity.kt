@@ -16,18 +16,41 @@ fun setToast(message: String?, context: Context) {
 }
 
 class EditProfileActivity : AppCompatActivity() {
+    private lateinit var fullName:EditText
+    private lateinit var nickName:EditText
+    private lateinit var email:EditText
+    private lateinit var location:EditText
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_profile)
         this.setTitle("Edit your profile...")
 
-        val editText = findViewById<EditText>(R.id.edit)
+        fullName = findViewById(R.id.fullName)
+        nickName = findViewById(R.id.nickName)
+        email = findViewById(R.id.email)
+        location = findViewById(R.id.location)
 
-        editText.setOnFocusChangeListener { v, hasFocus ->
-            if (!hasFocus) {
-                editText.setSelection(0, 0)
-            }
-        }
+
+        fullName.setOnFocusChangeListener { v, hasFocus ->
+            if (!hasFocus) {  // lost focus
+                fullName.setSelection(0,0)
+            } }
+
+        nickName.setOnFocusChangeListener { v, hasFocus ->
+            if (!hasFocus) {  // lost focus
+                nickName.setSelection(0,0)
+            } }
+
+        email.setOnFocusChangeListener { v, hasFocus ->
+            if (!hasFocus) {  // lost focus
+                email.setSelection(0,0)
+            } }
+
+        location.setOnFocusChangeListener { v, hasFocus ->
+            if (!hasFocus) {  // lost focus
+                location.setSelection(0,0)
+            } }
+
 
     }
 
@@ -41,7 +64,7 @@ class EditProfileActivity : AppCompatActivity() {
         // Handle item selection
         return when (item.itemId) {
             R.id.saveButton -> {
-                val text = findViewById<TextView>(R.id.tv)
+                val text = findViewById<TextView>(R.id.fullName)
                 setToast("Saving...", text.context)
                 true
             }

@@ -9,6 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MADProject">
+        <activity android:name=".EditProfileActivity"></activity>
         <activity android:name=".ShowProfileActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

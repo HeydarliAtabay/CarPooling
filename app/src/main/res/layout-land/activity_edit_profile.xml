@@ -75,6 +75,7 @@
         app:layout_constraintHorizontal_bias="0.898"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@color/design_default_color_error"
         tools:srcCompat="@tools:sample/avatars" />
 
     <ImageButton
@@ -82,6 +83,7 @@
         style="@android:style/Widget.Holo.Light.ImageButton"
         android:layout_width="257dp"
         android:layout_height="209dp"
+        android:src="@android:drawable/ic_menu_camera"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.898"

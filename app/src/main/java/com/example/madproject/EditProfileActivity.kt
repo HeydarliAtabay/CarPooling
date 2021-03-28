@@ -1,11 +1,12 @@
 package com.example.madproject
 
 import android.content.Context
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.text.method.KeyListener
 import android.view.*
+import android.view.ContextMenu.ContextMenuInfo
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
+
 
 var t: Toast? = null
 
@@ -33,24 +34,26 @@ class EditProfileActivity : AppCompatActivity() {
 
         fullName.setOnFocusChangeListener { v, hasFocus ->
             if (!hasFocus) {  // lost focus
-                fullName.setSelection(0,0)
+                fullName.setSelection(0, 0)
             } }
 
         nickName.setOnFocusChangeListener { v, hasFocus ->
             if (!hasFocus) {  // lost focus
-                nickName.setSelection(0,0)
+                nickName.setSelection(0, 0)
             } }
 
         email.setOnFocusChangeListener { v, hasFocus ->
             if (!hasFocus) {  // lost focus
-                email.setSelection(0,0)
+                email.setSelection(0, 0)
             } }
 
         location.setOnFocusChangeListener { v, hasFocus ->
             if (!hasFocus) {  // lost focus
-                location.setSelection(0,0)
+                location.setSelection(0, 0)
             } }
 
+        val editPhoto = findViewById<ImageButton>(R.id.imageButton)
+        registerForContextMenu(editPhoto)
 
     }
 
@@ -65,10 +68,33 @@ class EditProfileActivity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.saveButton -> {
                 val text = findViewById<TextView>(R.id.fullName)
-                setToast("Saving...", text.context)
+                setToast("Saving...", applicationContext)
                 true
             }
             else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    override fun onCreateContextMenu(menu: ContextMenu, v: View, menuInfo: ContextMenuInfo?) {
+        super.onCreateContextMenu(menu, v, menuInfo)
+        when (v.id) {
+            R.id.imageButton -> {
+                menuInflater.inflate(R.menu.menu_change_photo, menu)
+            }
+        }
+    }
+
+    override fun onContextItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_gallery -> {
+                setToast("Opening the gallery...", applicationContext)
+                true
+            }
+            R.id.action_camera -> {
+                setToast("Opening the camera...", applicationContext)
+                true
+            }
+            else -> false
         }
     }
 

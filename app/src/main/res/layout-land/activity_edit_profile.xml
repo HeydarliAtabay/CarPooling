@@ -71,9 +71,10 @@
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="257dp"
-        android:layout_height="209dp"
+        android:layout_width="210dp"
+        android:layout_height="210dp"
         android:adjustViewBounds="true"
+        android:scaleType="centerCrop"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.898"
@@ -84,8 +85,8 @@
     <ImageButton
         android:id="@+id/imageButton"
         style="@android:style/Widget.Holo.Light.ImageButton"
-        android:layout_width="257dp"
-        android:layout_height="209dp"
+        android:layout_width="210dp"
+        android:layout_height="210dp"
         android:src="@android:drawable/ic_menu_camera"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

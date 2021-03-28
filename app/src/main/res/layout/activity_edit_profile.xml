@@ -82,10 +82,12 @@
         style="@android:style/Widget.Holo.Light.ImageButton"
         android:layout_width="257dp"
         android:layout_height="209dp"
+        android:src="@android:drawable/ic_menu_camera"
         app:layout_constraintBottom_toTopOf="@+id/fullName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        tools:src="@android:drawable/ic_menu_camera"
         tools:srcCompat="@android:drawable/ic_menu_camera" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

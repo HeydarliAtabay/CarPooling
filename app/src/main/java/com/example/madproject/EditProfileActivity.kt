@@ -1,8 +1,13 @@
 package com.example.madproject
 
+import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.Intent
+import android.graphics.Bitmap
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.MediaStore
 import android.text.method.KeyListener
 import android.view.*
 import android.widget.*
@@ -20,6 +25,7 @@ class EditProfileActivity : AppCompatActivity() {
     private lateinit var nickName:EditText
     private lateinit var email:EditText
     private lateinit var location:EditText
+    private lateinit var imageView:ImageView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_profile)
@@ -29,6 +35,7 @@ class EditProfileActivity : AppCompatActivity() {
         nickName = findViewById(R.id.nickName)
         email = findViewById(R.id.email)
         location = findViewById(R.id.location)
+        imageView = findViewById(R.id.imageView)
 
 
         fullName.setOnFocusChangeListener { v, hasFocus ->
@@ -51,7 +58,31 @@ class EditProfileActivity : AppCompatActivity() {
                 location.setSelection(0,0)
             } }
 
+        val button = findViewById<ImageButton>(R.id.imageButton)
+        button.setOnClickListener{
+            dispatchTakePictureIntent()
+        }
 
+
+
+    }
+
+
+    private fun dispatchTakePictureIntent() {
+        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        try {
+            startActivityForResult(takePictureIntent, 1)
+        } catch (e: ActivityNotFoundException) {
+            // display error state to the user
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            val imageBitmap = data?.extras?.get("data") as Bitmap
+            imageView.setImageBitmap(imageBitmap)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

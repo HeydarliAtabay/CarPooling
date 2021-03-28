@@ -88,8 +88,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0"
         android:onClick="openContextMenu"
-        tools:srcCompat="@android:drawable/ic_menu_camera" />
+        tools:srcCompat="@android:drawable/ic_menu_camera"
+        tools:ignore="OnClick" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

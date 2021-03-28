@@ -14,7 +14,6 @@
         android:ems="10"
         android:inputType="textPersonName"
         android:text="Full Name"
-        android:hint="Full name"
         app:layout_constraintBottom_toTopOf="@+id/nickName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.08"
@@ -31,7 +30,6 @@
         android:ems="10"
         android:inputType="textEmailAddress"
         android:text="email@gmail.com"
-        android:hint="email@gmail.com"
         app:layout_constraintBottom_toTopOf="@+id/location"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.08"
@@ -46,7 +44,6 @@
         android:ems="10"
         android:inputType="text"
         android:text="Location"
-        android:hint="Location"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.08"
@@ -61,7 +58,6 @@
         android:ems="10"
         android:inputType="textPersonName"
         android:text="Nickname"
-        android:hint="Nickname"
         app:layout_constraintBottom_toTopOf="@+id/email"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.08"
@@ -80,6 +76,7 @@
         app:layout_constraintHorizontal_bias="0.898"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@color/design_default_color_error"
         tools:srcCompat="@tools:sample/avatars" />
 
     <ImageButton
@@ -93,7 +90,7 @@
         app:layout_constraintHorizontal_bias="0.898"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@android:drawable/ic_menu_camera"
+        android:onClick="openContextMenu"
         tools:srcCompat="@android:drawable/ic_menu_camera" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

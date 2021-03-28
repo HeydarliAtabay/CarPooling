@@ -1,5 +1,7 @@
 package com.example.madproject
 
+import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -11,7 +13,9 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.text.method.KeyListener
 import android.view.*
+import android.view.ContextMenu.ContextMenuInfo
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
@@ -50,29 +54,26 @@ class EditProfileActivity : AppCompatActivity() {
 
         fullName.setOnFocusChangeListener { v, hasFocus ->
             if (!hasFocus) {  // lost focus
-                fullName.setSelection(0, 0)
+                fullName.setSelection(0,0)
             } }
 
         nickName.setOnFocusChangeListener { v, hasFocus ->
             if (!hasFocus) {  // lost focus
-                nickName.setSelection(0, 0)
+                nickName.setSelection(0,0)
             } }
 
         email.setOnFocusChangeListener { v, hasFocus ->
             if (!hasFocus) {  // lost focus
-                email.setSelection(0, 0)
+                email.setSelection(0,0)
             } }
 
         location.setOnFocusChangeListener { v, hasFocus ->
             if (!hasFocus) {  // lost focus
-                location.setSelection(0, 0)
+                location.setSelection(0,0)
             } }
 
-        val button = findViewById<ImageButton>(R.id.imageButton)
-        button.setOnClickListener{
-            dispatchTakePictureIntent()
-
-        }
+        val editPhoto = findViewById<ImageButton>(R.id.imageButton)
+        registerForContextMenu(editPhoto)
 
 
     }
@@ -235,8 +236,6 @@ private fun dispatchTakePictureIntent() {
         }
     }
 
-
-
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater: MenuInflater = menuInflater
         inflater.inflate(R.menu.save_profile, menu)
@@ -248,10 +247,33 @@ private fun dispatchTakePictureIntent() {
         return when (item.itemId) {
             R.id.saveButton -> {
                 val text = findViewById<TextView>(R.id.fullName)
-                setToast("Saving...", text.context)
+                setToast("Saving...", applicationContext)
                 true
             }
             else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    override fun onCreateContextMenu(menu: ContextMenu, v: View, menuInfo: ContextMenuInfo?) {
+        super.onCreateContextMenu(menu, v, menuInfo)
+        when (v.id) {
+            R.id.imageButton -> {
+                menuInflater.inflate(R.menu.menu_change_photo, menu)
+            }
+        }
+    }
+
+    override fun onContextItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_gallery -> {
+                setToast("Opening the gallery...", applicationContext)
+                true
+            }
+            R.id.action_camera -> {
+                dispatchTakePictureIntent()
+                true
+            }
+            else -> false
         }
     }
 

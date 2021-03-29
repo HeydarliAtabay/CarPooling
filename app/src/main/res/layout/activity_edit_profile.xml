@@ -83,13 +83,15 @@
         style="@android:style/Widget.Holo.Light.ImageButton"
         android:layout_width="210dp"
         android:layout_height="210dp"
+        android:adjustViewBounds="true"
+        android:onClick="openContextMenu"
         android:src="@android:drawable/ic_menu_camera"
         app:layout_constraintBottom_toTopOf="@+id/fullName"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.502"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:onClick="openContextMenu"
-        tools:srcCompat="@android:drawable/ic_menu_camera"
-        tools:ignore="OnClick" />
+        tools:ignore="OnClick"
+        tools:srcCompat="@android:drawable/ic_menu_camera" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

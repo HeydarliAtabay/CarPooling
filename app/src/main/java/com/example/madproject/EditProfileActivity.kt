@@ -1,9 +1,6 @@
 package com.example.madproject
 
-import android.app.Activity
-import android.content.ActivityNotFoundException
-import android.content.Context
-import android.content.Intent
+import android.content.*
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
@@ -13,15 +10,13 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
-import android.text.method.KeyListener
+import android.provider.MediaStore.Images
 import android.view.*
 import android.view.ContextMenu.ContextMenuInfo
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
-import java.io.File
-import java.io.IOException
-import java.io.InputStream
+import java.io.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -54,22 +49,22 @@ class EditProfileActivity : AppCompatActivity() {
 
         fullName.setOnFocusChangeListener { v, hasFocus ->
             if (!hasFocus) {  // lost focus
-                fullName.setSelection(0,0)
+                fullName.setSelection(0, 0)
             } }
 
         nickName.setOnFocusChangeListener { v, hasFocus ->
             if (!hasFocus) {  // lost focus
-                nickName.setSelection(0,0)
+                nickName.setSelection(0, 0)
             } }
 
         email.setOnFocusChangeListener { v, hasFocus ->
             if (!hasFocus) {  // lost focus
-                email.setSelection(0,0)
+                email.setSelection(0, 0)
             } }
 
         location.setOnFocusChangeListener { v, hasFocus ->
             if (!hasFocus) {  // lost focus
-                location.setSelection(0,0)
+                location.setSelection(0, 0)
             } }
 
         val editPhoto = findViewById<ImageButton>(R.id.imageButton)
@@ -94,16 +89,7 @@ class EditProfileActivity : AppCompatActivity() {
             currentPhotoPath = absolutePath
         }
     }
-/*
-    private fun dispatchTakePictureIntent() {
-        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        try {
-            startActivityForResult(takePictureIntent, 1)
-        } catch (e: ActivityNotFoundException) {
-            // display error state to the user
-        }
-    }
-*/
+
 lateinit var photoURI:Uri
 private fun dispatchTakePictureIntent() {
     Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
@@ -130,7 +116,50 @@ private fun dispatchTakePictureIntent() {
         }
     }
 }
+/* Save image into the phone Gallery
+    private fun insertImage(cr: ContentResolver,
+                            source: Bitmap?,
+                            title: String?,
+                            description: String?): String? {
+        val values = ContentValues()
+        values.put(Images.Media.TITLE, title)
+        values.put(Images.Media.DISPLAY_NAME, title)
+        values.put(Images.Media.DESCRIPTION, description)
+        values.put(Images.Media.MIME_TYPE, "image/jpeg")
+        // Add the date meta data to ensure the image is added at the front of the gallery
+        values.put(Images.Media.DATE_ADDED, System.currentTimeMillis())
+        values.put(Images.Media.DATE_TAKEN, System.currentTimeMillis())
+        var url: Uri? = null
+        var stringUrl: String? = null /* value to be returned */
+        try {
+            url = cr.insert(Images.Media.EXTERNAL_CONTENT_URI, values)
+            if (source != null) {
+                val imageOut: OutputStream? = cr.openOutputStream(url!!)
+                try {
+                    source.compress(Bitmap.CompressFormat.JPEG, 50, imageOut)
+                } finally {
+                    imageOut?.close()
+                }
+                val id = ContentUris.parseId(url!!)
+                // Wait until MINI_KIND thumbnail is generated.
 
+            } else {
+                cr.delete(url!!, null, null)
+                url = null
+            }
+        } catch (e: Exception) {
+            if (url != null) {
+                cr.delete(url, null, null)
+                url = null
+            }
+        }
+        if (url != null) {
+            stringUrl = url.toString()
+        }
+        return stringUrl
+    }
+
+*/
     private fun setPic() {
         // Get the dimensions of the View
         val targetW: Int = imageView.width
@@ -156,6 +185,7 @@ private fun dispatchTakePictureIntent() {
         }
         BitmapFactory.decodeFile(currentPhotoPath, bmOptions)?.also { bitmap ->
             val bit = handleSamplingAndRotationBitmap(this, photoURI)
+            //insertImage(contentResolver,bit,"Profile MAD","Prova")
             imageView.setImageBitmap(bit)
         }
     }
@@ -228,6 +258,8 @@ private fun dispatchTakePictureIntent() {
         img?.recycle()
         return rotatedImg
     }
+
+
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)

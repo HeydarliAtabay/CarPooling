@@ -1,8 +1,8 @@
 package com.example.madproject
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -12,9 +12,10 @@ import android.view.ContextMenu.ContextMenuInfo
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
-import androidx.core.net.toUri
 import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
+import java.io.InputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -26,9 +27,10 @@ enum class Requests(val value: Int)
     INTENT_CAPTURE_PHOTO(1),
     INTENT_PHOTO_FROM_GALLERY(2);
 
+    /*
     companion object {
         fun from(findValue: Int): Requests = Requests.values().first { it.value == findValue }
-    }
+    }*/
 }
 
 fun setToast(message: String?, context: Context) {
@@ -49,7 +51,7 @@ class EditProfileActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_profile)
-        this.setTitle("Edit your profile...")
+        this.title = "Edit your profile..."
 
         fullName = findViewById(R.id.fullName)
         nickName = findViewById(R.id.nickName)
@@ -57,22 +59,22 @@ class EditProfileActivity : AppCompatActivity() {
         location = findViewById(R.id.location)
         imageView = findViewById(R.id.imageView)
 
-        fullName.setOnFocusChangeListener { v, hasFocus ->
+        fullName.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {  // lost focus
                 fullName.setSelection(0, 0)
             } }
 
-        nickName.setOnFocusChangeListener { v, hasFocus ->
+        nickName.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {  // lost focus
                 nickName.setSelection(0, 0)
             } }
 
-        email.setOnFocusChangeListener { v, hasFocus ->
+        email.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {  // lost focus
                 email.setSelection(0, 0)
             } }
 
-        location.setOnFocusChangeListener { v, hasFocus ->
+        location.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {  // lost focus
                 location.setSelection(0, 0)
             } }
@@ -82,7 +84,7 @@ class EditProfileActivity : AppCompatActivity() {
 
 
     }
-/*
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putString("currentPhotoPath", currentPhotoPath)
@@ -94,12 +96,12 @@ class EditProfileActivity : AppCompatActivity() {
         currentPhotoPath = if (resPath === null) "" else resPath
         if (currentPhotoPath !== "") {
             val imgFile = File(currentPhotoPath)
-            photoURI = imgFile.toUri()
+            photoURI = FileProvider.getUriForFile(this, "com.example.android.fileprovider", imgFile)
             imageView = findViewById(R.id.imageView)
             setPic()
         }
     }
-*/
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == RESULT_OK) {
@@ -107,8 +109,13 @@ class EditProfileActivity : AppCompatActivity() {
                 Requests.INTENT_CAPTURE_PHOTO.value -> setPic()
 
                 Requests.INTENT_PHOTO_FROM_GALLERY.value -> {
-                    photoURI = data?.data!!
-                    currentPhotoPath = photoURI.path!!
+                    val inputStream: InputStream? = data?.data?.let { contentResolver.openInputStream(it) }
+                    val outputFile = createImageFile()
+                    val fileOutputStream = FileOutputStream(outputFile)
+                    inputStream?.copyTo(fileOutputStream)
+                    fileOutputStream.close()
+                    inputStream?.close()
+                    photoURI = FileProvider.getUriForFile(this, "com.example.android.fileprovider", outputFile)
                     setPic()
                 }
             }
@@ -125,7 +132,6 @@ class EditProfileActivity : AppCompatActivity() {
         // Handle item selection
         return when (item.itemId) {
             R.id.saveButton -> {
-                val text = findViewById<TextView>(R.id.fullName)
                 setToast("Saving...", applicationContext)
                 true
             }
@@ -156,6 +162,9 @@ class EditProfileActivity : AppCompatActivity() {
         }
     }
 
+
+
+    @SuppressLint("SimpleDateFormat")
     @Throws(IOException::class)
     private fun createImageFile(): File {
         // Create an image file name
@@ -172,13 +181,12 @@ class EditProfileActivity : AppCompatActivity() {
     }
 
     private fun dispatchChoosePictureIntent() {
-
-        val chooserIntent = Intent(Intent.ACTION_PICK,
-                MediaStore.Images.Media.INTERNAL_CONTENT_URI)
+        val pickIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
         intent.type = "image/*"
-        startActivityForResult(chooserIntent, Requests.INTENT_PHOTO_FROM_GALLERY.value)
+        startActivityForResult(pickIntent, Requests.INTENT_PHOTO_FROM_GALLERY.value)
     }
 
+    @SuppressLint("QueryPermissionsNeeded")
     private fun dispatchTakePictureIntent() {
         Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
             // Ensure that there's a camera activity to handle the intent
@@ -188,7 +196,6 @@ class EditProfileActivity : AppCompatActivity() {
                     createImageFile()
                 } catch (ex: IOException) {
                     // Error occurred while creating the File
-
                     null
                 }
                 // Continue only if the File was successfully created
@@ -253,34 +260,6 @@ class EditProfileActivity : AppCompatActivity() {
     private fun setPic() {
         val pic = FixOrientation.handleSamplingAndRotationBitmap(this, photoURI)
         imageView.setImageBitmap(pic)
-
-        /*
-        // Get the dimensions of the View
-        val targetW: Int = imageView.width
-        val targetH: Int = imageView.height
-
-        val bmOptions = BitmapFactory.Options().apply {
-            // Get the dimensions of the bitmap
-            inJustDecodeBounds = true
-
-            val photoW: Int = outWidth
-            val photoH: Int = outHeight
-
-            // Determine how much to scale down the image
-            val scaleFactor: Int = Math.max(1, Math.min(photoW / targetW, photoH / targetH))
-
-            // Decode the image file into a Bitmap sized to fill the View
-            inJustDecodeBounds = false
-            inSampleSize = scaleFactor
-            inPurgeable = true
-
-        }
-
-        BitmapFactory.decodeFile(currentPhotoPath, bmOptions)?.also { bitmap ->
-            val bit = FixOrientation.handleSamplingAndRotationBitmap(this, photoURI)
-            //insertImage(contentResolver,bit,"Profile MAD","Prova")
-            imageView.setImageBitmap(bit)
-        }*/
     }
 
 }

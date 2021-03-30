@@ -1,6 +1,7 @@
 package com.example.madproject
 
-import android.content.*
+import android.content.Context
+import android.content.Intent
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
@@ -11,15 +12,20 @@ import android.view.ContextMenu.ContextMenuInfo
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
-import java.io.*
+import androidx.core.net.toUri
+import java.io.File
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
+
 var t: Toast? = null
 
-enum class Requests(val value : Int)
+enum class Requests(val value: Int)
 {
-    INTENT_CAPTURE_PHOTO(1);
+    INTENT_CAPTURE_PHOTO(1),
+    INTENT_PHOTO_FROM_GALLERY(2);
+
     companion object {
         fun from(findValue: Int): Requests = Requests.values().first { it.value == findValue }
     }
@@ -37,7 +43,7 @@ class EditProfileActivity : AppCompatActivity() {
     private lateinit var email:EditText
     private lateinit var location:EditText
     private lateinit var imageView:ImageView
-    private lateinit var currentPhotoPath: String
+    private var currentPhotoPath: String = ""
     private lateinit var photoURI:Uri
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -76,12 +82,35 @@ class EditProfileActivity : AppCompatActivity() {
 
 
     }
+/*
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString("currentPhotoPath", currentPhotoPath)
+    }
 
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        val resPath = savedInstanceState.getString("currentPhotoPath")
+        currentPhotoPath = if (resPath === null) "" else resPath
+        if (currentPhotoPath !== "") {
+            val imgFile = File(currentPhotoPath)
+            photoURI = imgFile.toUri()
+            imageView = findViewById(R.id.imageView)
+            setPic()
+        }
+    }
+*/
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == RESULT_OK) {
             when (requestCode) {
                 Requests.INTENT_CAPTURE_PHOTO.value -> setPic()
+
+                Requests.INTENT_PHOTO_FROM_GALLERY.value -> {
+                    photoURI = data?.data!!
+                    currentPhotoPath = photoURI.path!!
+                    setPic()
+                }
             }
         }
     }
@@ -116,7 +145,7 @@ class EditProfileActivity : AppCompatActivity() {
     override fun onContextItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_gallery -> {
-                setToast("Opening the gallery...", applicationContext)
+                dispatchChoosePictureIntent()
                 true
             }
             R.id.action_camera -> {
@@ -140,6 +169,14 @@ class EditProfileActivity : AppCompatActivity() {
             // Save a file: path for use with ACTION_VIEW intents
             currentPhotoPath = absolutePath
         }
+    }
+
+    private fun dispatchChoosePictureIntent() {
+
+        val chooserIntent = Intent(Intent.ACTION_PICK,
+                MediaStore.Images.Media.INTERNAL_CONTENT_URI)
+        intent.type = "image/*"
+        startActivityForResult(chooserIntent, Requests.INTENT_PHOTO_FROM_GALLERY.value)
     }
 
     private fun dispatchTakePictureIntent() {
@@ -214,6 +251,10 @@ class EditProfileActivity : AppCompatActivity() {
     */
 
     private fun setPic() {
+        val pic = FixOrientation.handleSamplingAndRotationBitmap(this, photoURI)
+        imageView.setImageBitmap(pic)
+
+        /*
         // Get the dimensions of the View
         val targetW: Int = imageView.width
         val targetH: Int = imageView.height
@@ -221,8 +262,6 @@ class EditProfileActivity : AppCompatActivity() {
         val bmOptions = BitmapFactory.Options().apply {
             // Get the dimensions of the bitmap
             inJustDecodeBounds = true
-
-            //BitmapFactory.decodeFile(currentPhotoPath, bmOptions)
 
             val photoW: Int = outWidth
             val photoH: Int = outHeight
@@ -236,11 +275,12 @@ class EditProfileActivity : AppCompatActivity() {
             inPurgeable = true
 
         }
+
         BitmapFactory.decodeFile(currentPhotoPath, bmOptions)?.also { bitmap ->
             val bit = FixOrientation.handleSamplingAndRotationBitmap(this, photoURI)
             //insertImage(contentResolver,bit,"Profile MAD","Prova")
             imageView.setImageBitmap(bit)
-        }
+        }*/
     }
 
 }

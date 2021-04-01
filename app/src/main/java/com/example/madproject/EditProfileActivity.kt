@@ -44,6 +44,8 @@ class EditProfileActivity : AppCompatActivity() {
     private lateinit var nickName:EditText
     private lateinit var email:EditText
     private lateinit var location:EditText
+    private lateinit var phoneNumber:EditText
+    private lateinit var dateOfBirth:EditText
     private lateinit var imageView:ImageView
     private var currentPhotoPath: String = ""
     private lateinit var photoURI:Uri
@@ -58,6 +60,8 @@ class EditProfileActivity : AppCompatActivity() {
         email = findViewById(R.id.email)
         location = findViewById(R.id.location)
         imageView = findViewById(R.id.imageView)
+        phoneNumber = findViewById(R.id.phoneNumber)
+        dateOfBirth = findViewById(R.id.dateOfBirth)
 
         fullName.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {  // lost focus
@@ -75,6 +79,16 @@ class EditProfileActivity : AppCompatActivity() {
             } }
 
         location.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) {  // lost focus
+                location.setSelection(0, 0)
+            } }
+
+        dateOfBirth.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) {  // lost focus
+                location.setSelection(0, 0)
+            } }
+
+        phoneNumber.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {  // lost focus
                 location.setSelection(0, 0)
             } }

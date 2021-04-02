@@ -134,7 +134,6 @@ class ShowProfileActivity : AppCompatActivity() {
         if (currentPhotoPath != "") {
             val imgFile = File(currentPhotoPath!!)
             photoURI = FileProvider.getUriForFile(this, "com.example.android.fileprovider", imgFile)
-            image = findViewById(R.id.imageView)
             val pic = FixOrientation.handleSamplingAndRotationBitmap(this, photoURI)
             image.setImageBitmap(pic)
         } else image.setImageResource(R.drawable.atabay)

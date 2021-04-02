@@ -103,6 +103,7 @@ class EditProfileActivity : AppCompatActivity() {
         registerForContextMenu(editPhoto)
 
 
+
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

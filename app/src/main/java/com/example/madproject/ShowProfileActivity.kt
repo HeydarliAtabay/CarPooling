@@ -1,6 +1,7 @@
 package com.example.madproject
 
 import android.content.Intent
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
@@ -21,8 +22,8 @@ class ShowProfileActivity : AppCompatActivity() {
     private lateinit var phoneNumber : TextView
     private lateinit var location : TextView
     private lateinit var image : ImageView
-
-
+    private var currentPhotoPath: String? = ""
+    private lateinit var photoURI: Uri
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,7 +46,7 @@ class ShowProfileActivity : AppCompatActivity() {
         email.text = "heydarli.atabay@gmail.com"
         phoneNumber.text = "345678909"
         location.text = "Turin, Italy"
-
+        image.setImageResource(R.drawable.atabay)
     }
 
 
@@ -58,17 +59,23 @@ class ShowProfileActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.editButton -> {
-                val intent = Intent(this, EditProfileActivity::class.java)
-                startActivityForResult(intent, 1)
+                editProfile()
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
 
-
-
-
-
-
+    private fun editProfile() {
+        val intent = Intent(this, EditProfileActivity::class.java).also {
+            it.putExtra(ValueIds.FULL_NAME.value, fullName.text.toString())
+            it.putExtra(ValueIds.NICKNAME.value, nickName.text.toString())
+            it.putExtra(ValueIds.DATE_OF_BIRTH.value, dateOfBirth.text.toString())
+            it.putExtra(ValueIds.EMAIL.value, email.text.toString())
+            it.putExtra(ValueIds.PHONE_NUMBER.value, phoneNumber.text.toString())
+            it.putExtra(ValueIds.LOCATION.value, location.text.toString())
+            it.putExtra(ValueIds.CURRENT_PHOTO_PATH.value, currentPhotoPath)
+        }
+        startActivityForResult(intent, Requests.INTENT_EDIT_ACTIVITY.value)
+    }
 }

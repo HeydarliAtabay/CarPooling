@@ -46,7 +46,7 @@ class ShowProfileActivity : AppCompatActivity() {
         sharedPref = this.getPreferences(Context.MODE_PRIVATE)
 
         // If the sharedPref does not exist (first run) it is created with the default values
-        if (!sharedPref.contains(ValueIds.FULL_NAME.value)) saveValues()
+        if (!sharedPref.contains(ValueIds.JSON_OBJECT.value)) saveValues()
         loadValues()
     }
 

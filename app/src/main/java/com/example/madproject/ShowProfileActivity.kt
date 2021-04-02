@@ -1,6 +1,8 @@
 package com.example.madproject
 
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -11,7 +13,10 @@ import android.view.MenuItem
 import android.widget.ImageView
 
 import android.widget.TextView
-import android.widget.Toast
+import androidx.core.content.FileProvider
+import androidx.core.content.edit
+import org.json.JSONObject
+import java.io.File
 
 
 class ShowProfileActivity : AppCompatActivity() {
@@ -24,29 +29,25 @@ class ShowProfileActivity : AppCompatActivity() {
     private lateinit var image : ImageView
     private var currentPhotoPath: String? = ""
     private lateinit var photoURI: Uri
-
+    private lateinit var sharedPref: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        this.setTitle("")
+        this.title = ""
         setContentView(R.layout.activity_show_profile)
 
-        fullName = findViewById<TextView>(R.id.fullName)
-        nickName = findViewById<TextView>(R.id.nickName)
-        dateOfBirth = findViewById<TextView>(R.id.dateOfBirth)
-        email = findViewById<TextView>(R.id.email)
-        phoneNumber = findViewById<TextView>(R.id.phoneNumber)
-        location = findViewById<TextView>(R.id.location)
-        image = findViewById<ImageView>(R.id.imageView3)
+        fullName = findViewById(R.id.fullName)
+        nickName = findViewById(R.id.nickName)
+        dateOfBirth = findViewById(R.id.dateOfBirth)
+        email = findViewById(R.id.email)
+        phoneNumber = findViewById(R.id.phoneNumber)
+        location = findViewById(R.id.location)
+        image = findViewById(R.id.imageView3)
+        sharedPref = this.getPreferences(Context.MODE_PRIVATE)
 
-
-        fullName.text = "Heydarli Atabay"
-        nickName.text = "Atash"
-        dateOfBirth.text = "23/09/95"
-        email.text = "heydarli.atabay@gmail.com"
-        phoneNumber.text = "345678909"
-        location.text = "Turin, Italy"
-        image.setImageResource(R.drawable.atabay)
+        // If the sharedPref does not exist (first run) it is created with the default values
+        if (!sharedPref.contains(ValueIds.FULL_NAME.value)) saveValues()
+        loadValues()
     }
 
 
@@ -66,6 +67,56 @@ class ShowProfileActivity : AppCompatActivity() {
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == RESULT_OK) {
+            when (requestCode) {
+                Requests.INTENT_EDIT_ACTIVITY.value -> {
+
+
+                    saveValues()
+                }
+
+            }
+        }
+    }
+
+    private fun saveValues() {
+
+        val dataObj = JSONObject()
+
+        dataObj.put(ValueIds.FULL_NAME.value, fullName.text.toString())
+        dataObj.put(ValueIds.NICKNAME.value, nickName.text.toString())
+        dataObj.put(ValueIds.DATE_OF_BIRTH.value, dateOfBirth.text.toString())
+        dataObj.put(ValueIds.EMAIL.value, email.text.toString())
+        dataObj.put(ValueIds.PHONE_NUMBER.value, phoneNumber.text.toString())
+        dataObj.put(ValueIds.LOCATION.value, location.text.toString())
+        dataObj.put(ValueIds.CURRENT_PHOTO_PATH.value, currentPhotoPath)
+
+        sharedPref.edit {
+            putString(ValueIds.JSON_OBJECT.value, dataObj.toString())
+            apply()
+        }
+    }
+
+    private fun loadValues() {
+
+        val pref = sharedPref.getString(ValueIds.JSON_OBJECT.value, null)
+
+        if (pref != null) {
+            val dataObj = JSONObject(pref)
+            fullName.text = dataObj.getString(ValueIds.FULL_NAME.value)
+            nickName.text = dataObj.getString(ValueIds.NICKNAME.value)
+            dateOfBirth.text = dataObj.getString(ValueIds.DATE_OF_BIRTH.value)
+            email.text = dataObj.getString(ValueIds.EMAIL.value)
+            phoneNumber.text = dataObj.getString(ValueIds.PHONE_NUMBER.value)
+            location.text = dataObj.getString(ValueIds.LOCATION.value)
+            currentPhotoPath = dataObj.getString(ValueIds.CURRENT_PHOTO_PATH.value)
+
+            setPic()
+        }
+    }
+
     private fun editProfile() {
         val intent = Intent(this, EditProfileActivity::class.java).also {
             it.putExtra(ValueIds.FULL_NAME.value, fullName.text.toString())
@@ -77,5 +128,15 @@ class ShowProfileActivity : AppCompatActivity() {
             it.putExtra(ValueIds.CURRENT_PHOTO_PATH.value, currentPhotoPath)
         }
         startActivityForResult(intent, Requests.INTENT_EDIT_ACTIVITY.value)
+    }
+
+    private fun setPic() {
+        if (currentPhotoPath != "") {
+            val imgFile = File(currentPhotoPath!!)
+            photoURI = FileProvider.getUriForFile(this, "com.example.android.fileprovider", imgFile)
+            image = findViewById(R.id.imageView)
+            val pic = FixOrientation.handleSamplingAndRotationBitmap(this, photoURI)
+            image.setImageBitmap(pic)
+        } else image.setImageResource(R.drawable.atabay)
     }
 }

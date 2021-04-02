@@ -9,7 +9,7 @@ import android.net.Uri
 import android.os.Build
 import java.io.IOException
 import java.io.InputStream
-import java.net.URI
+
 
 
 class FixOrientation {

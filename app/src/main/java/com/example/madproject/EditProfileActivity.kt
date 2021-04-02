@@ -3,6 +3,7 @@ package com.example.madproject
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -12,6 +13,8 @@ import android.view.ContextMenu.ContextMenuInfo
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
+import androidx.core.content.edit
+import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -19,19 +22,7 @@ import java.io.InputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
-
 var t: Toast? = null
-
-enum class Requests(val value: Int)
-{
-    INTENT_CAPTURE_PHOTO(1),
-    INTENT_PHOTO_FROM_GALLERY(2);
-
-    /*
-    companion object {
-        fun from(findValue: Int): Requests = Requests.values().first { it.value == findValue }
-    }*/
-}
 
 fun setToast(message: String?, context: Context) {
     t?.cancel()
@@ -47,8 +38,9 @@ class EditProfileActivity : AppCompatActivity() {
     private lateinit var phoneNumber:EditText
     private lateinit var dateOfBirth:EditText
     private lateinit var imageView:ImageView
-    private var currentPhotoPath: String = ""
-    private lateinit var photoURI:Uri
+    private var currentPhotoPath: String? = ""
+    private lateinit var photoURI: Uri
+    private lateinit var sharedPref: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,36 +54,50 @@ class EditProfileActivity : AppCompatActivity() {
         imageView = findViewById(R.id.imageView)
         phoneNumber = findViewById(R.id.phoneNumber)
         dateOfBirth = findViewById(R.id.dateOfBirth)
+        sharedPref = this.getPreferences(Context.MODE_PRIVATE)
+
+        // If the sharedPref exists (Following runs), load the values
+        if (!sharedPref.contains(ValueIds.FULL_NAME.value)) saveValues()
+        loadValues()
 
         fullName.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {  // lost focus
                 fullName.setSelection(0, 0)
-            } }
+                fullName.hint = ""
+            }  else {
+                fullName.hint = "Enter your full name"
+            }
+        }
 
         nickName.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {  // lost focus
                 nickName.setSelection(0, 0)
-            } }
+                nickName.hint = ""
+            } else nickName.hint = "Enter your nickname"
+        }
 
         email.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {  // lost focus
                 email.setSelection(0, 0)
-            } }
+                email.hint = ""
+            } else email.hint = "email@email.com"
+        }
 
         location.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {  // lost focus
                 location.setSelection(0, 0)
-            } }
+                location.hint = ""
+            } else location.hint = "Enter your location"
+        }
 
-        dateOfBirth.setOnFocusChangeListener { _, hasFocus ->
-            if (!hasFocus) {  // lost focus
-                location.setSelection(0, 0)
-            } }
+        DateInputMask(dateOfBirth).listen()
 
         phoneNumber.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {  // lost focus
-                location.setSelection(0, 0)
-            } }
+                phoneNumber.setSelection(0, 0)
+                phoneNumber.hint = ""
+            } else phoneNumber.hint = "Enter your phone number"
+        }
 
         val editPhoto = findViewById<ImageButton>(R.id.imageButton)
         registerForContextMenu(editPhoto)
@@ -108,8 +114,8 @@ class EditProfileActivity : AppCompatActivity() {
         super.onRestoreInstanceState(savedInstanceState)
         val resPath = savedInstanceState.getString("currentPhotoPath")
         currentPhotoPath = if (resPath === null) "" else resPath
-        if (currentPhotoPath !== "") {
-            val imgFile = File(currentPhotoPath)
+        if (currentPhotoPath != "") {
+            val imgFile = File(currentPhotoPath!!)
             photoURI = FileProvider.getUriForFile(this, "com.example.android.fileprovider", imgFile)
             imageView = findViewById(R.id.imageView)
             setPic()
@@ -147,6 +153,7 @@ class EditProfileActivity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.saveButton -> {
                 setToast("Saving...", applicationContext)
+                saveValues()
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -176,7 +183,46 @@ class EditProfileActivity : AppCompatActivity() {
         }
     }
 
+    private fun saveValues() {
 
+        val dataObj = JSONObject()
+
+        dataObj.put(ValueIds.FULL_NAME.value, fullName.text.toString())
+        dataObj.put(ValueIds.NICKNAME.value, nickName.text.toString())
+        dataObj.put(ValueIds.DATE_OF_BIRTH.value, dateOfBirth.text.toString())
+        dataObj.put(ValueIds.EMAIL.value, email.text.toString())
+        dataObj.put(ValueIds.PHONE_NUMBER.value, phoneNumber.text.toString())
+        dataObj.put(ValueIds.LOCATION.value, location.text.toString())
+        dataObj.put(ValueIds.CURRENT_PHOTO_PATH.value, currentPhotoPath)
+
+        sharedPref.edit {
+            putString(ValueIds.JSON_OBJECT.value, dataObj.toString())
+            apply()
+        }
+    }
+
+    private fun loadValues() {
+
+        val pref = sharedPref.getString(ValueIds.JSON_OBJECT.value, null)
+
+        if (pref != null) {
+            val dataObj = JSONObject(pref)
+            fullName.setText(dataObj.getString(ValueIds.FULL_NAME.value))
+            nickName.setText(dataObj.getString(ValueIds.NICKNAME.value))
+            dateOfBirth.setText(dataObj.getString(ValueIds.DATE_OF_BIRTH.value))
+            email.setText(dataObj.getString(ValueIds.EMAIL.value))
+            phoneNumber.setText(sharedPref.getString(ValueIds.PHONE_NUMBER.value, ""))
+            location.setText(sharedPref.getString(ValueIds.LOCATION.value, ""))
+            currentPhotoPath = sharedPref.getString(ValueIds.CURRENT_PHOTO_PATH.value, "")
+
+            if (currentPhotoPath != "") {
+                val imgFile = File(currentPhotoPath!!)
+                photoURI = FileProvider.getUriForFile(this, "com.example.android.fileprovider", imgFile)
+                imageView = findViewById(R.id.imageView)
+                setPic()
+            }
+        }
+    }
 
     @SuppressLint("SimpleDateFormat")
     @Throws(IOException::class)

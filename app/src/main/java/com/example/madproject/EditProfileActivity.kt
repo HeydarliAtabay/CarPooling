@@ -1,6 +1,7 @@
 package com.example.madproject
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -12,6 +13,7 @@ import android.view.ContextMenu.ContextMenuInfo
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
+import com.google.android.material.textfield.TextInputLayout
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -93,8 +95,14 @@ class EditProfileActivity : AppCompatActivity() {
         val editPhoto = findViewById<ImageButton>(R.id.imageButton)
         registerForContextMenu(editPhoto)
 
-
-
+        fullName.setText(intent.getStringExtra(ValueIds.FULL_NAME.value))
+        nickName.setText(intent.getStringExtra(ValueIds.NICKNAME.value))
+        email.setText(intent.getStringExtra(ValueIds.EMAIL.value))
+        location.setText(intent.getStringExtra(ValueIds.LOCATION.value))
+        phoneNumber.setText(intent.getStringExtra(ValueIds.PHONE_NUMBER.value))
+        dateOfBirth.setText(intent.getStringExtra(ValueIds.DATE_OF_BIRTH.value))
+        currentPhotoPath = intent.getStringExtra(ValueIds.CURRENT_PHOTO_PATH.value)
+        setPic()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -139,8 +147,17 @@ class EditProfileActivity : AppCompatActivity() {
         // Handle item selection
         return when (item.itemId) {
             R.id.saveButton -> {
-                setToast("Saving...", applicationContext)
-
+                setToast("Profile information saved!", applicationContext)
+                setResult(Activity.RESULT_OK, Intent().also{
+                    it.putExtra(ValueIds.FULL_NAME.value, fullName.text.toString())
+                    it.putExtra(ValueIds.NICKNAME.value, nickName.text.toString())
+                    it.putExtra(ValueIds.EMAIL.value, email.text.toString())
+                    it.putExtra(ValueIds.PHONE_NUMBER.value, phoneNumber.text.toString())
+                    it.putExtra(ValueIds.DATE_OF_BIRTH.value, dateOfBirth.text.toString())
+                    it.putExtra(ValueIds.LOCATION.value, location.text.toString())
+                    it.putExtra(ValueIds.CURRENT_PHOTO_PATH.value, currentPhotoPath)
+                })
+                finish()
                 true
             }
             else -> super.onOptionsItemSelected(item)

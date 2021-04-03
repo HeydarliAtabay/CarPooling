@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/design_default_color_on_primary"
     tools:context=".EditProfileActivity">
 
     <RelativeLayout
@@ -71,6 +72,7 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                app:endIconMode="clear_text"
                 android:hint="Full Name" >
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -90,6 +92,7 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                app:endIconMode="clear_text"
                 android:hint="Nickname" >
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -109,6 +112,7 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                app:endIconMode="clear_text"
                 android:hint="Date of Birth" >
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -128,6 +132,7 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                app:endIconMode="clear_text"
                 android:hint="E-mail" >
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -147,6 +152,7 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                app:endIconMode="clear_text"
                 android:hint="Phone number" >
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -166,6 +172,7 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                app:endIconMode="clear_text"
                 android:hint="Location" >
 
                 <com.google.android.material.textfield.TextInputEditText

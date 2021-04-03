@@ -286,7 +286,6 @@ class EditProfileActivity : AppCompatActivity() {
         if (currentPhotoPath != "") {
             val imgFile = File(currentPhotoPath!!)
             photoURI = FileProvider.getUriForFile(this, "com.example.android.fileprovider", imgFile)
-            imageView = findViewById(R.id.imageView)
             val pic = FixOrientation.handleSamplingAndRotationBitmap(this, photoURI)
             imageView.setImageBitmap(pic)
         } else imageView.setImageResource(R.drawable.atabay)

@@ -46,7 +46,7 @@ class ShowProfileActivity : AppCompatActivity() {
         sharedPref = this.getPreferences(Context.MODE_PRIVATE)
 
         // If the sharedPref does not exist (first run) it is created with the default values
-        if (!sharedPref.contains(ValueIds.FULL_NAME.value)) saveValues()
+        if (!sharedPref.contains(ValueIds.JSON_OBJECT.value)) saveValues()
         loadValues()
     }
 
@@ -134,7 +134,6 @@ class ShowProfileActivity : AppCompatActivity() {
         if (currentPhotoPath != "") {
             val imgFile = File(currentPhotoPath!!)
             photoURI = FileProvider.getUriForFile(this, "com.example.android.fileprovider", imgFile)
-            image = findViewById(R.id.imageView)
             val pic = FixOrientation.handleSamplingAndRotationBitmap(this, photoURI)
             image.setImageBitmap(pic)
         } else image.setImageResource(R.drawable.atabay)

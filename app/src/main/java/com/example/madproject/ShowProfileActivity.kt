@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -72,8 +73,14 @@ class ShowProfileActivity : AppCompatActivity() {
         if (resultCode == RESULT_OK) {
             when (requestCode) {
                 Requests.INTENT_EDIT_ACTIVITY.value -> {
-
-
+                    fullName.text = data?.getStringExtra(ValueIds.FULL_NAME.value)
+                    nickName.text = data?.getStringExtra(ValueIds.NICKNAME.value)
+                    email.text = data?.getStringExtra(ValueIds.EMAIL.value)
+                    phoneNumber.text = data?.getStringExtra(ValueIds.PHONE_NUMBER.value)
+                    dateOfBirth.text = data?.getStringExtra(ValueIds.DATE_OF_BIRTH.value)
+                    location.text = data?.getStringExtra(ValueIds.LOCATION.value)
+                    currentPhotoPath = data?.getStringExtra(ValueIds.CURRENT_PHOTO_PATH.value)
+                    setPic()
                     saveValues()
                 }
 
@@ -83,6 +90,7 @@ class ShowProfileActivity : AppCompatActivity() {
 
     private fun saveValues() {
 
+        Log.d("SAVEVALUES", "The values are being saved")
         val dataObj = JSONObject()
 
         dataObj.put(ValueIds.FULL_NAME.value, fullName.text.toString())
@@ -101,6 +109,7 @@ class ShowProfileActivity : AppCompatActivity() {
 
     private fun loadValues() {
 
+        Log.d("LOADVALUES", "The values are being loaded")
         val pref = sharedPref.getString(ValueIds.JSON_OBJECT.value, null)
 
         if (pref != null) {

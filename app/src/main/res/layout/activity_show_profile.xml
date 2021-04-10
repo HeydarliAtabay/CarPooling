@@ -69,14 +69,14 @@
                 android:id="@+id/fullName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="20dp"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:ems="13"
                 android:layout_marginStart="8dp"
                 android:layout_marginLeft="8dp"
-                android:text="Cristiano Gerbino" />
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="20dp"
+                android:ems="13"
+                android:text="Heydarli Atabay"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -90,13 +90,13 @@
                 android:id="@+id/nickName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:textSize="16sp"
-                android:layout_marginBottom="20dp"
-                android:ems="13"
                 android:layout_marginStart="8dp"
                 android:layout_marginLeft="8dp"
-                android:text="Cris" />
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="20dp"
+                android:ems="13"
+                android:text="Atash"
+                android:textSize="16sp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -130,13 +130,13 @@
                 android:id="@+id/email"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="20dp"
                 android:ems="13"
-                android:textSize="16sp"
-                android:layout_marginStart="8dp"
-                android:layout_marginLeft="8dp"
-                android:text="cristiano.gerbino@gmail.com" />
+                android:text="heydarli.atabay@gmail.com"
+                android:textSize="16sp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -150,13 +150,13 @@
                 android:id="@+id/phoneNumber"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:textSize="16sp"
-                android:layout_marginBottom="20dp"
-                android:ems="13"
                 android:layout_marginStart="8dp"
                 android:layout_marginLeft="8dp"
-                android:text="3490830208" />
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="20dp"
+                android:ems="13"
+                android:text="3490838493"
+                android:textSize="16sp" />
 
             <TextView
                 android:layout_width="wrap_content"

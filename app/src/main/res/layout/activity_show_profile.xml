@@ -73,7 +73,7 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="20dp"
-                android:ems="13"
+                android:ems="15"
                 android:text="Heydarli Atabay"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -94,7 +94,7 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="20dp"
-                android:ems="13"
+                android:ems="15"
                 android:text="Atash"
                 android:textSize="16sp" />
 
@@ -110,13 +110,13 @@
                 android:id="@+id/dateOfBirth"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="20dp"
-                android:textSize="16sp"
-                android:ems="13"
                 android:layout_marginStart="8dp"
                 android:layout_marginLeft="8dp"
-                android:text="23/08/1996" />
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="20dp"
+                android:ems="15"
+                android:text="23/08/1996"
+                android:textSize="16sp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -134,7 +134,7 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="20dp"
-                android:ems="13"
+                android:ems="15"
                 android:text="heydarli.atabay@gmail.com"
                 android:textSize="16sp" />
 
@@ -154,7 +154,7 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="20dp"
-                android:ems="13"
+                android:ems="15"
                 android:text="3490838493"
                 android:textSize="16sp" />
 
@@ -170,13 +170,13 @@
                 android:id="@+id/location"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="20dp"
-                android:textSize="16sp"
-                android:ems="13"
                 android:layout_marginStart="8dp"
                 android:layout_marginLeft="8dp"
-                android:text="Turin, Italy" />
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="20dp"
+                android:ems="15"
+                android:text="Turin, Italy"
+                android:textSize="16sp" />
 
         </LinearLayout>
 

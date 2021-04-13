@@ -10,9 +10,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
-
 import android.widget.ImageView
-
 import android.widget.TextView
 import androidx.core.content.FileProvider
 import androidx.core.content.edit
@@ -89,8 +87,6 @@ class ShowProfileActivity : AppCompatActivity() {
     }
 
     private fun saveValues() {
-
-        Log.d("SAVEVALUES", "The values are being saved")
         val dataObj = JSONObject()
 
         dataObj.put(ValueIds.FULL_NAME.value, fullName.text.toString())
@@ -108,8 +104,6 @@ class ShowProfileActivity : AppCompatActivity() {
     }
 
     private fun loadValues() {
-
-        Log.d("LOADVALUES", "The values are being loaded")
         val pref = sharedPref.getString(ValueIds.JSON_OBJECT.value, null)
 
         if (pref != null) {

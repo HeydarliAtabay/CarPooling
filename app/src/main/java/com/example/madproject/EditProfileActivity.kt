@@ -13,7 +13,6 @@ import android.view.ContextMenu.ContextMenuInfo
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
-import com.google.android.material.textfield.TextInputLayout
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -187,8 +186,6 @@ class EditProfileActivity : AppCompatActivity() {
         }
     }
 
-
-
     @SuppressLint("SimpleDateFormat")
     @Throws(IOException::class)
     private fun createImageFile(): File {
@@ -290,5 +287,4 @@ class EditProfileActivity : AppCompatActivity() {
             imageView.setImageBitmap(pic)
         } else imageView.setImageResource(R.drawable.atabay)
     }
-
 }

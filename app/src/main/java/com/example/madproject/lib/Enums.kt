@@ -1,4 +1,4 @@
-package com.example.madproject
+package com.example.madproject.lib
 
 enum class Requests(val value: Int)
 {

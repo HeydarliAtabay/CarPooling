@@ -1,4 +1,4 @@
-package com.example.madproject
+package com.example.madproject.lib
 
 import android.content.Context
 import android.graphics.Bitmap

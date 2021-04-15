@@ -1,4 +1,4 @@
-package com.example.madproject
+package com.example.madproject.lib
 
 import android.text.Editable
 import android.text.TextWatcher

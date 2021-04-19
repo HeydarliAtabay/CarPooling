@@ -21,14 +21,6 @@ import java.io.InputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
-var t: Toast? = null
-
-fun setToast(message: String?, context: Context) {
-    t?.cancel()
-    t = Toast.makeText(context, message, Toast.LENGTH_LONG)
-    t?.show()
-}
-
 class EditProfileActivity : AppCompatActivity() {
     private lateinit var fullName:EditText
     private lateinit var nickName:EditText
@@ -147,7 +139,7 @@ class EditProfileActivity : AppCompatActivity() {
         // Handle item selection
         return when (item.itemId) {
             R.id.saveButton -> {
-                setToast("Profile information saved!", applicationContext)
+
                 setResult(Activity.RESULT_OK, Intent().also{
                     it.putExtra(ValueIds.FULL_NAME.value, fullName.text.toString())
                     it.putExtra(ValueIds.NICKNAME.value, nickName.text.toString())

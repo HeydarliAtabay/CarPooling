@@ -10,8 +10,6 @@ import android.os.Build
 import java.io.IOException
 import java.io.InputStream
 
-
-
 class FixOrientation {
     companion object {
         @Throws(IOException::class)

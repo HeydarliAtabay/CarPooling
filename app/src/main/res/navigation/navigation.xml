@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation"
+    app:startDestination="@id/showProfile">
+
+    <fragment
+        android:id="@+id/showProfile"
+        android:name="com.example.madproject.ShowProfileFragment"
+        android:label="fragment_login"
+        tools:layout="@layout/fragment_edit_profile" >
+        <action
+            android:id="@+id/action_showProfile_to_editProfile"
+            app:destination="@id/editProfile" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/editProfile"
+        android:name="com.example.madproject.EditProfileFragment"
+        android:label="fragment_blank"
+        tools:layout="@layout/fragment_edit_profile" >
+        <action
+            android:id="@+id/action_editProfile_to_showProfile"
+            app:destination="@id/showProfile" />
+        <argument
+            android:name="group11.lab1.FULL_NAME"
+            app:argType="string"
+            android:defaultValue="Heydarli Atabay" />
+        <argument
+            android:name="group11.lab1.NICKNAME"
+            app:argType="string"
+            android:defaultValue="Atash" />
+        <argument
+            android:name="group11.lab1.EMAIL"
+            app:argType="string"
+            android:defaultValue="heydarli.atabay@gmail.com" />
+        <argument
+            android:name="group11.lab1.LOCATION"
+            app:argType="string"
+            android:defaultValue="Turin, Italy" />
+        <argument
+            android:name="group11.lab1.PHONE_NUMBER"
+            app:argType="string"
+            android:defaultValue="3490838493" />
+        <argument
+            android:name="group11.lab1.DATE_OF_BIRTH"
+            app:argType="string"
+            android:defaultValue="23/08/1996" />
+        <argument
+            android:name="group11.lab1.CURRENT_PHOTO_PATH"
+            app:argType="string"
+            android:defaultValue="" />
+    </fragment>
+
+</navigation>

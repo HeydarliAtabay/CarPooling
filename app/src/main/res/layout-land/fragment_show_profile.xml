@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,19 +9,17 @@
 
     <RelativeLayout
         android:id="@+id/RelativeLayout2"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
         android:layout_marginStart="16dp"
         android:layout_marginLeft="16dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
         android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/scrollView3"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/scrollView3"
+        app:layout_constraintHorizontal_weight="1"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_weight="1">
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/imageView3"
@@ -35,8 +34,8 @@
 
     <ScrollView
         android:id="@+id/scrollView3"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
         android:layout_marginStart="16dp"
         android:layout_marginLeft="16dp"
         android:layout_marginEnd="16dp"
@@ -46,9 +45,9 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/RelativeLayout2"
-        app:layout_constraintVertical_weight="2">
+        app:layout_constraintStart_toEndOf="@+id/RelativeLayout2"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintHorizontal_weight="2">
 
         <LinearLayout
             android:id="@+id/linearLayout"
@@ -72,7 +71,7 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="20dp"
-                android:ems="15"
+                android:ems="16"
                 android:text="Heydarli Atabay"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -93,7 +92,7 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="20dp"
-                android:ems="15"
+                android:ems="16"
                 android:text="Atash"
                 android:textSize="16sp" />
 
@@ -113,7 +112,7 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="20dp"
-                android:ems="15"
+                android:ems="16"
                 android:text="23/08/1996"
                 android:textSize="16sp" />
 
@@ -133,7 +132,7 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="20dp"
-                android:ems="15"
+                android:ems="16"
                 android:text="heydarli.atabay@gmail.com"
                 android:textSize="16sp" />
 
@@ -153,7 +152,7 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="20dp"
-                android:ems="15"
+                android:ems="16"
                 android:text="3490838493"
                 android:textSize="16sp" />
 
@@ -173,7 +172,7 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="20dp"
-                android:ems="15"
+                android:ems="16"
                 android:text="Turin, Italy"
                 android:textSize="16sp" />
         </LinearLayout>

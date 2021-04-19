@@ -1,18 +1,24 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Theme.MADProject" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
-        <!-- Primary brand color. -->
-        <item name="colorPrimary">#1A62F3</item>
-        <item name="colorPrimaryVariant">#0C6DB8</item>
-        <item name="colorOnPrimary">@color/black</item>
-        <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/teal_200</item>
-        <item name="colorOnSecondary">@color/black</item>
-        <item name="colorOnSurface">@color/black</item>
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorOnPrimary</item>
+        <!-- Primary colors -->
+        <item name="colorPrimary">#90CAF9</item>
+        <item name="colorOnPrimary">#000000</item>
+        <item name="colorPrimaryVariant">#C3FDFF</item>
+        <item name="colorPrimaryDark">#000000</item>
+
+        <!-- Secondary colors -->
+        <item name="colorSecondary">#03DAC6</item>
+        <item name="colorOnSecondary">#000000</item>
+        <item name="colorSecondaryVariant">#03DAC6</item>
+
+        <item name="colorOnSurface">#000000</item>
+
+        <item name="colorError">#CF6679</item>
+        <item name="colorOnError">#000000</item>
+
         <!-- Customize your theme here. -->
-        <item name="android:scrollbarThumbVertical">?attr/colorOnPrimary</item>
+        <item name="android:windowBackground">#FFFFFF</item>
+        <item name="android:scrollbarThumbVertical">?attr/colorPrimaryDark</item>
     </style>
 </resources>

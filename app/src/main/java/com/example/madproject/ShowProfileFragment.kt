@@ -1,59 +1,119 @@
 package com.example.madproject
 
+import android.content.Context
+import android.content.SharedPreferences
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.core.content.FileProvider
+import androidx.core.content.edit
+import androidx.navigation.fragment.findNavController
+import com.example.madproject.lib.FixOrientation
+import com.example.madproject.lib.ValueIds
+import org.json.JSONObject
+import java.io.File
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
+class ShowProfileFragment : Fragment(R.layout.fragment_show_profile) {
 
-/**
- * A simple [Fragment] subclass.
- * Use the [ShowProfileFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
-class ShowProfileFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private lateinit var fullName : TextView
+    private lateinit var nickName : TextView
+    private lateinit var dateOfBirth : TextView
+    private lateinit var email : TextView
+    private lateinit var phoneNumber : TextView
+    private lateinit var location : TextView
+    private lateinit var image : ImageView
+    private var currentPhotoPath: String? = ""
+    private lateinit var photoURI: Uri
+    private lateinit var sharedPref: SharedPreferences
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        this.requireActivity().title = "Your profile"
+
+        fullName = view.findViewById(R.id.fullName)
+        nickName = view.findViewById(R.id.nickName)
+        dateOfBirth = view.findViewById(R.id.dateOfBirth)
+        email = view.findViewById(R.id.email)
+        phoneNumber = view.findViewById(R.id.phoneNumber)
+        location = view.findViewById(R.id.location)
+        image = view.findViewById(R.id.imageView3)
+        sharedPref = this.requireActivity().getPreferences(Context.MODE_PRIVATE)
+
+        // If the sharedPref does not exist (first run) it is created with the default values
+        if (!sharedPref.contains(ValueIds.JSON_OBJECT.value)!!) saveValues()
+        loadValues()
+
+        setHasOptionsMenu(true)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.edit_menu, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.editButton -> {
+                val action = ShowProfileFragmentDirections.actionShowProfileToEditProfile(
+                    group11Lab1FULLNAME = fullName.text.toString(),
+                    group11Lab1NICKNAME = nickName.text.toString(),
+                    group11Lab1EMAIL = email.text.toString(),
+                    group11Lab1DATEOFBIRTH = dateOfBirth.text.toString(),
+                    group11Lab1LOCATION = location.text.toString(),
+                    group11Lab1PHONENUMBER = phoneNumber.text.toString(),
+                    group11Lab1CURRENTPHOTOPATH = currentPhotoPath!!
+                )
+                findNavController().navigate(action)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_show_profile, container, false)
+    private fun saveValues() {
+        val dataObj = JSONObject()
+
+        dataObj.put(ValueIds.FULL_NAME.value, fullName.text.toString())
+        dataObj.put(ValueIds.NICKNAME.value, nickName.text.toString())
+        dataObj.put(ValueIds.DATE_OF_BIRTH.value, dateOfBirth.text.toString())
+        dataObj.put(ValueIds.EMAIL.value, email.text.toString())
+        dataObj.put(ValueIds.PHONE_NUMBER.value, phoneNumber.text.toString())
+        dataObj.put(ValueIds.LOCATION.value, location.text.toString())
+        dataObj.put(ValueIds.CURRENT_PHOTO_PATH.value, currentPhotoPath)
+
+        sharedPref.edit {
+            putString(ValueIds.JSON_OBJECT.value, dataObj.toString())
+            apply()
+        }
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment ShowProfileFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            ShowProfileFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+    private fun loadValues() {
+        val pref = sharedPref.getString(ValueIds.JSON_OBJECT.value, null)
+
+        if (pref != null) {
+            val dataObj = JSONObject(pref)
+            fullName.text = dataObj.getString(ValueIds.FULL_NAME.value)
+            nickName.text = dataObj.getString(ValueIds.NICKNAME.value)
+            dateOfBirth.text = dataObj.getString(ValueIds.DATE_OF_BIRTH.value)
+            email.text = dataObj.getString(ValueIds.EMAIL.value)
+            phoneNumber.text = dataObj.getString(ValueIds.PHONE_NUMBER.value)
+            location.text = dataObj.getString(ValueIds.LOCATION.value)
+            currentPhotoPath = dataObj.getString(ValueIds.CURRENT_PHOTO_PATH.value)
+
+            setPic()
+        }
     }
+
+    private fun setPic() {
+        if (currentPhotoPath != "") {
+            val imgFile = File(currentPhotoPath!!)
+            photoURI = FileProvider.getUriForFile(this.requireActivity().applicationContext, "com.example.android.fileprovider", imgFile)
+            val pic = FixOrientation.handleSamplingAndRotationBitmap(this.requireActivity().applicationContext, photoURI)
+            image.setImageBitmap(pic)
+        } else image.setImageResource(R.drawable.atabay)
+    }
+
 }

@@ -115,7 +115,6 @@ class ShowProfileActivity : AppCompatActivity() {
             phoneNumber.text = dataObj.getString(ValueIds.PHONE_NUMBER.value)
             location.text = dataObj.getString(ValueIds.LOCATION.value)
             currentPhotoPath = dataObj.getString(ValueIds.CURRENT_PHOTO_PATH.value)
-
             setPic()
         }
     }

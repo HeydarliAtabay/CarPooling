@@ -9,12 +9,12 @@ import android.view.*
 import androidx.fragment.app.Fragment
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.appcompat.widget.Toolbar
 import androidx.core.content.FileProvider
 import androidx.core.content.edit
 import androidx.navigation.fragment.findNavController
 import com.example.madproject.lib.FixOrientation
 import com.example.madproject.lib.ValueIds
+import com.google.android.material.navigation.NavigationView
 import org.json.JSONObject
 import java.io.File
 
@@ -45,8 +45,14 @@ class ShowProfileFragment : Fragment(R.layout.fragment_show_profile) {
         // If the sharedPref does not exist (first run) it is created with the default values
         if (!sharedPref.contains(ValueIds.JSON_OBJECT.value)) saveValues()
         loadValues()
+        //aggiorna il navigation header
+        setNavigationHeader()
 
         setHasOptionsMenu(true)
+    }
+
+    fun getCurrentPhoto():String?{
+        return currentPhotoPath
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -116,4 +122,18 @@ class ShowProfileFragment : Fragment(R.layout.fragment_show_profile) {
         } else image.setImageResource(R.drawable.atabay)
     }
 
+    private fun setNavigationHeader(){
+        val navView = this.requireActivity().findViewById<NavigationView>(R.id.nav_view)
+        val header: View = navView.getHeaderView(0)
+        val profilePicture: ImageView = header.findViewById(R.id.imageViewHeader)
+
+        if (currentPhotoPath != "") {
+            val imgFile = File(currentPhotoPath!!)
+            photoURI = FileProvider.getUriForFile(this.requireActivity().applicationContext, "com.example.android.fileprovider", imgFile)
+            val pic = FixOrientation.handleSamplingAndRotationBitmap(this.requireActivity().applicationContext, photoURI)
+            profilePicture.setImageBitmap(pic)
+        } else profilePicture.setImageResource(R.drawable.atabay)
+
+
+    }
 }

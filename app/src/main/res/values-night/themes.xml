@@ -21,4 +21,14 @@
         <item name="android:windowBackground">#FFFFFF</item>
         <item name="android:scrollbarThumbVertical">?attr/colorPrimaryDark</item>
     </style>
+
+    <style name="Theme.MADProject.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="MyAppBar">
+        <item name="android:background">#4A000000</item>
+    </style>
+
 </resources>

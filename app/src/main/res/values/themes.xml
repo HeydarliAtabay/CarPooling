@@ -15,8 +15,21 @@
         <item name="colorError">#B00020</item>
         <item name="colorOnError">#FFFFFF</item>
 
+        <!-- Customize AppBar color -->
+
+
         <!-- Customize your theme here. -->
         <item name="android:scrollbarThumbVertical">@color/gray</item>
 
     </style>
+
+    <style name="Theme.MADProject.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="MyAppBar">
+        <item name="android:background">?attr/colorPrimary</item>
+    </style>
+
 </resources>

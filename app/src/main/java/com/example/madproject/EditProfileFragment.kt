@@ -58,7 +58,6 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        this.requireActivity().title = "Edit your profile..."
 
         fullName = view.findViewById(R.id.fullName)
         nickName = view.findViewById(R.id.nickName)

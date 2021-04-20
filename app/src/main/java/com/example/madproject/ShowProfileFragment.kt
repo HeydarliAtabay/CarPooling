@@ -31,8 +31,6 @@ class ShowProfileFragment : Fragment(R.layout.fragment_show_profile) {
     private lateinit var sharedPref: SharedPreferences
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        this.requireActivity().title = "Your profile"
-
         fullName = view.findViewById(R.id.fullName)
         nickName = view.findViewById(R.id.nickName)
         dateOfBirth = view.findViewById(R.id.dateOfBirth)

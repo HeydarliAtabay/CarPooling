@@ -6,7 +6,7 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/showProfile"
-            android:title="My Profile" />
+            android:title="Profile info" />
         <item
             android:id="@+id/tripList"
             android:title="Trip List" />

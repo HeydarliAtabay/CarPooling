@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/showProfile"
         android:name="com.example.madproject.ShowProfileFragment"
-        android:label="show_profile"
+        android:label="Your profile"
         tools:layout="@layout/fragment_show_profile" >
         <action
             android:id="@+id/action_showProfile_to_editProfile"
@@ -18,7 +18,7 @@
     <fragment
         android:id="@+id/editProfile"
         android:name="com.example.madproject.EditProfileFragment"
-        android:label="edit_profile"
+        android:label="Edit your profile..."
         tools:layout="@layout/fragment_edit_profile" >
         <action
             android:id="@+id/action_editProfile_to_showProfile"
@@ -56,7 +56,7 @@
     <fragment
         android:id="@+id/tripList"
         android:name="com.example.madproject.TripListFragment"
-        android:label="trip_list"
+        android:label="Trip list"
         tools:layout="@layout/fragment_trip_list" >
 
         <action
@@ -70,7 +70,7 @@
     <fragment
         android:id="@+id/tripDetail"
         android:name="com.example.madproject.TripDetailFragment"
-        android:label="trip_detail"
+        android:label="Trip details"
         tools:layout="@layout/fragment_trip_detail" >
 
         <action
@@ -81,7 +81,7 @@
     <fragment
         android:id="@+id/tripEdit"
         android:name="com.example.madproject.TripEditFragment"
-        android:label="trip_edit"
+        android:label="Edit your trip..."
         tools:layout="@layout/fragment_trip_edit" >
 
         <action

@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import androidx.appcompat.widget.Toolbar
 import androidx.navigation.fragment.findNavController
 
 class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {

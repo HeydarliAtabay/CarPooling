@@ -2,10 +2,9 @@ package com.example.madproject
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Button
+import androidx.appcompat.widget.Toolbar
 import androidx.navigation.fragment.findNavController
 
 class TripListFragment : Fragment(R.layout.fragment_trip_list) {

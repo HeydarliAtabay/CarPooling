@@ -9,6 +9,7 @@ import android.view.*
 import androidx.fragment.app.Fragment
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.FileProvider
 import androidx.core.content.edit
 import androidx.navigation.fragment.findNavController
@@ -31,6 +32,7 @@ class ShowProfileFragment : Fragment(R.layout.fragment_show_profile) {
     private lateinit var sharedPref: SharedPreferences
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
         fullName = view.findViewById(R.id.fullName)
         nickName = view.findViewById(R.id.nickName)
         dateOfBirth = view.findViewById(R.id.dateOfBirth)

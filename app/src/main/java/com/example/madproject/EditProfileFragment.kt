@@ -51,10 +51,15 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
 
     private val args: EditProfileFragmentArgs by navArgs()
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val resPath = savedInstanceState?.getString("currentPhotoPath")
+        currentPhotoPath = if (resPath === null) "" else resPath
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         this.requireActivity().title = "Edit your profile..."
 
-        Log.d("MY_LOG", "OnViewCreated -> cur = $currentPhotoPath")
         fullName = view.findViewById(R.id.fullName)
         nickName = view.findViewById(R.id.nickName)
         email = view.findViewById(R.id.email)
@@ -76,15 +81,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        Log.d("MY_LOG", "OnSaveInstanceState -> cur = $currentPhotoPath")
         outState.putString("currentPhotoPath", currentPhotoPath)
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        val resPath = savedInstanceState?.getString("currentPhotoPath")
-        currentPhotoPath = if (resPath === null) "" else resPath
-        Log.d("MY_LOG", "OnCreate -> cur = $currentPhotoPath")
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -129,7 +126,6 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        Log.d("MY_LOG", "OnActivityResult -> cur = $currentPhotoPath")
         if (resultCode == AppCompatActivity.RESULT_OK) {
             when (requestCode) {
                 Requests.INTENT_CAPTURE_PHOTO.value -> setPic()
@@ -197,24 +193,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         phoneNumber.setText(args.group11Lab1PHONENUMBER)
         location.setText(args.group11Lab1LOCATION)
         if (currentPhotoPath == "") currentPhotoPath = args.group11Lab1CURRENTPHOTOPATH
-        Log.d("MY_LOG", "setValues -> cur = $currentPhotoPath")
         setPic()
-    }
-
-    private fun loadValues() {
-        val pref = sharedPref.getString(ValueIds.JSON_OBJECT.value, null)
-
-        if (pref != null) {
-            val dataObj = JSONObject(pref)
-            fullName.setText(dataObj.getString(ValueIds.FULL_NAME.value))
-            nickName.setText(dataObj.getString(ValueIds.NICKNAME.value))
-            dateOfBirth.setText(dataObj.getString(ValueIds.DATE_OF_BIRTH.value))
-            email.setText(dataObj.getString(ValueIds.EMAIL.value))
-            phoneNumber.setText(dataObj.getString(ValueIds.PHONE_NUMBER.value))
-            location.setText(dataObj.getString(ValueIds.LOCATION.value))
-            currentPhotoPath = dataObj.getString(ValueIds.CURRENT_PHOTO_PATH.value)
-            setPic()
-        }
     }
 
     private fun saveValues() {

@@ -43,7 +43,7 @@ class ShowProfileFragment : Fragment(R.layout.fragment_show_profile) {
         sharedPref = this.requireActivity().getPreferences(Context.MODE_PRIVATE)
 
         // If the sharedPref does not exist (first run) it is created with the default values
-        if (!sharedPref.contains(ValueIds.JSON_OBJECT.value)!!) saveValues()
+        if (!sharedPref.contains(ValueIds.JSON_OBJECT.value)) saveValues()
         loadValues()
 
         setHasOptionsMenu(true)

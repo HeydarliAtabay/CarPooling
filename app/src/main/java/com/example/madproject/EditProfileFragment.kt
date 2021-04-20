@@ -8,14 +8,13 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
-import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
-import androidx.fragment.app.Fragment
+import androidx.appcompat.view.menu.MenuBuilder
 import androidx.core.content.FileProvider
 import androidx.core.content.edit
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.madproject.lib.DateInputMask
@@ -29,6 +28,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.text.SimpleDateFormat
 import java.util.*
+
 
 class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     var t: Toast? = null
@@ -220,9 +220,9 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
         val storageDir: File? = this.requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         return File.createTempFile(
-            "JPEG_${timeStamp}_", /* prefix */
-            ".jpg", /* suffix */
-            storageDir /* directory */
+                "JPEG_${timeStamp}_", /* prefix */
+                ".jpg", /* suffix */
+                storageDir /* directory */
         ).apply {
             // Save a file: path for use with ACTION_VIEW intents
             currentPhotoPath = absolutePath
@@ -250,14 +250,14 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                 // Continue only if the File was successfully created
                 photoFile?.also {
                     photoURI = FileProvider.getUriForFile(
-                        this.requireActivity(),
-                        "com.example.android.fileprovider",
-                        it
+                            this.requireActivity(),
+                            "com.example.android.fileprovider",
+                            it
                     )
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
                     startActivityForResult(
-                        takePictureIntent,
-                        Requests.INTENT_CAPTURE_PHOTO.value
+                            takePictureIntent,
+                            Requests.INTENT_CAPTURE_PHOTO.value
                     )
                 }
             }

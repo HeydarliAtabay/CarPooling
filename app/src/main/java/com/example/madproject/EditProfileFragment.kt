@@ -54,7 +54,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         this.requireActivity().title = "Edit your profile..."
 
-        Log.d("MY_LOG", "OnViewCreated")
+        Log.d("MY_LOG", "OnViewCreated -> cur = $currentPhotoPath")
         fullName = view.findViewById(R.id.fullName)
         nickName = view.findViewById(R.id.nickName)
         email = view.findViewById(R.id.email)
@@ -64,44 +64,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         dateOfBirth = view.findViewById(R.id.dateOfBirth)
         sharedPref = this.requireActivity().getPreferences(Context.MODE_PRIVATE)
 
-        fullName.setOnFocusChangeListener { _, hasFocus ->
-            if (!hasFocus) {  // lost focus
-                fullName.setSelection(0, 0)
-                fullName.hint = ""
-            }  else {
-                fullName.hint = "Enter your full name"
-            }
-        }
-
-        nickName.setOnFocusChangeListener { _, hasFocus ->
-            if (!hasFocus) {  // lost focus
-                nickName.setSelection(0, 0)
-                nickName.hint = ""
-            } else nickName.hint = "Enter your nickname"
-        }
-
-        email.setOnFocusChangeListener { _, hasFocus ->
-            if (!hasFocus) {  // lost focus
-                email.setSelection(0, 0)
-                email.hint = ""
-            } else email.hint = "email@email.com"
-        }
-
-        location.setOnFocusChangeListener { _, hasFocus ->
-            if (!hasFocus) {  // lost focus
-                location.setSelection(0, 0)
-                location.hint = ""
-            } else location.hint = "Enter your location"
-        }
-
-        DateInputMask(dateOfBirth).listen()
-
-        phoneNumber.setOnFocusChangeListener { _, hasFocus ->
-            if (!hasFocus) {  // lost focus
-                phoneNumber.setSelection(0, 0)
-                phoneNumber.hint = ""
-            } else phoneNumber.hint = "Enter your phone number"
-        }
+        fixEditText()
 
         setHasOptionsMenu(true)
 
@@ -113,14 +76,15 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        Log.d("MY_LOG", "OnSaveInstanceState")
-        saveValues()
+        Log.d("MY_LOG", "OnSaveInstanceState -> cur = $currentPhotoPath")
+        outState.putString("currentPhotoPath", currentPhotoPath)
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        Log.d("MY_LOG", "OnActivityCreated")
-        loadValues()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val resPath = savedInstanceState?.getString("currentPhotoPath")
+        currentPhotoPath = if (resPath === null) "" else resPath
+        Log.d("MY_LOG", "OnCreate -> cur = $currentPhotoPath")
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -165,6 +129,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        Log.d("MY_LOG", "OnActivityResult -> cur = $currentPhotoPath")
         if (resultCode == AppCompatActivity.RESULT_OK) {
             when (requestCode) {
                 Requests.INTENT_CAPTURE_PHOTO.value -> setPic()
@@ -183,6 +148,47 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         }
     }
 
+    private fun fixEditText() {
+        fullName.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) {  // lost focus
+                fullName.setSelection(0, 0)
+                fullName.hint = ""
+            }  else {
+                fullName.hint = "Enter your full name"
+            }
+        }
+
+        nickName.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) {  // lost focus
+                nickName.setSelection(0, 0)
+                nickName.hint = ""
+            } else nickName.hint = "Enter your nickname"
+        }
+
+        email.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) {  // lost focus
+                email.setSelection(0, 0)
+                email.hint = ""
+            } else email.hint = "email@email.com"
+        }
+
+        location.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) {  // lost focus
+                location.setSelection(0, 0)
+                location.hint = ""
+            } else location.hint = "Enter your location"
+        }
+
+        DateInputMask(dateOfBirth).listen()
+
+        phoneNumber.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) {  // lost focus
+                phoneNumber.setSelection(0, 0)
+                phoneNumber.hint = ""
+            } else phoneNumber.hint = "Enter your phone number"
+        }
+    }
+
     private fun setValues() {
         fullName.setText(args.group11Lab1FULLNAME)
         nickName.setText(args.group11Lab1NICKNAME)
@@ -190,7 +196,9 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         dateOfBirth.setText(args.group11Lab1DATEOFBIRTH)
         phoneNumber.setText(args.group11Lab1PHONENUMBER)
         location.setText(args.group11Lab1LOCATION)
-        currentPhotoPath = args.group11Lab1CURRENTPHOTOPATH
+        if (currentPhotoPath == "") currentPhotoPath = args.group11Lab1CURRENTPHOTOPATH
+        Log.d("MY_LOG", "setValues -> cur = $currentPhotoPath")
+        setPic()
     }
 
     private fun loadValues() {
@@ -205,7 +213,6 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             phoneNumber.setText(dataObj.getString(ValueIds.PHONE_NUMBER.value))
             location.setText(dataObj.getString(ValueIds.LOCATION.value))
             currentPhotoPath = dataObj.getString(ValueIds.CURRENT_PHOTO_PATH.value)
-
             setPic()
         }
     }

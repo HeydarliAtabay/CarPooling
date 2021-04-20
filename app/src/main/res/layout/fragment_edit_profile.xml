@@ -39,9 +39,9 @@
             android:adjustViewBounds="true"
             android:layout_centerInParent="true"
             android:onClick="openContextMenu"
-            android:src="@drawable/outline_add_a_photo_black_36"
+            android:src="@drawable/outline_add_a_photo_36"
             tools:ignore="OnClick"
-            tools:srcCompat="@drawable/outline_add_a_photo_black_36" />
+            tools:srcCompat="@drawable/outline_add_a_photo_36" />
 
     </RelativeLayout>
 

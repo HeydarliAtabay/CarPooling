@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -22,7 +21,6 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.core.content.edit
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -65,6 +63,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     private var currentPhotoPath: String? = ""
     private lateinit var photoURI: Uri
     private lateinit var sharedPref: SharedPreferences
+    private var picker: MaterialDatePicker<Long>? = null
 
     private val args: EditProfileFragmentArgs by navArgs()
 
@@ -93,6 +92,11 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         registerForContextMenu(editPhoto)
 
         setValues()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (picker?.isVisible == true) picker?.dismiss()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -225,9 +229,11 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             }
         }
 
+        /*
         dateOfBirth.setOnClickListener {
             setDatePicker()
         }
+         */
 
         phoneNumber.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {  // lost focus
@@ -255,27 +261,27 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             val p = currentDate.parse(dateOfBirth.text.toString())
             datePicker = datePicker.setSelection(p?.time)
         }
-        val picker = datePicker.build()
+        picker = datePicker.build()
 
-        picker.addOnCancelListener {
-            dateOfBirth.clearFocus()
-
-        }
-        picker.addOnNegativeButtonClickListener {
+        picker?.addOnCancelListener {
             dateOfBirth.clearFocus()
         }
 
-        picker.addOnDismissListener {
+        picker?.addOnNegativeButtonClickListener {
             dateOfBirth.clearFocus()
         }
 
-        picker.addOnPositiveButtonClickListener {
+        picker?.addOnDismissListener {
+            dateOfBirth.clearFocus()
+        }
+
+        picker?.addOnPositiveButtonClickListener {
             val selectedDate = DateFormat.getDateInstance(DateFormat.SHORT).format(Date(it))
             dateOfBirth.setText(selectedDate)
-            dateOfBirth.clearFocus()
+            email.requestFocus()
         }
-        dateOfBirth.invalidate()
-        picker.show(this.requireActivity().supportFragmentManager, "mmm")
+
+        picker?.show(this.requireActivity().supportFragmentManager, picker.toString())
     }
 
     private fun setValues() {

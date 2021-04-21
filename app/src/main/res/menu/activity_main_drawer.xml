@@ -5,14 +5,14 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/showProfile"
-            android:icon="@drawable/outline_account_circle_black_24"
-            android:title="Profile info" />
-
-        <item
             android:id="@+id/tripList"
             android:icon="@drawable/ic_map_black_24dp"
             android:title="Trip List" />
+
+        <item
+            android:id="@+id/showProfile"
+            android:icon="@drawable/outline_account_circle_black_24"
+            android:title="Profile info" />
     </group>
 
 </menu>

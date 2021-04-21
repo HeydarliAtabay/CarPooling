@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.view.*
+import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
@@ -151,6 +152,8 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                 fullName.hint = ""
             }  else {
                 fullName.hint = "Enter your full name"
+                val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.showSoftInput(fullName, InputMethodManager.SHOW_IMPLICIT)
             }
         }
 
@@ -158,30 +161,46 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             if (!hasFocus) {  // lost focus
                 nickName.setSelection(0, 0)
                 nickName.hint = ""
-            } else nickName.hint = "Enter your nickname"
+            } else {
+                nickName.hint = "Enter your nickname"
+                val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.showSoftInput(nickName, InputMethodManager.SHOW_IMPLICIT)
+            }
         }
 
         email.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {  // lost focus
                 email.setSelection(0, 0)
                 email.hint = ""
-            } else email.hint = "email@email.com"
+            } else {
+                email.hint = "email@email.com"
+                val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.showSoftInput(email, InputMethodManager.SHOW_IMPLICIT)
+            }
         }
 
         location.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {  // lost focus
                 location.setSelection(0, 0)
                 location.hint = ""
-            } else location.hint = "Enter your location"
+            } else {
+                location.hint = "Enter your location"
+                val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.showSoftInput(location, InputMethodManager.SHOW_IMPLICIT)
+            }
         }
 
-        DateInputMask(dateOfBirth).listen()
+        DateInputMask(dateOfBirth).listen(context)
 
         phoneNumber.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {  // lost focus
                 phoneNumber.setSelection(0, 0)
                 phoneNumber.hint = ""
-            } else phoneNumber.hint = "Enter your phone number"
+            } else {
+                phoneNumber.hint = "Enter your phone number"
+                val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.showSoftInput(phoneNumber, InputMethodManager.SHOW_IMPLICIT)
+            }
         }
     }
 

@@ -6,6 +6,7 @@
         <item name="colorOnPrimary">#000000</item>
         <item name="colorPrimaryVariant">#6EC6FF</item>
         <item name="colorPrimaryDark">#0069C0</item>
+        <item name="android:textColorPrimary">#B0000000</item>
 
         <!-- Secondary colors -->
         <item name="colorSecondary">#03DAC6</item>
@@ -14,9 +15,6 @@
 
         <item name="colorError">#B00020</item>
         <item name="colorOnError">#FFFFFF</item>
-
-        <!-- Customize AppBar color -->
-
 
         <!-- Customize your theme here. -->
         <item name="android:scrollbarThumbVertical">@color/gray</item>
@@ -30,6 +28,7 @@
 
     <style name="MyAppBar">
         <item name="android:background">?attr/colorPrimary</item>
+        <item name="android:textColorPrimary">?attr/colorOnPrimary</item>
     </style>
 
 </resources>

@@ -1,16 +1,20 @@
 package com.example.madproject.lib
 
+import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 
 class DateInputMask(val input : EditText) {
 
-    fun listen() {
+    fun listen(context: Context?) {
         input.addTextChangedListener(mDateEntryWatcher)
         input.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) input.hint = "dd/mm/yyyy"
             else input.hint = ""
+            val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT)
         }
     }
 

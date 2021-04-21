@@ -39,7 +39,6 @@
             android:layout_centerInParent="true"
             android:onClick="openContextMenu"
             android:src="@drawable/outline_add_a_photo_36"
-            android:tint="?attr/colorOnSurface"
             tools:ignore="OnClick"
             tools:srcCompat="@drawable/outline_add_a_photo_36" />
     </RelativeLayout>

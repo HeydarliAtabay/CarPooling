@@ -5,29 +5,42 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.text.InputType
+import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
-import android.widget.*
+import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.view.menu.MenuBuilder
 import androidx.core.content.FileProvider
 import androidx.core.content.edit
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.example.madproject.lib.DateInputMask
 import com.example.madproject.lib.FixOrientation
 import com.example.madproject.lib.Requests
 import com.example.madproject.lib.ValueIds
+import com.google.android.material.datepicker.CalendarConstraints
+import com.google.android.material.datepicker.DateValidatorPointBackward
+import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.textfield.TextInputLayout
 import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
+import java.text.DateFormat
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.temporal.TemporalField
 import java.util.*
 
 
@@ -102,7 +115,11 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         }
     }
 
-    override fun onCreateContextMenu(menu: ContextMenu, v: View, menuInfo: ContextMenu.ContextMenuInfo?) {
+    override fun onCreateContextMenu(
+        menu: ContextMenu,
+        v: View,
+        menuInfo: ContextMenu.ContextMenuInfo?
+    ) {
         super.onCreateContextMenu(menu, v, menuInfo)
         when (v.id) {
             R.id.imageButton -> {
@@ -132,13 +149,21 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                 Requests.INTENT_CAPTURE_PHOTO.value -> setPic()
 
                 Requests.INTENT_PHOTO_FROM_GALLERY.value -> {
-                    val inputStream: InputStream? = data?.data?.let { this.requireActivity().contentResolver.openInputStream(it) }
+                    val inputStream: InputStream? = data?.data?.let {
+                        this.requireActivity().contentResolver.openInputStream(
+                            it
+                        )
+                    }
                     val outputFile = createImageFile()
                     val fileOutputStream = FileOutputStream(outputFile)
                     inputStream?.copyTo(fileOutputStream)
                     fileOutputStream.close()
                     inputStream?.close()
-                    photoURI = FileProvider.getUriForFile(this.requireActivity(), "com.example.android.fileprovider", outputFile)
+                    photoURI = FileProvider.getUriForFile(
+                        this.requireActivity(),
+                        "com.example.android.fileprovider",
+                        outputFile
+                    )
                     setPic()
                 }
             }
@@ -190,7 +215,17 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             }
         }
 
-        DateInputMask(dateOfBirth).listen(context)
+        dateOfBirth.inputType = InputType.TYPE_NULL
+
+        dateOfBirth.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                setDatePicker()
+            }
+        }
+
+        dateOfBirth.setOnClickListener {
+            setDatePicker()
+        }
 
         phoneNumber.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {  // lost focus
@@ -202,6 +237,38 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                 imm.showSoftInput(phoneNumber, InputMethodManager.SHOW_IMPLICIT)
             }
         }
+    }
+
+    private fun setDatePicker() {
+        val constraintsBuilder = CalendarConstraints.Builder().setValidator(
+            DateValidatorPointBackward.now()
+        )
+        var datePicker = MaterialDatePicker.Builder.datePicker().setCalendarConstraints(
+            constraintsBuilder.build()
+        )
+
+        if (dateOfBirth.text.toString() != "") {
+            val currentDate = SimpleDateFormat("dd/MM/yyyy", Locale.ROOT)
+            currentDate.timeZone = TimeZone.getTimeZone("UTC")
+            val p = currentDate.parse(dateOfBirth.text.toString())
+            datePicker = datePicker.setSelection(p?.time)
+        }
+        val picker = datePicker.build()
+
+        picker.addOnCancelListener {
+
+        }
+
+        picker.addOnDismissListener {
+
+        }
+
+        picker.addOnPositiveButtonClickListener {
+            val selectedDate = DateFormat.getDateInstance(DateFormat.SHORT).format(Date(it))
+            dateOfBirth.setText(selectedDate)
+        }
+
+        picker.show(this.requireActivity().supportFragmentManager, "mmm")
     }
 
     private fun setValues() {
@@ -239,9 +306,9 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
         val storageDir: File? = this.requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         return File.createTempFile(
-                "JPEG_${timeStamp}_", /* prefix */
-                ".jpg", /* suffix */
-                storageDir /* directory */
+            "JPEG_${timeStamp}_", /* prefix */
+            ".jpg", /* suffix */
+            storageDir /* directory */
         ).apply {
             // Save a file: path for use with ACTION_VIEW intents
             currentPhotoPath = absolutePath
@@ -269,14 +336,14 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                 // Continue only if the File was successfully created
                 photoFile?.also {
                     photoURI = FileProvider.getUriForFile(
-                            this.requireActivity(),
-                            "com.example.android.fileprovider",
-                            it
+                        this.requireActivity(),
+                        "com.example.android.fileprovider",
+                        it
                     )
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
                     startActivityForResult(
-                            takePictureIntent,
-                            Requests.INTENT_CAPTURE_PHOTO.value
+                        takePictureIntent,
+                        Requests.INTENT_CAPTURE_PHOTO.value
                     )
                 }
             }
@@ -286,8 +353,15 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     private fun setPic() {
         if (currentPhotoPath != "") {
             val imgFile = File(currentPhotoPath!!)
-            photoURI = FileProvider.getUriForFile(this.requireActivity().applicationContext, "com.example.android.fileprovider", imgFile)
-            val pic = FixOrientation.handleSamplingAndRotationBitmap(this.requireActivity().applicationContext, photoURI)
+            photoURI = FileProvider.getUriForFile(
+                this.requireActivity().applicationContext,
+                "com.example.android.fileprovider",
+                imgFile
+            )
+            val pic = FixOrientation.handleSamplingAndRotationBitmap(
+                this.requireActivity().applicationContext,
+                photoURI
+            )
             image.setImageBitmap(pic)
         } else image.setImageResource(R.drawable.avatar)
     }

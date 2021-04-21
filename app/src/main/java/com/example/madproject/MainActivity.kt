@@ -20,8 +20,9 @@ import com.example.madproject.lib.FixOrientation
 import com.example.madproject.lib.ValueIds
 import com.google.android.material.navigation.NavigationView
 import org.json.JSONObject
-import org.w3c.dom.Text
 import java.io.File
+import java.lang.RuntimeException
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -43,13 +44,14 @@ class MainActivity : AppCompatActivity() {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(setOf(
-            R.id.showProfile, R.id.tripList), drawerLayout)
+                R.id.showProfile, R.id.tripList), drawerLayout)
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
         sharedPref = getPreferences(Context.MODE_PRIVATE)
 
         if (!sharedPref.contains(ValueIds.JSON_OBJECT.value)) setDefaultNavigationHeader() else loadNavigationHeader()
+
 
     }
 
@@ -89,4 +91,5 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.fragment)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
+
 }

@@ -13,21 +13,6 @@
     android:paddingBottom="16dp"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
-    <!--
-    <ImageView
-        android:id="@+id/imageViewHeader"
-        android:layout_width="120dp"
-        android:layout_height="99dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="64dp"
-        android:adjustViewBounds="true"
-        android:paddingTop="8dp"
-        android:scaleType="centerCrop"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@mipmap/ic_launcher_round" />
--->
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/imageViewHeader"
         android:layout_width="96dp"
@@ -35,9 +20,8 @@
         android:layout_marginStart="16dp"
         android:layout_marginLeft="16dp"
         android:layout_marginTop="57dp"
-        android:src="@drawable/atabay"
         app:civ_border_color="#FF000000"
-        app:civ_border_width="2dp"
+        app:civ_border_width="1dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -46,12 +30,11 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginLeft="16dp"
-        android:ellipsize="end"
         android:ems="15"
         android:paddingTop="8dp"
         android:text="Alberto Solavagionehhhhhiuehfe"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textSize="23dp"
+        android:textSize="20dp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

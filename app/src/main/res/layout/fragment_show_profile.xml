@@ -73,7 +73,7 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="20dp"
                 android:ems="15"
-                android:text="Heydarli Atabay"
+                android:text="Guest"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 

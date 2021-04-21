@@ -84,6 +84,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
                     android:textSize="16sp"
+                    android:maxLength="30"
                     android:ems="18"
                     android:inputType="textPersonName"  />
 

@@ -270,6 +270,6 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             photoURI = FileProvider.getUriForFile(this.requireActivity().applicationContext, "com.example.android.fileprovider", imgFile)
             val pic = FixOrientation.handleSamplingAndRotationBitmap(this.requireActivity().applicationContext, photoURI)
             image.setImageBitmap(pic)
-        } else image.setImageResource(R.drawable.atabay)
+        } else image.setImageResource(R.drawable.avatar)
     }
 }

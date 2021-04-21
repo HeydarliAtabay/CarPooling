@@ -119,7 +119,7 @@ class ShowProfileFragment : Fragment(R.layout.fragment_show_profile) {
             photoURI = FileProvider.getUriForFile(this.requireActivity().applicationContext, "com.example.android.fileprovider", imgFile)
             val pic = FixOrientation.handleSamplingAndRotationBitmap(this.requireActivity().applicationContext, photoURI)
             image.setImageBitmap(pic)
-        } else image.setImageResource(R.drawable.atabay)
+        } else image.setImageResource(R.drawable.avatar)
     }
 
     private fun setNavigationHeader(){
@@ -132,7 +132,7 @@ class ShowProfileFragment : Fragment(R.layout.fragment_show_profile) {
             photoURI = FileProvider.getUriForFile(this.requireActivity().applicationContext, "com.example.android.fileprovider", imgFile)
             val pic = FixOrientation.handleSamplingAndRotationBitmap(this.requireActivity().applicationContext, photoURI)
             profilePicture.setImageBitmap(pic)
-        } else profilePicture.setImageResource(R.drawable.atabay)
+        } else profilePicture.setImageResource(R.drawable.avatar)
 
 
     }

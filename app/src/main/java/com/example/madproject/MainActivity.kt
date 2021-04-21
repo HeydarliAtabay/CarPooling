@@ -65,17 +65,17 @@ class MainActivity : AppCompatActivity() {
 
     private fun setPic(currentPhotoPath: String, profilePicture: ImageView) {
         if (currentPhotoPath != "") {
-            val imgFile = File(currentPhotoPath!!)
+            val imgFile = File(currentPhotoPath)
             val photoURI: Uri = FileProvider.getUriForFile(this.applicationContext, "com.example.android.fileprovider", imgFile)
             val pic = FixOrientation.handleSamplingAndRotationBitmap(this.applicationContext, photoURI)
             profilePicture.setImageBitmap(pic)
-        } else profilePicture.setImageResource(R.drawable.atabay)
+        } else profilePicture.setImageResource(R.drawable.avatar)
     }
 
     private fun setDefaultNavigationHeader() {
         val header : View = navView.getHeaderView(0)
         val profilePicture:ImageView  = header.findViewById<ImageView>(R.id.imageViewHeader)
-        profilePicture.setImageResource(R.drawable.atabay)
+        profilePicture.setImageResource(R.drawable.avatar)
     }
 
     override fun onSupportNavigateUp(): Boolean {

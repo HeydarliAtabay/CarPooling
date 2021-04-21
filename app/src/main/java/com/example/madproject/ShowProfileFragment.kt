@@ -125,14 +125,17 @@ class ShowProfileFragment : Fragment(R.layout.fragment_show_profile) {
     private fun setNavigationHeader(){
         val navView = this.requireActivity().findViewById<NavigationView>(R.id.nav_view)
         val header: View = navView.getHeaderView(0)
-        val profilePicture: ImageView = header.findViewById(R.id.imageViewHeader)
+        val profilePictureHeader: ImageView = header.findViewById(R.id.imageViewHeader)
+        val profileNameHeader: TextView = header.findViewById(R.id.nameHeader)
+
+        profileNameHeader.text = fullName.text
 
         if (currentPhotoPath != "") {
             val imgFile = File(currentPhotoPath!!)
             photoURI = FileProvider.getUriForFile(this.requireActivity().applicationContext, "com.example.android.fileprovider", imgFile)
             val pic = FixOrientation.handleSamplingAndRotationBitmap(this.requireActivity().applicationContext, photoURI)
-            profilePicture.setImageBitmap(pic)
-        } else profilePicture.setImageResource(R.drawable.avatar)
+            profilePictureHeader.setImageBitmap(pic)
+        } else profilePictureHeader.setImageResource(R.drawable.avatar)
 
 
     }

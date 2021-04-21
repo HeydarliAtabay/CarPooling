@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.FileProvider
@@ -19,6 +20,7 @@ import com.example.madproject.lib.FixOrientation
 import com.example.madproject.lib.ValueIds
 import com.google.android.material.navigation.NavigationView
 import org.json.JSONObject
+import org.w3c.dom.Text
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
@@ -54,12 +56,15 @@ class MainActivity : AppCompatActivity() {
     private fun loadNavigationHeader() {
         val pref = sharedPref.getString(ValueIds.JSON_OBJECT.value, null)
         val header: View = navView.getHeaderView(0)
-        val profilePicture: ImageView = header.findViewById(R.id.imageViewHeader)
+        val profilePictureHeader: ImageView = header.findViewById(R.id.imageViewHeader)
+        val profileNameHeader: TextView = header.findViewById(R.id.nameHeader)
 
         if (pref != null) {
             val dataObj = JSONObject(pref)
+            val profileName = dataObj.getString(ValueIds.FULL_NAME.value)
             val currentPhotoPath = dataObj.getString(ValueIds.CURRENT_PHOTO_PATH.value)
-            setPic(currentPhotoPath, profilePicture)
+            setPic(currentPhotoPath, profilePictureHeader)
+            profileNameHeader.text = profileName
         }
     }
 
@@ -74,8 +79,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun setDefaultNavigationHeader() {
         val header : View = navView.getHeaderView(0)
-        val profilePicture:ImageView  = header.findViewById<ImageView>(R.id.imageViewHeader)
+        val profilePicture:ImageView  = header.findViewById(R.id.imageViewHeader)
+        val profileName: TextView = header.findViewById(R.id.nameHeader)
         profilePicture.setImageResource(R.drawable.avatar)
+        profileName.text = "Guest"
     }
 
     override fun onSupportNavigateUp(): Boolean {

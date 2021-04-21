@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -21,6 +22,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.core.content.edit
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -256,18 +258,23 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         val picker = datePicker.build()
 
         picker.addOnCancelListener {
+            dateOfBirth.clearFocus()
 
+        }
+        picker.addOnNegativeButtonClickListener {
+            dateOfBirth.clearFocus()
         }
 
         picker.addOnDismissListener {
-
+            dateOfBirth.clearFocus()
         }
 
         picker.addOnPositiveButtonClickListener {
             val selectedDate = DateFormat.getDateInstance(DateFormat.SHORT).format(Date(it))
             dateOfBirth.setText(selectedDate)
+            dateOfBirth.clearFocus()
         }
-
+        dateOfBirth.invalidate()
         picker.show(this.requireActivity().supportFragmentManager, "mmm")
     }
 

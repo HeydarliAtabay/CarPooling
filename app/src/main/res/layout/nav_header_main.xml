@@ -24,7 +24,7 @@
         android:layout_height="96dp"
         android:layout_marginStart="10dp"
         android:layout_marginLeft="10dp"
-        android:layout_marginTop="75dp"
+        android:layout_marginTop="90dp"
         app:civ_border_color="#FF000000"
         app:civ_border_width="1dp"
         app:layout_constraintStart_toStartOf="parent"
@@ -40,13 +40,13 @@
         android:paddingTop="8dp"
         android:text="Guest"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textSize="17dp"
+        android:textSize="20dp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.375"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.972" />
+        app:layout_constraintVertical_bias="0.93" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -229,12 +229,6 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             }
         }
 
-        /*
-        dateOfBirth.setOnClickListener {
-            setDatePicker()
-        }
-         */
-
         phoneNumber.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {  // lost focus
                 phoneNumber.setSelection(0, 0)
@@ -268,10 +262,6 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         }
 
         picker?.addOnNegativeButtonClickListener {
-            dateOfBirth.clearFocus()
-        }
-
-        picker?.addOnDismissListener {
             dateOfBirth.clearFocus()
         }
 

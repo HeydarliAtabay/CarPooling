@@ -12,7 +12,7 @@
 
         <item
             android:id="@+id/showProfile"
-            android:icon="@drawable/outline_account_circle_black_24"
+            android:icon="@drawable/ic_person_outline_black_24dp"
             android:tint="?attr/color"
             android:title="Profile info" />
     </group>

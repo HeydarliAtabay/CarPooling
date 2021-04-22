@@ -14,7 +14,8 @@
             android:id="@+id/action_showProfile_to_editProfile"
             app:destination="@id/editProfile"
             app:enterAnim="@anim/slide_in"
-            app:popEnterAnim="@anim/slide_out" />
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out" />
     </fragment>
 
     <fragment

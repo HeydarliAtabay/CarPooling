@@ -76,6 +76,8 @@
         <action
             android:id="@+id/action_tripDetail_to_tripEdit"
             app:destination="@id/tripEdit" />
+        <argument android:name="group11.Lab2.DEPARTURE"
+            app:argType="string" />
     </fragment>
 
     <fragment

@@ -84,7 +84,7 @@ class MainActivity : AppCompatActivity() {
         val profilePicture:ImageView  = header.findViewById(R.id.imageViewHeader)
         val profileName: TextView = header.findViewById(R.id.nameHeader)
         profilePicture.setImageResource(R.drawable.avatar)
-        profileName.text = "Guest"
+        profileName.text = "Guest profile"
     }
 
     override fun onSupportNavigateUp(): Boolean {

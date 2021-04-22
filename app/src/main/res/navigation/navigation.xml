@@ -26,27 +26,27 @@
         <argument
             android:name="group11.lab1.FULL_NAME"
             app:argType="string"
-            android:defaultValue="Heydarli Atabay" />
+            android:defaultValue="Guest profile" />
         <argument
             android:name="group11.lab1.NICKNAME"
             app:argType="string"
-            android:defaultValue="Atash" />
+            android:defaultValue="" />
         <argument
             android:name="group11.lab1.EMAIL"
             app:argType="string"
-            android:defaultValue="heydarli.atabay@gmail.com" />
+            android:defaultValue="" />
         <argument
             android:name="group11.lab1.LOCATION"
             app:argType="string"
-            android:defaultValue="Turin, Italy" />
+            android:defaultValue="" />
         <argument
             android:name="group11.lab1.PHONE_NUMBER"
             app:argType="string"
-            android:defaultValue="3490838493" />
+            android:defaultValue="" />
         <argument
             android:name="group11.lab1.DATE_OF_BIRTH"
             app:argType="string"
-            android:defaultValue="23/08/1996" />
+            android:defaultValue="" />
         <argument
             android:name="group11.lab1.CURRENT_PHOTO_PATH"
             app:argType="string"

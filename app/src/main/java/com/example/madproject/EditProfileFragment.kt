@@ -250,7 +250,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         )
 
         if (dateOfBirth.text.toString() != "") {
-            val currentDate = SimpleDateFormat("dd/MM/yyyy", Locale.ROOT)
+            val currentDate = SimpleDateFormat("MMM dd, yyyy", Locale.ROOT)
             currentDate.timeZone = TimeZone.getTimeZone("UTC")
             val p = currentDate.parse(dateOfBirth.text.toString())
             datePicker = datePicker.setSelection(p?.time)
@@ -266,8 +266,12 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         }
 
         picker?.addOnPositiveButtonClickListener {
-            val selectedDate = DateFormat.getDateInstance(DateFormat.SHORT).format(Date(it))
-            dateOfBirth.setText(selectedDate)
+            //val selectedDate = DateFormat.getDateInstance(DateFormat.SHORT).format(Date(it))
+            //dateOfBirth.setText(selectedDate)
+
+            val inputFormat = SimpleDateFormat("dd MMM yyyy", Locale.ROOT)
+            val outputFormat = SimpleDateFormat("MMM dd, yyyy", Locale.ROOT)
+            dateOfBirth.setText(outputFormat.format(inputFormat.parse(picker?.headerText!!)!!))
             email.requestFocus()
         }
 
@@ -275,7 +279,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     }
 
     private fun setValues() {
-        fullName.setText(args.group11Lab1FULLNAME)
+        if (args.group11Lab1FULLNAME == "Guest profile") fullName.setText("") else fullName.setText(args.group11Lab1FULLNAME)
         nickName.setText(args.group11Lab1NICKNAME)
         email.setText(args.group11Lab1EMAIL)
         dateOfBirth.setText(args.group11Lab1DATEOFBIRTH)

@@ -82,7 +82,9 @@ class ShowProfileFragment : Fragment(R.layout.fragment_show_profile) {
     private fun saveValues() {
         val dataObj = JSONObject()
 
-        dataObj.put(ValueIds.FULL_NAME.value, fullName.text.toString())
+        if (fullName.text.toString() == "Guest profile") dataObj.put(ValueIds.FULL_NAME.value, "")
+        else dataObj.put(ValueIds.FULL_NAME.value, fullName.text.toString())
+
         dataObj.put(ValueIds.NICKNAME.value, nickName.text.toString())
         dataObj.put(ValueIds.DATE_OF_BIRTH.value, dateOfBirth.text.toString())
         dataObj.put(ValueIds.EMAIL.value, email.text.toString())
@@ -101,7 +103,8 @@ class ShowProfileFragment : Fragment(R.layout.fragment_show_profile) {
 
         if (pref != null) {
             val dataObj = JSONObject(pref)
-            fullName.text = dataObj.getString(ValueIds.FULL_NAME.value)
+            if (dataObj.getString(ValueIds.FULL_NAME.value) == "") fullName.text = "Guest profile"
+            else fullName.text = dataObj.getString(ValueIds.FULL_NAME.value)
             nickName.text = dataObj.getString(ValueIds.NICKNAME.value)
             dateOfBirth.text = dataObj.getString(ValueIds.DATE_OF_BIRTH.value)
             email.text = dataObj.getString(ValueIds.EMAIL.value)

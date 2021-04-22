@@ -12,7 +12,9 @@
         tools:layout="@layout/fragment_show_profile" >
         <action
             android:id="@+id/action_showProfile_to_editProfile"
-            app:destination="@id/editProfile" />
+            app:destination="@id/editProfile"
+            app:enterAnim="@anim/slide_in"
+            app:popEnterAnim="@anim/slide_out" />
     </fragment>
 
     <fragment
@@ -22,7 +24,10 @@
         tools:layout="@layout/fragment_edit_profile" >
         <action
             android:id="@+id/action_editProfile_to_showProfile"
-            app:destination="@id/showProfile" />
+            app:destination="@id/showProfile"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/slide_in" />
         <argument
             android:name="group11.lab1.FULL_NAME"
             app:argType="string"
@@ -61,10 +66,14 @@
 
         <action
             android:id="@+id/action_tripList_to_tripDetail"
-            app:destination="@id/tripDetail" />
+            app:destination="@id/tripDetail"
+            app:enterAnim="@anim/slide_in"
+            app:popEnterAnim="@anim/slide_out" />
         <action
             android:id="@+id/action_tripList_to_tripEdit"
-            app:destination="@id/tripEdit" />
+            app:destination="@id/tripEdit"
+            app:enterAnim="@anim/slide_in"
+            app:popEnterAnim="@anim/slide_out" />
     </fragment>
 
     <fragment
@@ -75,7 +84,9 @@
 
         <action
             android:id="@+id/action_tripDetail_to_tripEdit"
-            app:destination="@id/tripEdit" />
+            app:destination="@id/tripEdit"
+            app:enterAnim="@anim/slide_in"
+            app:popEnterAnim="@anim/slide_out" />
     </fragment>
 
     <fragment
@@ -86,7 +97,10 @@
 
         <action
             android:id="@+id/action_tripEdit_to_tripList"
-            app:destination="@id/tripList" />
+            app:destination="@id/tripList"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/slide_in" />
     </fragment>
 
 </navigation>

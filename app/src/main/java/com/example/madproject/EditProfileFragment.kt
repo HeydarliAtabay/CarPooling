@@ -10,14 +10,9 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.text.InputType
-import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.Toast
-import androidx.annotation.RequiresApi
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.core.content.edit
@@ -30,29 +25,17 @@ import com.example.madproject.lib.ValueIds
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointBackward
 import com.google.android.material.datepicker.MaterialDatePicker
-import com.google.android.material.textfield.TextInputLayout
+import com.google.android.material.snackbar.Snackbar
 import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
-import java.text.DateFormat
 import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.time.temporal.TemporalField
 import java.util.*
 
 
 class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
-    var t: Toast? = null
-
-    fun setToast(message: String?, context: Context) {
-        t?.cancel()
-        t = Toast.makeText(context, message, Toast.LENGTH_LONG)
-        t?.show()
-    }
-
     private lateinit var fullName: EditText
     private lateinit var nickName: EditText
     private lateinit var email: EditText
@@ -112,7 +95,15 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.saveButton -> {
-                setToast("Profile information saved!", this.requireActivity().applicationContext)
+                val snack = Snackbar.make(this.requireActivity().findViewById(R.id.cLayout), R.string.profile_save, Snackbar.LENGTH_SHORT)
+
+                val tv = snack.view.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+                    tv.textAlignment = View.TEXT_ALIGNMENT_CENTER;
+                } else {
+                    tv.gravity = Gravity.CENTER_HORIZONTAL;
+                }
+                snack.show()
                 saveValues()
                 findNavController().navigate(R.id.action_editProfile_to_showProfile)
                 true
@@ -122,9 +113,9 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     }
 
     override fun onCreateContextMenu(
-        menu: ContextMenu,
-        v: View,
-        menuInfo: ContextMenu.ContextMenuInfo?
+            menu: ContextMenu,
+            v: View,
+            menuInfo: ContextMenu.ContextMenuInfo?
     ) {
         super.onCreateContextMenu(menu, v, menuInfo)
         when (v.id) {
@@ -157,7 +148,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                 Requests.INTENT_PHOTO_FROM_GALLERY.value -> {
                     val inputStream: InputStream? = data?.data?.let {
                         this.requireActivity().contentResolver.openInputStream(
-                            it
+                                it
                         )
                     }
                     val outputFile = createImageFile()
@@ -166,9 +157,9 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                     fileOutputStream.close()
                     inputStream?.close()
                     photoURI = FileProvider.getUriForFile(
-                        this.requireActivity(),
-                        "com.example.android.fileprovider",
-                        outputFile
+                            this.requireActivity(),
+                            "com.example.android.fileprovider",
+                            outputFile
                     )
                     setPic()
                 }
@@ -243,10 +234,10 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
 
     private fun setDatePicker() {
         val constraintsBuilder = CalendarConstraints.Builder().setValidator(
-            DateValidatorPointBackward.now()
+                DateValidatorPointBackward.now()
         )
         var datePicker = MaterialDatePicker.Builder.datePicker().setCalendarConstraints(
-            constraintsBuilder.build()
+                constraintsBuilder.build()
         )
 
         if (dateOfBirth.text.toString() != "") {
@@ -313,9 +304,9 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
         val storageDir: File? = this.requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         return File.createTempFile(
-            "JPEG_${timeStamp}_", /* prefix */
-            ".jpg", /* suffix */
-            storageDir /* directory */
+                "JPEG_${timeStamp}_", /* prefix */
+                ".jpg", /* suffix */
+                storageDir /* directory */
         ).apply {
             // Save a file: path for use with ACTION_VIEW intents
             currentPhotoPath = absolutePath
@@ -343,14 +334,14 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                 // Continue only if the File was successfully created
                 photoFile?.also {
                     photoURI = FileProvider.getUriForFile(
-                        this.requireActivity(),
-                        "com.example.android.fileprovider",
-                        it
+                            this.requireActivity(),
+                            "com.example.android.fileprovider",
+                            it
                     )
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
                     startActivityForResult(
-                        takePictureIntent,
-                        Requests.INTENT_CAPTURE_PHOTO.value
+                            takePictureIntent,
+                            Requests.INTENT_CAPTURE_PHOTO.value
                     )
                 }
             }
@@ -361,13 +352,13 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         if (currentPhotoPath != "") {
             val imgFile = File(currentPhotoPath!!)
             photoURI = FileProvider.getUriForFile(
-                this.requireActivity().applicationContext,
-                "com.example.android.fileprovider",
-                imgFile
+                    this.requireActivity().applicationContext,
+                    "com.example.android.fileprovider",
+                    imgFile
             )
             val pic = FixOrientation.handleSamplingAndRotationBitmap(
-                this.requireActivity().applicationContext,
-                photoURI
+                    this.requireActivity().applicationContext,
+                    photoURI
             )
             image.setImageBitmap(pic)
         } else image.setImageResource(R.drawable.avatar)

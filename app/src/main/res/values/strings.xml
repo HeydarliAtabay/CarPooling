@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Car Pooling</string>
+    <string name="profile_save">Profile information saved!</string>
 </resources>

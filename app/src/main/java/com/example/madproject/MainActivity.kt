@@ -28,7 +28,6 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var sharedPref: SharedPreferences
-
     private lateinit var navView: NavigationView
 
     override fun onCreate(savedInstanceState: Bundle?) {

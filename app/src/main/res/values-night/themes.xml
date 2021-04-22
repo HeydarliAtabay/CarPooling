@@ -26,6 +26,8 @@
         <!-- Customize your theme here. -->
         <item name="android:windowBackground">#FFFFFF</item>
         <item name="android:scrollbarThumbVertical">?attr/colorPrimaryDark</item>
+        <item name="snackbarStyle">@style/Widget.App.Snackbar</item>
+
     </style>
 
     <style name="Theme.MADProject.NoActionBar">
@@ -47,6 +49,10 @@
         <item name="boxStrokeWidth">2dp</item>
         <item name="startIconTint">@color/white</item>
         <item name="endIconTint">@color/white</item>
+    </style>
+
+    <style name="Widget.App.Snackbar" parent="Widget.MaterialComponents.Snackbar">
+        <item name="android:layout_margin">20dp</item>
     </style>
 
 </resources>

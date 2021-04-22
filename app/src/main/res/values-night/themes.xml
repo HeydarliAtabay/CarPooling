@@ -6,8 +6,10 @@
         <item name="colorOnPrimary">#000000</item>
         <item name="colorPrimaryVariant">#C3FDFF</item>
         <item name="colorPrimaryDark">#000000</item>
-        <item name="android:textColorPrimary">#B7FFFFFF</item>
+        <item name="android:textColorPrimary">#FFFFFF</item>
         <item name="android:textColor">@color/white</item>
+
+        <item name="colorControlNormal">@color/black</item>
 
         <!-- Secondary colors -->
         <item name="colorSecondary">#03DAC6</item>

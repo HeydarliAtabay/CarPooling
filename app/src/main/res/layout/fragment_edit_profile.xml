@@ -87,7 +87,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:endIconMode="clear_text"
-                app:startIconDrawable="@drawable/outline_account_circle_black_24"
+                app:startIconDrawable="@drawable/ic_full_name"
                 android:hint="Full Name" >
 
                 <com.google.android.material.textfield.TextInputEditText

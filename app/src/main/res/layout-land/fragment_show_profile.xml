@@ -70,10 +70,10 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="20dp"
                 android:drawablePadding="8dp"
-                app:drawableStartCompat="@drawable/outline_account_circle_black_24"
+                app:drawableStartCompat="@drawable/ic_full_name"
                 android:tint="?attr/color"
                 android:ems="16"
-                android:text="Heydarli Atabay"
+                android:text="Guest profile"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -97,7 +97,6 @@
                 app:drawableStartCompat="@drawable/outline_account_circle_black_24"
                 android:tint="?attr/color"
                 android:ems="16"
-                android:text="Atash"
                 android:textSize="16sp" />
 
             <TextView
@@ -120,7 +119,6 @@
                 app:drawableStartCompat="@drawable/outline_calendar_today_black_24"
                 android:tint="?attr/color"
                 android:ems="16"
-                android:text="23/08/1996"
                 android:textSize="16sp" />
 
             <TextView
@@ -143,7 +141,6 @@
                 app:drawableStartCompat="@drawable/outline_email_black_24"
                 android:tint="?attr/color"
                 android:ems="16"
-                android:text="heydarli.atabay@gmail.com"
                 android:textSize="16sp" />
 
             <TextView
@@ -166,7 +163,6 @@
                 app:drawableStartCompat="@drawable/outline_phone_black_24"
                 android:tint="?attr/color"
                 android:ems="16"
-                android:text="3490838493"
                 android:textSize="16sp" />
 
             <TextView
@@ -189,7 +185,6 @@
                 app:drawableStartCompat="@drawable/outline_location_on_black_24"
                 android:tint="?attr/color"
                 android:ems="16"
-                android:text="Turin, Italy"
                 android:textSize="16sp" />
         </LinearLayout>
     </ScrollView>

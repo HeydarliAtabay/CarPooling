@@ -20,7 +20,6 @@
             android:layout_height="?attr/actionBarSize"
             style="@style/MyAppBar" />
 
-
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent" >

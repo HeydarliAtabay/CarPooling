@@ -71,7 +71,7 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="20dp"
                 android:drawablePadding="8dp"
-                app:drawableStartCompat="@drawable/outline_account_circle_black_24"
+                app:drawableStartCompat="@drawable/ic_full_name"
                 app:drawableTint="?attr/color"
                 android:ems="15"
                 android:text="Guest profile"

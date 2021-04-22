@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".EditProfileFragment">
 
-    <RelativeLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/RelativeLayout2"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -22,28 +22,41 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_weight="1">
 
-        <ImageView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/imageView"
-            android:layout_width="210dp"
-            android:layout_height="210dp"
-            android:adjustViewBounds="true"
-            android:scaleType="centerCrop"
+            style="@style/ImageViewBorder"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_centerInParent="true"
-            tools:srcCompat="@tools:sample/avatars" />
+            android:layout_margin="30dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1.0">
+
+        </de.hdodenhof.circleimageview.CircleImageView>
 
         <ImageButton
             android:id="@+id/imageButton"
             style="@android:style/Widget.Holo.Light.ImageButton"
-            android:layout_width="210dp"
-            android:layout_height="210dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:adjustViewBounds="true"
-            android:layout_centerInParent="true"
+            android:background="@drawable/button_state_selector"
             android:onClick="openContextMenu"
-            android:src="@drawable/outline_add_a_photo_36"
-            tools:ignore="OnClick"
-            tools:srcCompat="@drawable/outline_add_a_photo_36" />
+            android:src="@drawable/outline_add_a_photo_30"
+            android:tint="?attr/color"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.732"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.842"
+            tools:ignore="OnClick" />
 
-    </RelativeLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ScrollView
         android:id="@+id/scrollView3"
@@ -70,7 +83,7 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/text_input_layout"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                style="@style/MyTextInputLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:endIconMode="clear_text"
@@ -84,6 +97,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
                     android:textSize="16sp"
+                    android:textColor="?attr/color"
                     android:maxLength="30"
                     android:ems="18"
                     android:inputType="textPersonName"  />
@@ -92,7 +106,7 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/text_input_layout1"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                style="@style/MyTextInputLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:endIconMode="clear_text"
@@ -106,6 +120,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
                     android:textSize="16sp"
+                    android:textColor="?attr/color"
                     android:ems="18"
                     android:inputType="textPersonName"  />
 
@@ -113,7 +128,7 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/text_input_layout2"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                style="@style/MyTextInputLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:endIconMode="clear_text"
@@ -127,6 +142,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
                     android:textSize="16sp"
+                    android:textColor="?attr/color"
                     android:ems="18"
                     android:inputType="date"  />
 
@@ -134,7 +150,7 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/text_input_layout3"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                style="@style/MyTextInputLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:endIconMode="clear_text"
@@ -148,6 +164,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
                     android:textSize="16sp"
+                    android:textColor="?attr/color"
                     android:ems="18"
                     android:inputType="textEmailAddress"  />
 
@@ -155,7 +172,7 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/text_input_layout4"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                style="@style/MyTextInputLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:endIconMode="clear_text"
@@ -169,6 +186,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
                     android:textSize="16sp"
+                    android:textColor="?attr/color"
                     android:ems="18"
                     android:inputType="phone"  />
 
@@ -176,7 +194,7 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/text_input_layout5"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                style="@style/MyTextInputLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:endIconMode="clear_text"
@@ -190,6 +208,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
                     android:textSize="16sp"
+                    android:textColor="?attr/color"
                     android:ems="18"
                     android:inputType="text"  />
             </com.google.android.material.textfield.TextInputLayout>

@@ -13,6 +13,8 @@ import android.widget.Toast
 import android.widget.Toast.*
 import androidx.appcompat.view.menu.ActionMenuItemView
 import androidx.appcompat.widget.Toolbar
+import androidx.cardview.widget.CardView
+import androidx.navigation.Navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -21,109 +23,125 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 
 class TripListFragment : Fragment(R.layout.fragment_trip_list) {
-    private var layoutManager: RecyclerView.LayoutManager?=null
-    private var adapter: RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>?=null
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val edit = view.findViewById<Button>(R.id.edit)
-        val details = view.findViewById<Button>(R.id.details)
         val fab=view.findViewById<FloatingActionButton>(R.id.fab)
 
-        val recyclerView=view.findViewById<RecyclerView>(R.id.recyclerView2)
-        layoutManager= LinearLayoutManager(context)
-        recyclerView.layoutManager =layoutManager
+        val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView2)
+        recyclerView.layoutManager = LinearLayoutManager(this.requireActivity())
 
-        adapter=RecyclerViewAdapter()
-        recyclerView.adapter=adapter
+        val images = listOf<Int>(R.drawable.car_example, R.drawable.car_example, R.drawable.car_example)
+        val fromlist = listOf<String>("Rome", "Milano", "Ivrea")
+        val tolist = listOf<String>("Torino", "Torino", "Torino")
+        val dates = listOf<String>("28/04", "30/04", "02/05")
+        val times = listOf<String>("08:30", "10:00", "11:00")
+        val prices = listOf<String>("50", "20", "10")
 
+        val items = mutableListOf<Trip>()
 
-        details.setOnClickListener {
-            findNavController().navigate(R.id.action_tripList_to_tripDetail)
-
+        for (i in 0..2) {
+            val item = Trip(images[i], fromlist[i], tolist[i], dates[i], times[i], prices[i])
+            items += listOf(item)
         }
 
-        edit.setOnClickListener {
-            findNavController().navigate(R.id.action_tripList_to_tripEdit)
-        }
+        recyclerView.adapter = TripsAdapter(items)
 
         fab.setOnClickListener{
-            findNavController().navigate(R.id.action_tripList_to_tripEdit)
+            val action = TripListFragmentDirections.actionTripListToTripEdit(
+                group11Lab2TRIPARRIVAL = "",
+                group11Lab2TRIPDEPARTURE = "",
+                group11Lab2CURRENTCARPHOTOPATH = "",
+                group11Lab2TRIPDATE = "",
+                group11Lab2TRIPDURATION = "",
+                group11Lab2TRIPINFO = "",
+                group11Lab2TRIPPRICE = "",
+                group11Lab2TRIPSEATS = "",
+                group11Lab2TRIPSTOPS = "",
+                group11Lab2TRIPTIME = ""
+            )
+            findNavController().navigate(action)
         }
     }
 
+    class TripsAdapter(val data: List<Trip>): RecyclerView.Adapter<TripsAdapter.TripViewHolder>(){
 
-class RecyclerViewAdapter: RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>(){
+        class TripViewHolder(itemView: View):RecyclerView.ViewHolder(itemView){
+            val image = itemView.findViewById<ImageView>(R.id.image1)
+            val from_dest = itemView.findViewById<TextView>(R.id.from_dest)
+            val to_dest = itemView.findViewById<TextView>(R.id.to_dest)
+            val date = itemView.findViewById<TextView>(R.id.date_txt)
+            val time = itemView.findViewById<TextView>(R.id.time_txt)
+            val price = itemView.findViewById<TextView>(R.id.price_txt)
+            val editTripButton = itemView.findViewById<Button>(R.id.editTripButton)
+            val cv = itemView.findViewById<CardView>(R.id.card_view)
 
+            fun bind(t: Trip) {
+                from_dest.text = t.from
+                to_dest.text = t.to
+                date.text = t.date
+                time.text = t.time
+                price.text = t.price
 
-    val images = listOf<Int>(R.drawable.car_example, R.drawable.car_example, R.drawable.car_example)
-    val fromlist = listOf<String>("Rome", "Milano", "Ivrea")
-    val tolist = listOf<String>("Torino", "Torino", "Torino")
-    val dates = listOf<String>("28/04", "30/04", "02/05")
-    val times = listOf<String>("08:30", "10:00", "11:00")
-    val prices = listOf<String>("50", "20", "10")
+                cv.setOnClickListener {
+                    val action = TripListFragmentDirections.actionTripListToTripDetail(
+                        group11Lab2TRIPARRIVAL = to_dest.text.toString(),
+                        group11Lab2TRIPDEPARTURE = from_dest.text.toString(),
+                        group11Lab2CURRENTCARPHOTOPATH = "",
+                        group11Lab2TRIPDATE = date.text.toString(),
+                        group11Lab2TRIPDURATION = "5000000000000000",
+                        group11Lab2TRIPINFO = "",
+                        group11Lab2TRIPPRICE = price.text.toString(),
+                        group11Lab2TRIPSEATS = "",
+                        group11Lab2TRIPSTOPS = "",
+                        group11Lab2TRIPTIME = time.text.toString()
+                    )
+                    findNavController(itemView).navigate(action)
+                }
 
-    class ViewHolder(itemView: View):RecyclerView.ViewHolder(itemView){
-        var image : ImageView
-        var from_dest : TextView
-        var to_dest: TextView
-        var date: TextView
-        var time : TextView
-        var price : TextView
+                editTripButton.setOnClickListener {
+                    val action = TripListFragmentDirections.actionTripListToTripEdit(
+                        group11Lab2TRIPARRIVAL = to_dest.text.toString(),
+                        group11Lab2TRIPDEPARTURE = from_dest.text.toString(),
+                        group11Lab2CURRENTCARPHOTOPATH = "",
+                        group11Lab2TRIPDATE = date.text.toString(),
+                        group11Lab2TRIPDURATION = "40000000000000000000",
+                        group11Lab2TRIPINFO = "",
+                        group11Lab2TRIPPRICE = price.text.toString(),
+                        group11Lab2TRIPSEATS = "",
+                        group11Lab2TRIPSTOPS = "",
+                        group11Lab2TRIPTIME = time.text.toString()
+                    )
+                    findNavController(itemView).navigate(action)
+                }
+            }
 
-        init{
-            image= itemView.findViewById(R.id.image1)
-            from_dest= itemView.findViewById(R.id.from_dest)
-            to_dest = itemView.findViewById(R.id.to_dest)
-            date= itemView.findViewById(R.id.date_txt)
-            time=itemView.findViewById(R.id.time_txt)
-            price=itemView.findViewById(R.id.price_txt)
-
-
-        }
-
-        fun initialize(itemView: View, action: OnTripItemClickListener){
-            from_dest.text="hello"
-            to_dest.text="hello"
-            date.text="hello"
-            price.text="hello"
-
-            itemView.setOnClickListener{
+            fun unbind() {
+                editTripButton.setOnClickListener { null }
+                cv.setOnClickListener { null }
             }
         }
-    }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val v= LayoutInflater.from(parent.context)
-        .inflate(R.layout.recyclerview_card,parent,false)
-        return ViewHolder(v)
+        override fun onViewRecycled(holder: TripViewHolder) {
+            super.onViewRecycled(holder)
+            holder.unbind()
+        }
 
-    }
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TripViewHolder {
+            val v= LayoutInflater.from(parent.context)
+                    .inflate(R.layout.recyclerview_card, parent,false)
+            return TripViewHolder(v)
+        }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-       holder.from_dest.text=fromlist[position]
-        holder.to_dest.text=tolist[position]
-        holder.date.text=dates[position]
-        holder.time.text=times[position]
-        holder.price.text=prices[position]
-        holder.image.setImageResource(images[position])
+        override fun onBindViewHolder(holder: TripViewHolder, position: Int) {
 
+            holder.bind(data[position])
 
 
+        }
 
-
-        holder.itemView.setOnClickListener{
-            holder.price.text="finito"
+        override fun getItemCount(): Int {
+            return data.size
         }
     }
-
-    override fun getItemCount(): Int {
-        return fromlist.size
-    }
-}
-}
-
-interface OnTripItemClickListener{
-    fun onItemClick(itemView: View, position: Int)
 }

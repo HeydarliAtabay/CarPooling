@@ -76,6 +76,46 @@
         <action
             android:id="@+id/action_tripDetail_to_tripEdit"
             app:destination="@id/tripEdit" />
+        <argument
+            android:name="group11.lab2.TRIP_DEPARTURE"
+            app:argType="string"
+            android:defaultValue="Turin, Italy" />
+        <argument
+            android:name="group11.lab2.TRIP_ARRIVAL"
+            app:argType="string"
+            android:defaultValue="Catania, Italy" />
+        <argument
+            android:name="group11.lab2.TRIP_DATE"
+            app:argType="string"
+            android:defaultValue="22/12/2020" />
+        <argument
+            android:name="group11.lab2.TRIP_TIME"
+            app:argType="string"
+            android:defaultValue="08:30" />
+        <argument
+            android:name="group11.lab2.TRIP_DURATION"
+            app:argType="string"
+            android:defaultValue="15" />
+        <argument
+            android:name="group11.lab2.TRIP_SEATS"
+            app:argType="string"
+            android:defaultValue="3" />
+        <argument
+            android:name="group11.lab2.TRIP_PRICE"
+            app:argType="string"
+            android:defaultValue="50" />
+        <argument
+            android:name="group11.lab2.TRIP_INFO"
+            app:argType="string"
+            android:defaultValue="No space for luggages, listening rap music" />
+        <argument
+            android:name="group11.lab2.TRIP_STOPS"
+            app:argType="string"
+            android:defaultValue="Stop in Naples, at 16:00" />
+        <argument
+            android:name="group11.lab2.CURRENT_CAR_PHOTO_PATH"
+            app:argType="string"
+            android:defaultValue="" />
     </fragment>
 
     <fragment
@@ -88,43 +128,43 @@
             android:id="@+id/action_tripEdit_to_tripList"
             app:destination="@id/tripList" />
         <argument
-            android:name="group11.lab2.DEPARTURE"
+            android:name="group11.lab2.TRIP_DEPARTURE"
             app:argType="string"
             android:defaultValue="Turin, Italy" />
         <argument
-            android:name="group11.lab2.ARRIVAL"
+            android:name="group11.lab2.TRIP_ARRIVAL"
             app:argType="string"
             android:defaultValue="Catania, Italy" />
         <argument
-            android:name="group11.lab2.DATE"
+            android:name="group11.lab2.TRIP_DATE"
             app:argType="string"
             android:defaultValue="22/12/2020" />
         <argument
-            android:name="group11.lab2.TIME"
+            android:name="group11.lab2.TRIP_TIME"
             app:argType="string"
             android:defaultValue="08:30" />
         <argument
-            android:name="group11.lab2.DURATION"
+            android:name="group11.lab2.TRIP_DURATION"
             app:argType="string"
             android:defaultValue="15" />
         <argument
-            android:name="group11.lab2.SEATS"
+            android:name="group11.lab2.TRIP_SEATS"
             app:argType="string"
             android:defaultValue="3" />
         <argument
-            android:name="group11.lab2.PRICE"
+            android:name="group11.lab2.TRIP_PRICE"
             app:argType="string"
             android:defaultValue="50" />
         <argument
-            android:name="group11.lab2.INFO"
+            android:name="group11.lab2.TRIP_INFO"
             app:argType="string"
             android:defaultValue="No space for luggages, listening rap music" />
         <argument
-            android:name="group11.lab2.STOPS"
+            android:name="group11.lab2.TRIP_STOPS"
             app:argType="string"
             android:defaultValue="Stop in Naples, at 16:00" />
         <argument
-            android:name="group11.lab2.CURRENT_CAR_PATH"
+            android:name="group11.lab2.CURRENT_CAR_PHOTO_PATH"
             app:argType="string"
             android:defaultValue="" />
     </fragment>

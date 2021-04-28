@@ -318,16 +318,16 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     }
 
     private fun setValues() {
-        departure.setText(args.group11Lab2DEPARTURE)
-        arrival.setText(args.group11Lab2ARRIVAL)
-        departureDate.setText(args.group11Lab2DATE)
-        departureTime.setText(args.group11Lab2TIME)
-        duration.setText(args.group11Lab2DURATION)
-        availableSeats.setText(args.group11Lab2SEATS)
-        price.setText(args.group11Lab2PRICE)
-        additionalInfo.setText(args.group11Lab2INFO)
-        intermediateStop.setText(args.group11Lab2STOPS)
-        if (currentCarPath == "") currentCarPath = args.group11Lab2CURRENTCARPATH
+        departure.setText(args.group11Lab2TRIPDEPARTURE)
+        arrival.setText(args.group11Lab2TRIPARRIVAL)
+        departureDate.setText(args.group11Lab2TRIPDATE)
+        departureTime.setText(args.group11Lab2TRIPTIME)
+        duration.setText(args.group11Lab2TRIPDURATION)
+        availableSeats.setText(args.group11Lab2TRIPSEATS)
+        price.setText(args.group11Lab2TRIPPRICE)
+        additionalInfo.setText(args.group11Lab2TRIPINFO)
+        intermediateStop.setText(args.group11Lab2TRIPSTOPS)
+        if (currentCarPath == "") currentCarPath = args.group11Lab2CURRENTCARPHOTOPATH
         setCarPic()
     }
 

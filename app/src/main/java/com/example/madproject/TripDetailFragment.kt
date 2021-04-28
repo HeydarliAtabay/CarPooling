@@ -64,16 +64,16 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
         return when (item.itemId) {
             R.id.editTrip -> {
                 val action = TripDetailFragmentDirections.actionTripDetailToTripEdit(
-                        group11Lab2DEPARTURE = departure.text.toString(),
-                        group11Lab2ARRIVAL = arrival.text.toString(),
-                        group11Lab2DATE = departureDate.text.toString(),
-                        group11Lab2TIME = departureTime.text.toString(),
-                        group11Lab2DURATION = duration.text.toString(),
-                        group11Lab2SEATS = availableSeats.text.toString(),
-                        group11Lab2PRICE = price.text.toString(),
-                        group11Lab2INFO = additionalInfo.text.toString(),
-                        group11Lab2STOPS = intermediateStop.text.toString(),
-                        group11Lab2CURRENTCARPATH = currentCarPath!!
+                        group11Lab2TRIPDEPARTURE = departure.text.toString(),
+                        group11Lab2TRIPARRIVAL = arrival.text.toString(),
+                        group11Lab2TRIPDATE = departureDate.text.toString(),
+                        group11Lab2TRIPTIME = departureTime.text.toString(),
+                        group11Lab2TRIPDURATION = duration.text.toString(),
+                        group11Lab2TRIPSEATS = availableSeats.text.toString(),
+                        group11Lab2TRIPPRICE = price.text.toString(),
+                        group11Lab2TRIPINFO = additionalInfo.text.toString(),
+                        group11Lab2TRIPSTOPS = intermediateStop.text.toString(),
+                        group11Lab2CURRENTCARPHOTOPATH = currentCarPath!!
                 )
                 findNavController().navigate(action)
                 true

@@ -25,6 +25,7 @@ import com.example.madproject.lib.Requests
 import com.example.madproject.lib.ValueIds
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointBackward
+import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
@@ -286,7 +287,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
 
     private fun setDatePicker() {
         val constraintsBuilder = CalendarConstraints.Builder().setValidator(
-                DateValidatorPointBackward.now()
+                DateValidatorPointForward.now()
         )
 
         var datePicker = MaterialDatePicker.Builder.datePicker().setCalendarConstraints(

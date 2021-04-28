@@ -4,8 +4,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
-import android.renderscript.ScriptGroup
-import android.util.Log
 import android.view.LayoutInflater
 import androidx.fragment.app.Fragment
 import android.view.View
@@ -13,10 +11,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
-import android.widget.Toast.*
-import androidx.appcompat.view.menu.ActionMenuItemView
-import androidx.appcompat.widget.Toolbar
 import androidx.cardview.widget.CardView
 import androidx.core.content.FileProvider
 import androidx.navigation.Navigation.findNavController
@@ -33,11 +27,13 @@ import java.io.File
 
 class TripListFragment : Fragment(R.layout.fragment_trip_list) {
     lateinit var tripList: List<Trip>
+    lateinit var emptyList: TextView
     lateinit var sharedPref: SharedPreferences
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         sharedPref = requireActivity().getPreferences(Context.MODE_PRIVATE)
+        emptyList = view.findViewById(R.id.emptyList)
 
         val fab=view.findViewById<FloatingActionButton>(R.id.fab)
 
@@ -46,6 +42,7 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
 
         if(sharedPref.contains(ValueIds.JSON_OBJECT_TRIPS.value)) {
             loadTrips()
+            emptyList.visibility = View.INVISIBLE
             recyclerView.adapter = TripsAdapter(tripList)
         }
 

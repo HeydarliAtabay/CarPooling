@@ -327,7 +327,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         price.setText(args.group11Lab2TRIPPRICE)
         additionalInfo.setText(args.group11Lab2TRIPINFO)
         intermediateStop.setText(args.group11Lab2TRIPSTOPS)
-        if (currentCarPath == "") currentCarPath = args.group11Lab2CURRENTCARPATH
+        if (currentCarPath == "") currentCarPath = args.group11Lab2CURRENTCARPHOTOPATH
         setCarPic()
     }
 

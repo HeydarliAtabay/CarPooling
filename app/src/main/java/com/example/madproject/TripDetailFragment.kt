@@ -73,7 +73,7 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
                         group11Lab2TRIPPRICE = price.text.toString(),
                         group11Lab2TRIPINFO = additionalInfo.text.toString(),
                         group11Lab2TRIPSTOPS = intermediateStop.text.toString(),
-                        group11Lab2CURRENTCARPATH = currentCarPath!!
+                        group11Lab2CURRENTCARPHOTOPATH = currentCarPath!!
                 )
                 findNavController().navigate(action)
                 true

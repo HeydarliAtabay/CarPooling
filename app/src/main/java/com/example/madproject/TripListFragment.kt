@@ -51,7 +51,7 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
             val action = TripListFragmentDirections.actionTripListToTripEdit(
                 group11Lab2TRIPARRIVAL = "",
                 group11Lab2TRIPDEPARTURE = "",
-                group11Lab2CURRENTCARPATH = "",
+                group11Lab2CURRENTCARPHOTOPATH = "",
                 group11Lab2TRIPDATE = "",
                 group11Lab2TRIPDURATION = "",
                 group11Lab2TRIPINFO = "",
@@ -87,7 +87,7 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
                     val action = TripListFragmentDirections.actionTripListToTripDetail(
                         group11Lab2TRIPARRIVAL = to_dest.text.toString(),
                         group11Lab2TRIPDEPARTURE = from_dest.text.toString(),
-                        group11Lab2CURRENTCARPATH = "",
+                        group11Lab2CURRENTCARPHOTOPATH = "",
                         group11Lab2TRIPDATE = date.text.toString(),
                         group11Lab2TRIPDURATION = "5000000000000000",
                         group11Lab2TRIPINFO = "",
@@ -103,7 +103,7 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
                     val action = TripListFragmentDirections.actionTripListToTripEdit(
                         group11Lab2TRIPARRIVAL = to_dest.text.toString(),
                         group11Lab2TRIPDEPARTURE = from_dest.text.toString(),
-                        group11Lab2CURRENTCARPATH = "",
+                        group11Lab2CURRENTCARPHOTOPATH = "",
                         group11Lab2TRIPDATE = date.text.toString(),
                         group11Lab2TRIPDURATION = "40000000000000000000",
                         group11Lab2TRIPINFO = "",

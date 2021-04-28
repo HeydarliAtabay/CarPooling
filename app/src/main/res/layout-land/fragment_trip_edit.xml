@@ -77,6 +77,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:endIconMode="clear_text"
+            app:startIconDrawable="@drawable/outline_trip_origin_black_24"
             android:hint="Departure" >
 
             <com.google.android.material.textfield.TextInputEditText
@@ -98,6 +99,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:endIconMode="clear_text"
+            app:startIconDrawable="@drawable/outline_location_on_black_24"
             android:hint="Arrival" >
 
             <com.google.android.material.textfield.TextInputEditText
@@ -119,6 +121,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:endIconMode="clear_text"
+            app:startIconDrawable="@drawable/outline_calendar_today_black_24"
             android:hint="Date" >
 
             <com.google.android.material.textfield.TextInputEditText
@@ -140,6 +143,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:endIconMode="clear_text"
+            app:startIconDrawable="@drawable/outline_schedule_black_24"
             android:hint="Time" >
 
             <com.google.android.material.textfield.TextInputEditText
@@ -161,6 +165,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:endIconMode="clear_text"
+            app:startIconDrawable="@drawable/outline_hourglass_top_black_24"
             android:hint="Estimated duration (hours)" >
 
             <com.google.android.material.textfield.TextInputEditText
@@ -182,6 +187,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:endIconMode="clear_text"
+            app:startIconDrawable="@drawable/outline_chair_black_24"
             android:hint="Available seats" >
 
             <com.google.android.material.textfield.TextInputEditText
@@ -203,6 +209,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:endIconMode="clear_text"
+            app:startIconDrawable="@drawable/outline_euro_black_24"
             android:hint="Price (€)" >
 
             <com.google.android.material.textfield.TextInputEditText
@@ -224,6 +231,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:endIconMode="clear_text"
+            app:startIconDrawable="@drawable/outline_info_black_24"
             android:hint="Additional informations" >
 
             <com.google.android.material.textfield.TextInputEditText
@@ -245,6 +253,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:endIconMode="clear_text"
+            app:startIconDrawable="@drawable/outline_add_location_alt_black_24"
             android:hint="Intermediate stops" >
 
             <com.google.android.material.textfield.TextInputEditText

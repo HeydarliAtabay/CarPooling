@@ -30,31 +30,31 @@
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/slide_in" />
         <argument
-            android:name="group11.lab1.FULL_NAME"
+            android:name="group11.lab2.FULL_NAME"
             app:argType="string"
             android:defaultValue="Guest profile" />
         <argument
-            android:name="group11.lab1.NICKNAME"
+            android:name="group11.lab2.NICKNAME"
             app:argType="string"
             android:defaultValue="" />
         <argument
-            android:name="group11.lab1.EMAIL"
+            android:name="group11.lab2.EMAIL"
             app:argType="string"
             android:defaultValue="" />
         <argument
-            android:name="group11.lab1.LOCATION"
+            android:name="group11.lab2.LOCATION"
             app:argType="string"
             android:defaultValue="" />
         <argument
-            android:name="group11.lab1.PHONE_NUMBER"
+            android:name="group11.lab2.PHONE_NUMBER"
             app:argType="string"
             android:defaultValue="" />
         <argument
-            android:name="group11.lab1.DATE_OF_BIRTH"
+            android:name="group11.lab2.DATE_OF_BIRTH"
             app:argType="string"
             android:defaultValue="" />
         <argument
-            android:name="group11.lab1.CURRENT_PHOTO_PATH"
+            android:name="group11.lab2.CURRENT_PHOTO_PATH"
             app:argType="string"
             android:defaultValue="" />
     </fragment>

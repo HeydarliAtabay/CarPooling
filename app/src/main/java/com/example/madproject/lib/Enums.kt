@@ -19,5 +19,5 @@ enum class ValueIds(val value: String) {
     PHONE_NUMBER("group11.lab1.PHONE_NUMBER"),
     DATE_OF_BIRTH("group11.lab1.DATE_OF_BIRTH"),
     CURRENT_PHOTO_PATH("group11.lab1.CURRENT_PHOTO_PATH"),
-    JSON_OBJECT("group11.lab1.JSON_OBJECT");
+    JSON_OBJECT_PROFILE("group11.lab1.JSON_OBJECT_PROFILE");
 }

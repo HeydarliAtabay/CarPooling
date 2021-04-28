@@ -26,6 +26,7 @@ import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointBackward
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.snackbar.Snackbar
+import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
@@ -270,13 +271,13 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     }
 
     private fun setValues() {
-        if (args.group11Lab1FULLNAME == "Guest profile") fullName.setText("") else fullName.setText(args.group11Lab1FULLNAME)
-        nickName.setText(args.group11Lab1NICKNAME)
-        email.setText(args.group11Lab1EMAIL)
-        dateOfBirth.setText(args.group11Lab1DATEOFBIRTH)
-        phoneNumber.setText(args.group11Lab1PHONENUMBER)
-        location.setText(args.group11Lab1LOCATION)
-        if (currentPhotoPath == "") currentPhotoPath = args.group11Lab1CURRENTPHOTOPATH
+        if (args.group11Lab2FULLNAME == "Guest profile") fullName.setText("") else fullName.setText(args.group11Lab2FULLNAME)
+        nickName.setText(args.group11Lab2NICKNAME)
+        email.setText(args.group11Lab2EMAIL)
+        dateOfBirth.setText(args.group11Lab2DATEOFBIRTH)
+        phoneNumber.setText(args.group11Lab2PHONENUMBER)
+        location.setText(args.group11Lab2LOCATION)
+        if (currentPhotoPath == "") currentPhotoPath = args.group11Lab2CURRENTPHOTOPATH
         setPic()
     }
 
@@ -292,7 +293,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         dataObj.put(ValueIds.CURRENT_PHOTO_PATH.value, currentPhotoPath)
 
         sharedPref.edit {
-            putString(ValueIds.JSON_OBJECT.value, dataObj.toString())
+            putString(ValueIds.JSON_OBJECT_PROFILE.value, dataObj.toString())
             apply()
         }
     }

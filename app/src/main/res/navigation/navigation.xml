@@ -69,12 +69,14 @@
             android:id="@+id/action_tripList_to_tripDetail"
             app:destination="@id/tripDetail"
             app:enterAnim="@anim/slide_in"
-            app:popEnterAnim="@anim/slide_out" />
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out" />
         <action
             android:id="@+id/action_tripList_to_tripEdit"
             app:destination="@id/tripEdit"
             app:enterAnim="@anim/slide_in"
-            app:popEnterAnim="@anim/slide_out" />
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out" />
     </fragment>
 
     <fragment

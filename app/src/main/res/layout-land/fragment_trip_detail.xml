@@ -23,11 +23,13 @@
 
         <ImageView
             android:id="@+id/imageCar"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="230dp"
+            android:layout_height="150dp"
             android:layout_centerInParent="true"
-            android:layout_margin="30dp"
-            app:srcCompat="@drawable/car_example" />
+            android:adjustViewBounds="true"
+            android:src="@drawable/car_example"
+            android:scaleType="centerCrop"
+            tools:srcCompat="@tools:sample/avatars" />
 
     </RelativeLayout>
 

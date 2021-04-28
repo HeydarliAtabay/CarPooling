@@ -36,7 +36,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
-    private var currentCarPath: String? = ""
+    private var currentCarPhotoPath: String? = ""
     private lateinit var imageCar : ImageView
     private lateinit var photoCarURI: Uri
     private lateinit var departure : EditText
@@ -56,12 +56,12 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val resPath = savedInstanceState?.getString("currentCarPath")
-        currentCarPath = if (resPath === null) "" else resPath
+        currentCarPhotoPath = if (resPath === null) "" else resPath
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString("currentCarPath", currentCarPath)
+        outState.putString("currentCarPhotoPath", currentCarPhotoPath)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -327,7 +327,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         price.setText(args.group11Lab2TRIPPRICE)
         additionalInfo.setText(args.group11Lab2TRIPINFO)
         intermediateStop.setText(args.group11Lab2TRIPSTOPS)
-        if (currentCarPath == "") currentCarPath = args.group11Lab2CURRENTCARPHOTOPATH
+        if (currentCarPhotoPath == "") currentCarPhotoPath = args.group11Lab2CURRENTCARPHOTOPATH
         setCarPic()
     }
 
@@ -343,7 +343,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
                 storageDir /* directory */
         ).apply {
             // Save a file: path for use with ACTION_VIEW intents
-            currentCarPath = absolutePath
+            currentCarPhotoPath = absolutePath
         }
     }
 
@@ -402,8 +402,8 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     }
 
     private fun setCarPic() {
-        if (currentCarPath != "") {
-            val imgFile = File(currentCarPath!!)
+        if (currentCarPhotoPath != "") {
+            val imgFile = File(currentCarPhotoPath!!)
             photoCarURI = FileProvider.getUriForFile(
                     this.requireActivity().applicationContext,
                     "com.example.android.fileprovider",

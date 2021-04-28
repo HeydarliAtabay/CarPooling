@@ -12,11 +12,12 @@ import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.FileProvider
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.example.madproject.lib.FixOrientation
 import java.io.File
 
 class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
-    private var currentCarPath: String? = ""
+    private var currentCarPhotoPath: String? = ""
     private lateinit var imageCar : ImageView
     private lateinit var photoCarURI: Uri
     private lateinit var departure : TextView
@@ -29,6 +30,8 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
     private lateinit var additionalInfo : TextView
     private lateinit var intermediateStop : TextView
     private lateinit var sharedPref: SharedPreferences
+
+    private val args: TripDetailFragmentArgs by navArgs()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         imageCar = view.findViewById(R.id.imageCar)
@@ -44,6 +47,8 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
         sharedPref = this.requireActivity().getPreferences(Context.MODE_PRIVATE)
 
         setHasOptionsMenu(true)
+
+        setValues()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -52,8 +57,8 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
     }
 
     private fun setPic() {
-        if (currentCarPath != "") {
-            val imgFile = File(currentCarPath!!)
+        if (currentCarPhotoPath != "") {
+            val imgFile = File(currentCarPhotoPath!!)
             photoCarURI = FileProvider.getUriForFile(this.requireActivity().applicationContext, "com.example.android.fileprovider", imgFile)
             val pic = FixOrientation.handleSamplingAndRotationBitmap(this.requireActivity().applicationContext, photoCarURI)
             imageCar.setImageBitmap(pic)
@@ -73,12 +78,28 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
                         group11Lab2TRIPPRICE = price.text.toString(),
                         group11Lab2TRIPINFO = additionalInfo.text.toString(),
                         group11Lab2TRIPSTOPS = intermediateStop.text.toString(),
-                        group11Lab2CURRENTCARPHOTOPATH = currentCarPath!!
+                        group11Lab2CURRENTCARPHOTOPATH = currentCarPhotoPath!!
                 )
                 findNavController().navigate(action)
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun setValues() {
+
+        if (currentCarPhotoPath == "") currentCarPhotoPath = args.group11Lab2CURRENTCARPHOTOPATH
+        arrival.text = args.group11Lab2TRIPARRIVAL
+        departure.text = args.group11Lab2TRIPDEPARTURE
+        departureDate.text = args.group11Lab2TRIPDATE
+        departureTime.text = args.group11Lab2TRIPTIME
+        duration.text = args.group11Lab2TRIPDURATION
+        availableSeats.text = args.group11Lab2TRIPSEATS
+        price.text = args.group11Lab2TRIPPRICE
+        additionalInfo.text = args.group11Lab2TRIPINFO
+        intermediateStop.text = args.group11Lab2TRIPSTOPS
+
+        setPic()
     }
 }

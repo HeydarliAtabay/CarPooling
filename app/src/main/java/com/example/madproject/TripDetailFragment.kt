@@ -67,7 +67,7 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.edit_trip, menu)
+        inflater.inflate(R.menu.edit_menu, menu)
     }
 
     private fun setCarPic() {
@@ -81,7 +81,7 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.editTrip -> {
+            R.id.editButton -> {
                 val action = TripDetailFragmentDirections.actionTripDetailToTripEdit(
                         group11Lab2TRIPDEPARTURE = departure.text.toString(),
                         group11Lab2TRIPARRIVAL = arrival.text.toString(),

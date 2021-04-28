@@ -51,10 +51,6 @@ class ShowProfileFragment : Fragment(R.layout.fragment_show_profile) {
         setHasOptionsMenu(true)
     }
 
-    fun getCurrentPhoto():String?{
-        return currentPhotoPath
-    }
-
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.edit_menu, menu)

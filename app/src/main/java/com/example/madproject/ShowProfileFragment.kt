@@ -64,13 +64,13 @@ class ShowProfileFragment : Fragment(R.layout.fragment_show_profile) {
         return when (item.itemId) {
             R.id.editButton -> {
                 val action = ShowProfileFragmentDirections.actionShowProfileToEditProfile(
-                    group11Lab1FULLNAME = fullName.text.toString(),
-                    group11Lab1NICKNAME = nickName.text.toString(),
-                    group11Lab1EMAIL = email.text.toString(),
-                    group11Lab1DATEOFBIRTH = dateOfBirth.text.toString(),
-                    group11Lab1LOCATION = location.text.toString(),
-                    group11Lab1PHONENUMBER = phoneNumber.text.toString(),
-                    group11Lab1CURRENTPHOTOPATH = currentPhotoPath!!
+                    group11Lab2FULLNAME = fullName.text.toString(),
+                    group11Lab2NICKNAME = nickName.text.toString(),
+                    group11Lab2EMAIL = email.text.toString(),
+                    group11Lab2DATEOFBIRTH = dateOfBirth.text.toString(),
+                    group11Lab2LOCATION = location.text.toString(),
+                    group11Lab2PHONENUMBER = phoneNumber.text.toString(),
+                    group11Lab2CURRENTPHOTOPATH = currentPhotoPath!!
                 )
                 findNavController().navigate(action)
                 true

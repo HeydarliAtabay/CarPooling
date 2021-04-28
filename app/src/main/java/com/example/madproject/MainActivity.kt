@@ -49,13 +49,13 @@ class MainActivity : AppCompatActivity() {
 
         sharedPref = getPreferences(Context.MODE_PRIVATE)
 
-        if (!sharedPref.contains(ValueIds.JSON_OBJECT.value)) setDefaultNavigationHeader() else loadNavigationHeader()
+        if (!sharedPref.contains(ValueIds.JSON_OBJECT_PROFILE.value)) setDefaultNavigationHeader() else loadNavigationHeader()
 
 
     }
 
     private fun loadNavigationHeader() {
-        val pref = sharedPref.getString(ValueIds.JSON_OBJECT.value, null)
+        val pref = sharedPref.getString(ValueIds.JSON_OBJECT_PROFILE.value, null)
         val header: View = navView.getHeaderView(0)
         val profilePictureHeader: ImageView = header.findViewById(R.id.imageViewHeader)
         val profileNameHeader: TextView = header.findViewById(R.id.nameHeader)

@@ -210,7 +210,7 @@
             android:layout_height="wrap_content"
             app:endIconMode="clear_text"
             app:startIconDrawable="@drawable/outline_euro_black_24"
-            android:hint="Price (€)" >
+            android:hint="Price" >
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/price"

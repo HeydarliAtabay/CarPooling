@@ -46,7 +46,6 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
         intermediateStop = view.findViewById(R.id.intermediate_stops)
         sharedPref = this.requireActivity().getPreferences(Context.MODE_PRIVATE)
 
-
         setHasOptionsMenu(true)
 
         setValuesTrip()

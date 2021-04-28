@@ -24,32 +24,33 @@
 
         <ImageView
             android:id="@+id/imageCar"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="230dp"
+            android:layout_height="150dp"
             android:layout_centerInParent="true"
-            android:layout_margin="30dp"
+            android:adjustViewBounds="true"
+            android:scaleType="centerCrop"
+            android:src="@drawable/car_example"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:srcCompat="@tools:sample/avatars" />
 
         <ImageButton
             android:id="@+id/imageButton2"
             style="@android:style/Widget.Holo.Light.ImageButton"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="230dp"
+            android:layout_height="150dp"
+            android:layout_centerInParent="true"
             android:adjustViewBounds="true"
-            android:src="@drawable/outline_add_a_photo_30"
-            android:background="@drawable/button_state_selector"
-            android:tint="?attr/color"
+            android:onClick="openContextMenu"
+            android:src="@android:drawable/ic_menu_camera"
             app:layout_constraintBottom_toBottomOf="@+id/imageCar"
             app:layout_constraintEnd_toEndOf="@+id/imageCar"
             app:layout_constraintStart_toStartOf="@+id/imageCar"
             app:layout_constraintTop_toTopOf="@+id/imageCar"
-            app:layout_constraintHorizontal_bias="0.773"
-            app:layout_constraintVertical_bias="1.0"
-            android:onClick="openContextMenu"
-            tools:ignore="OnClick"/>
+            tools:ignore="OnClick"
+            tools:srcCompat="@android:drawable/ic_menu_camera" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
@@ -79,6 +80,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:endIconMode="clear_text"
+                app:startIconDrawable="@drawable/outline_trip_origin_black_24"
                 android:hint="Departure" >
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -100,6 +102,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:endIconMode="clear_text"
+                app:startIconDrawable="@drawable/outline_location_on_black_24"
                 android:hint="Arrival" >
 
             <com.google.android.material.textfield.TextInputEditText
@@ -121,7 +124,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:endIconMode="clear_text"
-                android:hint="Date" >
+                android:hint="Date"
+                app:startIconDrawable="@drawable/outline_calendar_today_black_24">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/date"
@@ -142,6 +146,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:endIconMode="clear_text"
+                app:startIconDrawable="@drawable/outline_schedule_black_24"
                 android:hint="Time" >
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -163,6 +168,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:endIconMode="clear_text"
+                app:startIconDrawable="@drawable/outline_hourglass_top_black_24"
                 android:hint="Estimated duration (hours)" >
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -184,6 +190,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:endIconMode="clear_text"
+                app:startIconDrawable="@drawable/outline_chair_black_24"
                 android:hint="Available seats" >
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -205,6 +212,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:endIconMode="clear_text"
+                app:startIconDrawable="@drawable/outline_euro_black_24"
                 android:hint="Price (€)" >
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -226,6 +234,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:endIconMode="clear_text"
+                app:startIconDrawable="@drawable/outline_info_black_24"
                 android:hint="Additional informations" >
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -247,6 +256,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:endIconMode="clear_text"
+                app:startIconDrawable="@drawable/outline_add_location_alt_black_24"
                 android:hint="Intermediate stops" >
 
                 <com.google.android.material.textfield.TextInputEditText

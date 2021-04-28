@@ -5,17 +5,34 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/imageCar"
-        android:layout_width="300dp"
-        android:layout_height="210dp"
+    <RelativeLayout
+        android:id="@+id/RelativeLayout2"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@+id/scrollView2"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/car_example"
-        android:contentDescription="TODO" />
+        app:layout_constraintVertical_weight="1">
+
+
+        <ImageView
+            android:id="@+id/imageCar"
+            android:layout_width="230dp"
+            android:layout_height="150dp"
+            android:layout_centerInParent="true"
+            android:adjustViewBounds="true"
+            android:src="@drawable/car_example"
+            android:scaleType="centerCrop"
+            tools:srcCompat="@tools:sample/avatars" />
+
+    </RelativeLayout>
 
     <ScrollView
         android:id="@+id/scrollView2"
@@ -29,7 +46,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageCar">
+        app:layout_constraintVertical_weight="2"
+        app:layout_constraintTop_toBottomOf="@+id/RelativeLayout2">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -52,6 +70,8 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="20dp"
+                android:drawablePadding="8dp"
+                app:drawableStartCompat="@drawable/outline_trip_origin_black_24"
                 android:ems="15"
                 android:text="Turin, Italy"
                 android:textSize="16sp"/>
@@ -72,6 +92,8 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="20dp"
+                android:drawablePadding="8dp"
+                app:drawableStartCompat="@drawable/outline_location_on_black_24"
                 android:ems="15"
                 android:text="Catania, Italy"
                 android:textSize="16sp"/>
@@ -93,6 +115,8 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="20dp"
                 android:ems="15"
+                android:drawablePadding="8dp"
+                app:drawableStartCompat="@drawable/outline_calendar_today_black_24"
                 android:text="22/12/2020"
                 android:textSize="16sp"/>
 
@@ -113,6 +137,8 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="20dp"
                 android:ems="15"
+                android:drawablePadding="8dp"
+                app:drawableStartCompat="@drawable/outline_schedule_black_24"
                 android:text="08:30"
                 android:textSize="16sp"/>
 
@@ -133,6 +159,8 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="20dp"
                 android:ems="15"
+                android:drawablePadding="8dp"
+                app:drawableStartCompat="@drawable/outline_hourglass_top_black_24"
                 android:text="15 hours"
                 android:textSize="16sp"/>
 
@@ -153,6 +181,8 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="20dp"
                 android:ems="15"
+                android:drawablePadding="8dp"
+                app:drawableStartCompat="@drawable/outline_chair_black_24"
                 android:text="3"
                 android:textSize="16sp"/>
 
@@ -172,6 +202,8 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="20dp"
+                android:drawablePadding="8dp"
+                app:drawableStartCompat="@drawable/outline_euro_black_24"
                 android:ems="15"
                 android:text="50€"
                 android:textSize="16sp"/>
@@ -193,6 +225,8 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="20dp"
                 android:ems="15"
+                android:drawablePadding="8dp"
+                app:drawableStartCompat="@drawable/outline_info_black_24"
                 android:text="No space for luggages, listening rap music"
                 android:textSize="16sp"/>
 
@@ -213,6 +247,8 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="20dp"
                 android:ems="15"
+                android:drawablePadding="8dp"
+                app:drawableStartCompat="@drawable/outline_add_location_alt_black_24"
                 android:text="Stop in Naples, at 16:00"
                 android:textSize="16sp"/>
 

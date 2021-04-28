@@ -31,7 +31,6 @@
                 android:id="@+id/image1"
                 android:layout_width="match_parent"
                 android:layout_height="160dp"
-                android:src="@drawable/car_example"
                 android:contentDescription="Car Image" />
 
             <LinearLayout

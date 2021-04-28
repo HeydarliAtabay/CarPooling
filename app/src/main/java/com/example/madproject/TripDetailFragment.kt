@@ -12,6 +12,7 @@ import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.FileProvider
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.example.madproject.lib.FixOrientation
 import java.io.File
 
@@ -30,6 +31,8 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
     private lateinit var intermediateStop : TextView
     private lateinit var sharedPref: SharedPreferences
 
+    private val args: TripDetailFragmentArgs by navArgs()
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         imageCar = view.findViewById(R.id.imageCar)
         departure = view.findViewById(R.id.departure_location)
@@ -43,7 +46,24 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
         intermediateStop = view.findViewById(R.id.intermediate_stops)
         sharedPref = this.requireActivity().getPreferences(Context.MODE_PRIVATE)
 
+
         setHasOptionsMenu(true)
+
+        setValuesTrip()
+    }
+
+    private fun setValuesTrip() {
+        departure.text = args.group11Lab2TRIPDEPARTURE
+        arrival.text = args.group11Lab2TRIPARRIVAL
+        departureDate.text = args.group11Lab2TRIPDATE
+        departureTime.text = args.group11Lab2TRIPTIME
+        duration.text = args.group11Lab2TRIPDURATION
+        availableSeats.text = args.group11Lab2TRIPSEATS
+        price.text = args.group11Lab2TRIPPRICE
+        additionalInfo.text = args.group11Lab2TRIPINFO
+        intermediateStop.text = args.group11Lab2TRIPSTOPS
+        if (currentCarPath == "") currentCarPath = args.group11Lab2CURRENTCARPHOTOPATH
+        setCarPic()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -51,7 +71,7 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
         inflater.inflate(R.menu.edit_trip, menu)
     }
 
-    private fun setPic() {
+    private fun setCarPic() {
         if (currentCarPath != "") {
             val imgFile = File(currentCarPath!!)
             photoCarURI = FileProvider.getUriForFile(this.requireActivity().applicationContext, "com.example.android.fileprovider", imgFile)
@@ -73,7 +93,7 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
                         group11Lab2TRIPPRICE = price.text.toString(),
                         group11Lab2TRIPINFO = additionalInfo.text.toString(),
                         group11Lab2TRIPSTOPS = intermediateStop.text.toString(),
-                        group11Lab2CURRENTCARPATH = currentCarPath!!
+                        group11Lab2CURRENTCARPHOTOPATH = currentCarPath!!
                 )
                 findNavController().navigate(action)
                 true

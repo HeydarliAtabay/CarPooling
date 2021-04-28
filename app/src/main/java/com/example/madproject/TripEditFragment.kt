@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.text.InputType
+import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.view.inputmethod.InputMethodManager
@@ -27,11 +28,14 @@ import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointBackward
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.snackbar.Snackbar
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
+import java.math.BigDecimal
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -50,6 +54,8 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     private lateinit var intermediateStop : EditText
     private lateinit var sharedPref: SharedPreferences
     private var picker: MaterialDatePicker<Long>? = null
+
+    private lateinit var trip:Trip
 
     private val args: TripEditFragmentArgs by navArgs()
 
@@ -327,7 +333,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         price.setText(args.group11Lab2TRIPPRICE)
         additionalInfo.setText(args.group11Lab2TRIPINFO)
         intermediateStop.setText(args.group11Lab2TRIPSTOPS)
-        if (currentCarPath == "") currentCarPath = args.group11Lab2CURRENTCARPATH
+        if (currentCarPath == "") currentCarPath = args.group11Lab2CURRENTCARPHOTOPATH
         setCarPic()
     }
 
@@ -383,22 +389,40 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     }
 
     private fun saveTripValues() {
-        val dataObj = JSONObject()
 
-        dataObj.put(ValueIds.TRIP_DEPARTURE.value, departure.text.toString())
-        dataObj.put(ValueIds.TRIP_ARRIVAL.value, arrival.text.toString())
-        dataObj.put(ValueIds.TRIP_DATE.value, departureDate.text.toString())
-        dataObj.put(ValueIds.TRIP_TIME.value, departureTime.text.toString())
-        dataObj.put(ValueIds.TRIP_DURATION.value, duration.text.toString())
-        dataObj.put(ValueIds.TRIP_AVAILABLE_SEATS.value, availableSeats.text.toString())
-        dataObj.put(ValueIds.TRIP_PRICE.value, price.text.toString())
-        dataObj.put(ValueIds.TRIP_ADDITIONAL_INFO.value, additionalInfo.text.toString())
-        dataObj.put(ValueIds.TRIP_INTERMEDIATE_STOP.value, price.text.toString())
+        val carPath:String = if(currentCarPath==null) "" else currentCarPath!!
+        trip = Trip(carPath,
+            departure.text.toString(),
+            arrival.text.toString(),
+            departureDate.text.toString(),
+            departureTime.text.toString(),
+            duration.text.toString(),
+            availableSeats.text.toString(),
+            additionalInfo.text.toString(),
+            intermediateStop.text.toString(),
+            BigDecimal(if(price.text.toString()=="") "0" else price.text.toString()))
 
+        var tripList:MutableList<Trip> = mutableListOf()
+        val gson = Gson()
+        if (sharedPref.contains(ValueIds.JSON_OBJECT_TRIPS.value)) {
+            val pref = sharedPref.getString(ValueIds.JSON_OBJECT_TRIPS.value, null)
+            val type = object : TypeToken<MutableList<Trip>>() {}.type
+            if (pref != null) {
+                tripList = gson.fromJson(pref, type)
+            }
+            tripList.add(trip)
+        }
+        else{
+            tripList.add(trip)
+        }
+
+        val stringToSave:String = gson.toJson(tripList)
         sharedPref.edit {
-            putString(ValueIds.JSON_OBJECT_TRIP.value, dataObj.toString())
+            putString(ValueIds.JSON_OBJECT_TRIPS.value, stringToSave)
             apply()
         }
+
+
     }
 
     private fun setCarPic() {

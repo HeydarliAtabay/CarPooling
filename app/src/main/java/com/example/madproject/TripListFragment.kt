@@ -1,7 +1,11 @@
 package com.example.madproject
 
+import android.content.Context
+import android.content.SharedPreferences
+import android.net.Uri
 import android.os.Bundle
 import android.renderscript.ScriptGroup
+import android.util.Log
 import android.view.LayoutInflater
 import androidx.fragment.app.Fragment
 import android.view.View
@@ -14,44 +18,42 @@ import android.widget.Toast.*
 import androidx.appcompat.view.menu.ActionMenuItemView
 import androidx.appcompat.widget.Toolbar
 import androidx.cardview.widget.CardView
+import androidx.core.content.FileProvider
 import androidx.navigation.Navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.madproject.lib.FixOrientation
+import com.example.madproject.lib.ValueIds
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import java.io.File
 
 
 class TripListFragment : Fragment(R.layout.fragment_trip_list) {
+    lateinit var tripList: List<Trip>
+    lateinit var sharedPref: SharedPreferences
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        sharedPref = requireActivity().getPreferences(Context.MODE_PRIVATE)
 
         val fab=view.findViewById<FloatingActionButton>(R.id.fab)
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView2)
         recyclerView.layoutManager = LinearLayoutManager(this.requireActivity())
 
-        val images = listOf<Int>(R.drawable.car_example, R.drawable.car_example, R.drawable.car_example)
-        val fromlist = listOf<String>("Rome", "Milano", "Ivrea")
-        val tolist = listOf<String>("Torino", "Torino", "Torino")
-        val dates = listOf<String>("28/04", "30/04", "02/05")
-        val times = listOf<String>("08:30", "10:00", "11:00")
-        val prices = listOf<String>("50", "20", "10")
-
-        val items = mutableListOf<Trip>()
-
-        for (i in 0..2) {
-            val item = Trip(images[i], fromlist[i], tolist[i], dates[i], times[i], prices[i])
-            items += listOf(item)
+        if(sharedPref.contains(ValueIds.JSON_OBJECT_TRIPS.value)) {
+            loadTrips()
+            recyclerView.adapter = TripsAdapter(tripList)
         }
-
-        recyclerView.adapter = TripsAdapter(items)
 
         fab.setOnClickListener{
             val action = TripListFragmentDirections.actionTripListToTripEdit(
                 group11Lab2TRIPARRIVAL = "",
                 group11Lab2TRIPDEPARTURE = "",
-                group11Lab2CURRENTCARPATH = "",
+                group11Lab2CURRENTCARPHOTOPATH = "",
                 group11Lab2TRIPDATE = "",
                 group11Lab2TRIPDURATION = "",
                 group11Lab2TRIPINFO = "",
@@ -64,53 +66,66 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
         }
     }
 
-    class TripsAdapter(val data: List<Trip>): RecyclerView.Adapter<TripsAdapter.TripViewHolder>(){
+    private fun loadTrips(){
+        val gson = Gson()
+        val pref = sharedPref.getString(ValueIds.JSON_OBJECT_TRIPS.value, null)
+        val type = object : TypeToken<List<Trip>>() {}.type
+        if (pref != null) {
+            tripList = gson.fromJson(pref, type)
+        }
+    }
+
+    class TripsAdapter(val data:List<Trip>): RecyclerView.Adapter<TripsAdapter.TripViewHolder>(){
 
         class TripViewHolder(itemView: View):RecyclerView.ViewHolder(itemView){
-            val image = itemView.findViewById<ImageView>(R.id.image1)
-            val from_dest = itemView.findViewById<TextView>(R.id.from_dest)
-            val to_dest = itemView.findViewById<TextView>(R.id.to_dest)
-            val date = itemView.findViewById<TextView>(R.id.date_txt)
-            val time = itemView.findViewById<TextView>(R.id.time_txt)
-            val price = itemView.findViewById<TextView>(R.id.price_txt)
-            val editTripButton = itemView.findViewById<Button>(R.id.editTripButton)
-            val cv = itemView.findViewById<CardView>(R.id.card_view)
+            private val image = itemView.findViewById<ImageView>(R.id.image1)
+            private val from_dest = itemView.findViewById<TextView>(R.id.from_dest)
+            private val to_dest = itemView.findViewById<TextView>(R.id.to_dest)
+            private val date = itemView.findViewById<TextView>(R.id.date_txt)
+            private val time = itemView.findViewById<TextView>(R.id.time_txt)
+            private val price = itemView.findViewById<TextView>(R.id.price_txt)
+            private val editTripButton = itemView.findViewById<Button>(R.id.editTripButton)
+            private val cv = itemView.findViewById<CardView>(R.id.card_view)
+            private var currentPhotoPath:String = ""
 
             fun bind(t: Trip) {
                 from_dest.text = t.from
                 to_dest.text = t.to
-                date.text = t.date
-                time.text = t.time
-                price.text = t.price
+                date.text = t.departureDate
+                time.text = t.departureTime
+                price.text = t.price.toEngineeringString()
+                currentPhotoPath = t.imagePath
+
+                setPic()
 
                 cv.setOnClickListener {
                     val action = TripListFragmentDirections.actionTripListToTripDetail(
-                        group11Lab2TRIPARRIVAL = to_dest.text.toString(),
-                        group11Lab2TRIPDEPARTURE = from_dest.text.toString(),
-                        group11Lab2CURRENTCARPATH = "",
-                        group11Lab2TRIPDATE = date.text.toString(),
-                        group11Lab2TRIPDURATION = "5000000000000000",
-                        group11Lab2TRIPINFO = "",
-                        group11Lab2TRIPPRICE = price.text.toString(),
-                        group11Lab2TRIPSEATS = "",
-                        group11Lab2TRIPSTOPS = "",
-                        group11Lab2TRIPTIME = time.text.toString()
+                        group11Lab2TRIPARRIVAL = t.to,
+                        group11Lab2TRIPDEPARTURE = t.from,
+                        group11Lab2CURRENTCARPHOTOPATH = t.imagePath,
+                        group11Lab2TRIPDATE = t.departureDate,
+                        group11Lab2TRIPDURATION = t.duration,
+                        group11Lab2TRIPINFO = t.additionalInfo,
+                        group11Lab2TRIPPRICE = t.price.toEngineeringString(),
+                        group11Lab2TRIPSEATS = t.availableSeat,
+                        group11Lab2TRIPSTOPS = t.intermediateStop,
+                        group11Lab2TRIPTIME = t.departureTime
                     )
                     findNavController(itemView).navigate(action)
                 }
 
                 editTripButton.setOnClickListener {
                     val action = TripListFragmentDirections.actionTripListToTripEdit(
-                        group11Lab2TRIPARRIVAL = to_dest.text.toString(),
-                        group11Lab2TRIPDEPARTURE = from_dest.text.toString(),
-                        group11Lab2CURRENTCARPATH = "",
-                        group11Lab2TRIPDATE = date.text.toString(),
-                        group11Lab2TRIPDURATION = "40000000000000000000",
-                        group11Lab2TRIPINFO = "",
-                        group11Lab2TRIPPRICE = price.text.toString(),
-                        group11Lab2TRIPSEATS = "",
-                        group11Lab2TRIPSTOPS = "",
-                        group11Lab2TRIPTIME = time.text.toString()
+                        group11Lab2TRIPARRIVAL = t.to,
+                        group11Lab2TRIPDEPARTURE = t.from,
+                        group11Lab2CURRENTCARPHOTOPATH = t.imagePath,
+                        group11Lab2TRIPDATE = t.departureDate,
+                        group11Lab2TRIPDURATION = t.duration,
+                        group11Lab2TRIPINFO = t.additionalInfo,
+                        group11Lab2TRIPPRICE = t.price.toEngineeringString(),
+                        group11Lab2TRIPSEATS = t.availableSeat,
+                        group11Lab2TRIPSTOPS = t.intermediateStop,
+                        group11Lab2TRIPTIME = t.departureTime
                     )
                     findNavController(itemView).navigate(action)
                 }
@@ -120,6 +135,16 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
                 editTripButton.setOnClickListener { null }
                 cv.setOnClickListener { null }
             }
+
+            private fun setPic() {
+                if (currentPhotoPath != "") {
+                    val imgFile = File(currentPhotoPath!!)
+                    val photoURI:Uri = FileProvider.getUriForFile(itemView.context.applicationContext, "com.example.android.fileprovider", imgFile)
+                    val pic = FixOrientation.handleSamplingAndRotationBitmap(itemView.context.applicationContext, photoURI)
+                    image.setImageBitmap(pic)
+                } else image.setImageResource(R.drawable.car_example)
+            }
+
         }
 
         override fun onViewRecycled(holder: TripViewHolder) {
@@ -136,7 +161,6 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
         override fun onBindViewHolder(holder: TripViewHolder, position: Int) {
 
             holder.bind(data[position])
-
 
         }
 

@@ -96,6 +96,8 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.saveButton -> {
+                Toast.makeText(context, "Profile information saved!", Toast.LENGTH_LONG).show()
+                /*
                 val snack = Snackbar.make(this.requireActivity().findViewById(R.id.cLayout), R.string.profile_save, Snackbar.LENGTH_SHORT)
 
                 val tv = snack.view.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
@@ -104,7 +106,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                 } else {
                     tv.gravity = Gravity.CENTER_HORIZONTAL;
                 }
-                snack.show()
+                snack.show()*/
                 saveValues()
                 findNavController().navigate(R.id.action_editProfile_to_showProfile)
                 true

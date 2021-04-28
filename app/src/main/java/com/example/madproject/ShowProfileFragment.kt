@@ -43,7 +43,7 @@ class ShowProfileFragment : Fragment(R.layout.fragment_show_profile) {
         sharedPref = this.requireActivity().getPreferences(Context.MODE_PRIVATE)
 
         // If the sharedPref does not exist (first run) it is created with the default values
-        if (!sharedPref.contains(ValueIds.JSON_OBJECT.value)) saveValues()
+        if (!sharedPref.contains(ValueIds.JSON_OBJECT_PROFILE.value)) saveValues()
         loadValues()
         //aggiorna il navigation header
         setNavigationHeader()
@@ -93,13 +93,13 @@ class ShowProfileFragment : Fragment(R.layout.fragment_show_profile) {
         dataObj.put(ValueIds.CURRENT_PHOTO_PATH.value, currentPhotoPath)
 
         sharedPref.edit {
-            putString(ValueIds.JSON_OBJECT.value, dataObj.toString())
+            putString(ValueIds.JSON_OBJECT_PROFILE.value, dataObj.toString())
             apply()
         }
     }
 
     private fun loadValues() {
-        val pref = sharedPref.getString(ValueIds.JSON_OBJECT.value, null)
+        val pref = sharedPref.getString(ValueIds.JSON_OBJECT_PROFILE.value, null)
 
         if (pref != null) {
             val dataObj = JSONObject(pref)

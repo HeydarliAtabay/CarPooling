@@ -295,7 +295,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         )
 
         if (departureDate.text.toString() != "") {
-            val currentDate = SimpleDateFormat("MMM dd, yyyy", Locale.ROOT)
+            val currentDate = SimpleDateFormat("MMM dd, yyyy")
             currentDate.timeZone = TimeZone.getTimeZone("UTC")
             val p = currentDate.parse(departureDate.text.toString())
             datePicker = datePicker.setSelection(p?.time)

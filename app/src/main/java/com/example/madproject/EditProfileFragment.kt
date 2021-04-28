@@ -244,7 +244,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         )
 
         if (dateOfBirth.text.toString() != "") {
-            val currentDate = SimpleDateFormat("MMM dd, yyyy", Locale.ROOT)
+            val currentDate = SimpleDateFormat("MMM dd, yyyy")
             currentDate.timeZone = TimeZone.getTimeZone("UTC")
             val p = currentDate.parse(dateOfBirth.text.toString())
             datePicker = datePicker.setSelection(p?.time)
@@ -263,8 +263,8 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             //val selectedDate = DateFormat.getDateInstance(DateFormat.SHORT).format(Date(it))
             //dateOfBirth.setText(selectedDate)
 
-            val inputFormat = SimpleDateFormat("dd MMM yyyy", Locale.ROOT)
-            val outputFormat = SimpleDateFormat("MMM dd, yyyy", Locale.ROOT)
+            val inputFormat = SimpleDateFormat("dd MMM yyyy")
+            val outputFormat = SimpleDateFormat("MMM dd, yyyy")
             dateOfBirth.setText(outputFormat.format(inputFormat.parse(picker?.headerText!!)!!))
             email.requestFocus()
         }

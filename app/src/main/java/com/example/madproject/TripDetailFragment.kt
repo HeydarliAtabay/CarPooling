@@ -83,6 +83,7 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
         return when (item.itemId) {
             R.id.editButton -> {
                 val action = TripDetailFragmentDirections.actionTripDetailToTripEdit(
+                        group11Lab2TRIPID = args.group11Lab2TRIPID,
                         group11Lab2TRIPDEPARTURE = departure.text.toString(),
                         group11Lab2TRIPARRIVAL = arrival.text.toString(),
                         group11Lab2TRIPDATE = departureDate.text.toString(),

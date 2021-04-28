@@ -391,7 +391,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     private fun saveTripValues() {
 
         val carPath:String = if(currentCarPath==null) "" else currentCarPath!!
-        trip = Trip(carPath,
+        trip = Trip(-1, carPath,
             departure.text.toString(),
             arrival.text.toString(),
             departureDate.text.toString(),
@@ -409,10 +409,19 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
             val type = object : TypeToken<MutableList<Trip>>() {}.type
             if (pref != null) {
                 tripList = gson.fromJson(pref, type)
+                trip.id = tripList.size
             }
-            tripList.add(trip)
+
+            if (args.group11Lab2TRIPID == -1) {
+                tripList.add(trip)
+            } else {
+                trip.id = args.group11Lab2TRIPID
+                tripList[trip.id] = trip
+            }
+
         }
         else{
+            trip.id = 0
             tripList.add(trip)
         }
 

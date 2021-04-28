@@ -89,6 +89,9 @@
             app:enterAnim="@anim/slide_in"
             app:popEnterAnim="@anim/slide_out" />
         <argument
+            android:name="group11.lab2.TRIP_ID"
+            app:argType="integer" />
+        <argument
             android:name="group11.lab2.TRIP_DEPARTURE"
             app:argType="string"
             android:defaultValue="" />
@@ -142,6 +145,9 @@
             app:enterAnim="@anim/fade_in"
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/slide_in" />
+        <argument
+            android:name="group11.lab2.TRIP_ID"
+            app:argType="integer" />
         <argument
             android:name="group11.lab2.TRIP_DEPARTURE"
             app:argType="string"

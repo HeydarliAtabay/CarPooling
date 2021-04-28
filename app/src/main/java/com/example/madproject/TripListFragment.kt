@@ -48,6 +48,7 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
 
         fab.setOnClickListener{
             val action = TripListFragmentDirections.actionTripListToTripEdit(
+                group11Lab2TRIPID = -1,
                 group11Lab2TRIPARRIVAL = "",
                 group11Lab2TRIPDEPARTURE = "",
                 group11Lab2CURRENTCARPHOTOPATH = "",
@@ -97,6 +98,7 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
 
                 cv.setOnClickListener {
                     val action = TripListFragmentDirections.actionTripListToTripDetail(
+                        group11Lab2TRIPID = t.id,
                         group11Lab2TRIPARRIVAL = t.to,
                         group11Lab2TRIPDEPARTURE = t.from,
                         group11Lab2CURRENTCARPHOTOPATH = t.imagePath,
@@ -113,6 +115,7 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
 
                 editTripButton.setOnClickListener {
                     val action = TripListFragmentDirections.actionTripListToTripEdit(
+                        group11Lab2TRIPID = t.id,
                         group11Lab2TRIPARRIVAL = t.to,
                         group11Lab2TRIPDEPARTURE = t.from,
                         group11Lab2CURRENTCARPHOTOPATH = t.imagePath,

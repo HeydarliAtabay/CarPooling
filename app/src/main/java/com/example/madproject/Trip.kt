@@ -2,7 +2,8 @@ package com.example.madproject
 
 import java.math.BigDecimal
 
-data class Trip(val imagePath: String,
+data class Trip(var id: Int,
+                val imagePath: String,
                 val from: String,
                 val to: String,
                 val departureDate: String,

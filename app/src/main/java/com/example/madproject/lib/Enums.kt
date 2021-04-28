@@ -29,5 +29,4 @@ enum class ValueIds(val value: String) {
     TRIP_INTERMEDIATE_STOP("group11.lab2.TRIP_INTERMEDIATE_STOP"),
     JSON_OBJECT("group11.lab1.JSON_OBJECT"),
     JSON_OBJECT_TRIP("group11.lab1.JSON_OBJECT_TRIP");
-
 }

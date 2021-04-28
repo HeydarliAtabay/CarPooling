@@ -113,7 +113,7 @@
             app:argType="string"
             android:defaultValue="Stop in Naples, at 16:00" />
         <argument
-            android:name="group11.lab2.CURRENT_CAR_PATH"
+            android:name="group11.lab2.CURRENT_CAR_PHOTO_PATH"
             app:argType="string"
             android:defaultValue="" />
     </fragment>
@@ -164,7 +164,7 @@
             app:argType="string"
             android:defaultValue="Stop in Naples, at 16:00" />
         <argument
-            android:name="group11.lab2.CURRENT_CAR_PATH"
+            android:name="group11.lab2.CURRENT_CAR_PHOTO_PATH"
             app:argType="string"
             android:defaultValue="" />
     </fragment>

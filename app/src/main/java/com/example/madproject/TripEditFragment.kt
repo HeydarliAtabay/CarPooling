@@ -3,7 +3,9 @@ package com.example.madproject
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
@@ -15,13 +17,17 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.FileProvider
+import androidx.core.content.edit
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.madproject.lib.FixOrientation
 import com.example.madproject.lib.Requests
+import com.example.madproject.lib.ValueIds
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointBackward
 import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.snackbar.Snackbar
+import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -42,9 +48,21 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     private lateinit var price : EditText
     private lateinit var additionalInfo : EditText
     private lateinit var intermediateStop : EditText
+    private lateinit var sharedPref: SharedPreferences
     private var picker: MaterialDatePicker<Long>? = null
 
     private val args: TripEditFragmentArgs by navArgs()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val resPath = savedInstanceState?.getString("currentCarPath")
+        currentCarPath = if (resPath === null) "" else resPath
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString("currentCarPath", currentCarPath)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         imageCar = view.findViewById(R.id.imageCar)
@@ -57,10 +75,11 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         price = view.findViewById(R.id.price)
         additionalInfo = view.findViewById(R.id.info)
         intermediateStop = view.findViewById(R.id.intermediate_stops)
+        sharedPref = this.requireActivity().getPreferences(Context.MODE_PRIVATE)
 
         fixEditText()
 
-        //setHasOptionsMenu(true)
+        setHasOptionsMenu(true)
 
         val editPhoto = view.findViewById<ImageButton>(R.id.imageButton2)
         registerForContextMenu(editPhoto)
@@ -72,6 +91,32 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         /*button.setOnClickListener {
             findNavController().navigate(R.id.action_tripEdit_to_tripList)
         }*/
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.save_profile, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.saveButton -> {
+                Toast.makeText(context, "Trip information saved!", Toast.LENGTH_LONG).show()
+                //val snack = Snackbar.make(this.requireActivity().findViewById(R.id.cLayout), R.string.profile_save, Snackbar.LENGTH_SHORT)
+
+                //val tv = snack.view.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+                /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+                    tv.textAlignment = View.TEXT_ALIGNMENT_CENTER;
+                } else {
+                    tv.gravity = Gravity.CENTER_HORIZONTAL;
+                }
+                snack.show()*/
+                saveTripValues()
+                findNavController().navigate(R.id.action_tripEdit_to_tripList)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     override fun onPause() {
@@ -133,6 +178,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
             }
         }
     }
+
 
     private fun fixEditText() {
         departure.setOnFocusChangeListener { _, hasFocus ->
@@ -333,6 +379,25 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
                     )
                 }
             }
+        }
+    }
+
+    private fun saveTripValues() {
+        val dataObj = JSONObject()
+
+        dataObj.put(ValueIds.TRIP_DEPARTURE.value, departure.text.toString())
+        dataObj.put(ValueIds.TRIP_ARRIVAL.value, arrival.text.toString())
+        dataObj.put(ValueIds.TRIP_DATE.value, departureDate.text.toString())
+        dataObj.put(ValueIds.TRIP_TIME.value, departureTime.text.toString())
+        dataObj.put(ValueIds.TRIP_DURATION.value, duration.text.toString())
+        dataObj.put(ValueIds.TRIP_AVAILABLE_SEATS.value, availableSeats.text.toString())
+        dataObj.put(ValueIds.TRIP_PRICE.value, price.text.toString())
+        dataObj.put(ValueIds.TRIP_ADDITIONAL_INFO.value, additionalInfo.text.toString())
+        dataObj.put(ValueIds.TRIP_INTERMEDIATE_STOP.value, price.text.toString())
+
+        sharedPref.edit {
+            putString(ValueIds.JSON_OBJECT_TRIP.value, dataObj.toString())
+            apply()
         }
     }
 

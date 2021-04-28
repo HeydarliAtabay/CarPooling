@@ -1,6 +1,7 @@
 package com.example.madproject
 
 import android.os.Bundle
+import android.renderscript.ScriptGroup
 import android.view.LayoutInflater
 import androidx.fragment.app.Fragment
 import android.view.View
@@ -15,6 +16,9 @@ import androidx.appcompat.widget.Toolbar
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+
+
 
 class TripListFragment : Fragment(R.layout.fragment_trip_list) {
     private var layoutManager: RecyclerView.LayoutManager?=null
@@ -25,6 +29,7 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
 
         val edit = view.findViewById<Button>(R.id.edit)
         val details = view.findViewById<Button>(R.id.details)
+        val fab=view.findViewById<FloatingActionButton>(R.id.fab)
 
         val recyclerView=view.findViewById<RecyclerView>(R.id.recyclerView2)
         layoutManager= LinearLayoutManager(context)
@@ -36,13 +41,21 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
 
         details.setOnClickListener {
             findNavController().navigate(R.id.action_tripList_to_tripDetail)
+
         }
 
         edit.setOnClickListener {
             findNavController().navigate(R.id.action_tripList_to_tripEdit)
         }
+
+        fab.setOnClickListener{
+            findNavController().navigate(R.id.action_tripList_to_tripEdit)
+        }
     }
+
+
 class RecyclerViewAdapter: RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>(){
+
 
     val images = listOf<Int>(R.drawable.car_example, R.drawable.car_example, R.drawable.car_example)
     val fromlist = listOf<String>("Rome", "Milano", "Ivrea")
@@ -66,6 +79,18 @@ class RecyclerViewAdapter: RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>(
             date= itemView.findViewById(R.id.date_txt)
             time=itemView.findViewById(R.id.time_txt)
             price=itemView.findViewById(R.id.price_txt)
+
+
+        }
+
+        fun initialize(itemView: View, action: OnTripItemClickListener){
+            from_dest.text="hello"
+            to_dest.text="hello"
+            date.text="hello"
+            price.text="hello"
+
+            itemView.setOnClickListener{
+            }
         }
     }
 
@@ -86,8 +111,10 @@ class RecyclerViewAdapter: RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>(
 
 
 
-        holder.itemView.setOnClickListener{v:View ->
-            holder.price.text="basildi"
+
+
+        holder.itemView.setOnClickListener{
+            holder.price.text="finito"
         }
     }
 
@@ -95,4 +122,8 @@ class RecyclerViewAdapter: RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>(
         return fromlist.size
     }
 }
+}
+
+interface OnTripItemClickListener{
+    fun onItemClick(itemView: View, position: Int)
 }

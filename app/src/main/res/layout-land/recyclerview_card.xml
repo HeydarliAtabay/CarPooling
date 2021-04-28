@@ -26,9 +26,12 @@
 
             <ImageView
                 android:id="@+id/image1"
-                android:layout_width="250dp"
-                android:layout_height="match_parent"
+                android:layout_width="230dp"
+                android:layout_margin="8dp"
+                android:layout_height="150dp"
                 android:layout_gravity="top"
+                android:adjustViewBounds="true"
+                android:scaleType="centerCrop"
                 android:contentDescription="Car Image"
                 android:src="@drawable/car_example"
                 app:layout_constraintBottom_toBottomOf="parent"

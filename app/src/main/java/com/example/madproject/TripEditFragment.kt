@@ -314,8 +314,8 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
             //val selectedDate = DateFormat.getDateInstance(DateFormat.SHORT).format(Date(it))
             //dateOfBirth.setText(selectedDate)
 
-            val inputFormat = SimpleDateFormat("dd MMM yyyy", Locale.ROOT)
-            val outputFormat = SimpleDateFormat("MMM dd, yyyy", Locale.ROOT)
+            val inputFormat = SimpleDateFormat("dd MMM yyyy")
+            val outputFormat = SimpleDateFormat("MMM dd, yyyy")
             departureDate.setText(outputFormat.format(inputFormat.parse(picker?.headerText!!)!!))
             departureTime.requestFocus()
         }

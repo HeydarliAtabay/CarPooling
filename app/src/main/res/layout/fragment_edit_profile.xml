@@ -100,7 +100,7 @@
                     android:textColor="?attr/color"
                     android:maxLength="30"
                     android:ems="18"
-                    android:inputType="textPersonName"  />
+                    android:inputType="textCapSentences"  />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -210,7 +210,7 @@
                     android:textSize="16sp"
                     android:textColor="?attr/color"
                     android:ems="18"
-                    android:inputType="text"  />
+                    android:inputType="textCapWords"  />
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
     </ScrollView>

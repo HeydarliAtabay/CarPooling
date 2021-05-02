@@ -80,6 +80,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
 
     override fun onPause() {
         super.onPause()
+        closeKeyboard()
         if (picker?.isVisible == true) picker?.dismiss()
     }
 
@@ -170,6 +171,14 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         }
     }
 
+    private fun closeKeyboard() {
+        val v = this.requireActivity().currentFocus
+        if (v != null) {
+            val imm = this.requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(v.windowToken, 0)
+        }
+    }
+
     private fun fixEditText() {
         fullName.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {  // lost focus
@@ -239,9 +248,11 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         val constraintsBuilder = CalendarConstraints.Builder().setValidator(
                 DateValidatorPointBackward.now()
         )
-        var datePicker = MaterialDatePicker.Builder.datePicker().setCalendarConstraints(
+        var datePicker = MaterialDatePicker.Builder.datePicker()
+            .setTitleText("Select your date of birth")
+            .setCalendarConstraints(
                 constraintsBuilder.build()
-        )
+            )
 
         if (dateOfBirth.text.toString() != "") {
             val currentDate = SimpleDateFormat("MMM dd, yyyy")
@@ -260,9 +271,6 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         }
 
         picker?.addOnPositiveButtonClickListener {
-            //val selectedDate = DateFormat.getDateInstance(DateFormat.SHORT).format(Date(it))
-            //dateOfBirth.setText(selectedDate)
-
             val inputFormat = SimpleDateFormat("dd MMM yyyy")
             val outputFormat = SimpleDateFormat("MMM dd, yyyy")
             dateOfBirth.setText(outputFormat.format(inputFormat.parse(picker?.headerText!!)!!))

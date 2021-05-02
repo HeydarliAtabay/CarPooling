@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.text.InputType
+import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.view.inputmethod.InputMethodManager
@@ -28,6 +29,8 @@ import com.google.android.material.datepicker.DateValidatorPointBackward
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.timepicker.MaterialTimePicker
+import com.google.android.material.timepicker.TimeFormat
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import org.json.JSONObject
@@ -38,6 +41,7 @@ import java.io.InputStream
 import java.math.BigDecimal
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.min
 
 class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     private var currentCarPath: String? = ""
@@ -53,7 +57,8 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     private lateinit var additionalInfo : EditText
     private lateinit var intermediateStop : EditText
     private lateinit var sharedPref: SharedPreferences
-    private var picker: MaterialDatePicker<Long>? = null
+    private var datepicker: MaterialDatePicker<Long>? = null
+    private var timepicker: MaterialTimePicker? = null
 
     private lateinit var trip:Trip
 
@@ -92,11 +97,6 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
 
         setValues()
 
-        //val button = view.findViewById<Button>(R.id.button)
-
-        /*button.setOnClickListener {
-            findNavController().navigate(R.id.action_tripEdit_to_tripList)
-        }*/
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -107,17 +107,8 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.saveButton -> {
-                Toast.makeText(context, "Trip information saved!", Toast.LENGTH_LONG).show()
-                //val snack = Snackbar.make(this.requireActivity().findViewById(R.id.cLayout), R.string.profile_save, Snackbar.LENGTH_SHORT)
-
-                //val tv = snack.view.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
-                /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-                    tv.textAlignment = View.TEXT_ALIGNMENT_CENTER;
-                } else {
-                    tv.gravity = Gravity.CENTER_HORIZONTAL;
-                }
-                snack.show()*/
                 saveTripValues()
+                Toast.makeText(context, "Trip information saved!", Toast.LENGTH_LONG).show()
                 findNavController().navigate(R.id.action_tripEdit_to_tripList)
                 true
             }
@@ -127,7 +118,9 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
 
     override fun onPause() {
         super.onPause()
-        if (picker?.isVisible == true) picker?.dismiss()
+        closeKeyboard()
+        if (datepicker?.isVisible == true) datepicker?.dismiss()
+        if (timepicker?.isVisible == true) timepicker?.dismiss()
     }
 
     override fun onCreateContextMenu(
@@ -185,6 +178,13 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         }
     }
 
+    private fun closeKeyboard() {
+        val v = this.requireActivity().currentFocus
+        if (v != null) {
+            val imm = this.requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(v.windowToken, 0)
+        }
+    }
 
     private fun fixEditText() {
         departure.setOnFocusChangeListener { _, hasFocus ->
@@ -217,6 +217,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
             }
         }
 
+        /*
         departureTime.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {  // lost focus
                 departureTime.setSelection(0, 0)
@@ -225,6 +226,14 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
                 departureTime.hint = "Departure time"
                 val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.showSoftInput(departureTime, InputMethodManager.SHOW_IMPLICIT)
+            }
+        }*/
+
+        departureTime.inputType = InputType.TYPE_NULL
+
+        departureTime.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                setTimePicker()
             }
         }
 
@@ -290,37 +299,93 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
                 DateValidatorPointForward.now()
         )
 
-        var datePicker = MaterialDatePicker.Builder.datePicker().setCalendarConstraints(
+        var dPicker = MaterialDatePicker.Builder.datePicker()
+            .setTitleText("Select trip departure date")
+            .setCalendarConstraints(
                 constraintsBuilder.build()
-        )
+            )
 
         if (departureDate.text.toString() != "") {
             val currentDate = SimpleDateFormat("MMM dd, yyyy")
             currentDate.timeZone = TimeZone.getTimeZone("UTC")
             val p = currentDate.parse(departureDate.text.toString())
-            datePicker = datePicker.setSelection(p?.time)
+            dPicker = dPicker.setSelection(p?.time)
         }
-        picker = datePicker.build()
+        datepicker = dPicker.build()
 
-        picker?.addOnCancelListener {
+        datepicker?.addOnCancelListener {
             departureDate.clearFocus()
         }
 
-        picker?.addOnNegativeButtonClickListener {
+        datepicker?.addOnNegativeButtonClickListener {
             departureDate.clearFocus()
         }
 
-        picker?.addOnPositiveButtonClickListener {
+        datepicker?.addOnPositiveButtonClickListener {
             //val selectedDate = DateFormat.getDateInstance(DateFormat.SHORT).format(Date(it))
             //dateOfBirth.setText(selectedDate)
 
             val inputFormat = SimpleDateFormat("dd MMM yyyy")
             val outputFormat = SimpleDateFormat("MMM dd, yyyy")
-            departureDate.setText(outputFormat.format(inputFormat.parse(picker?.headerText!!)!!))
+            departureDate.setText(outputFormat.format(inputFormat.parse(datepicker?.headerText!!)!!))
             departureTime.requestFocus()
         }
 
-        picker?.show(this.requireActivity().supportFragmentManager, picker.toString())
+        datepicker?.show(this.requireActivity().supportFragmentManager, datepicker.toString())
+    }
+
+    private fun parseTime(hour: Int?, minute: Int?): String {
+        if ((hour == null) || (minute == null)) return ""
+
+        val h = if (hour < 10) "0$hour" else hour.toString()
+        val m = if (minute < 10) "0$minute" else minute.toString()
+
+        return "$h:$m"
+    }
+
+    private fun unParseTime(time: String): Int {
+        val first = time[0]
+        val second = time[1]
+        if (first.toInt() == 0) return second.toInt()
+
+        return time.toInt()
+    }
+
+    private fun setTimePicker() {
+
+        var h = 0
+        var m = 0
+
+
+        if (departureTime.text.toString() != "") {
+            val s = departureTime.text.toString().split(":")
+            if (s.size == 2) {
+                h = unParseTime(s[0])
+                m = unParseTime(s[1])
+            }
+        }
+
+        timepicker = MaterialTimePicker.Builder()
+            .setTitleText("Select trip departure time")
+            .setTimeFormat(TimeFormat.CLOCK_24H)
+            .setHour(h)
+            .setMinute(m)
+            .build()
+
+        timepicker?.addOnCancelListener {
+            departureTime.clearFocus()
+        }
+
+        timepicker?.addOnNegativeButtonClickListener {
+            departureTime.clearFocus()
+        }
+
+        timepicker?.addOnPositiveButtonClickListener {
+            departureTime.setText(parseTime(timepicker?.hour, timepicker?.minute))
+            duration.requestFocus()
+        }
+
+        timepicker?.show(this.requireActivity().supportFragmentManager, timepicker.toString())
     }
 
     private fun setValues() {

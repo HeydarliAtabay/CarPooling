@@ -44,6 +44,11 @@
         <item name="civ_border_width">1dp</item>
     </style>
 
+    <style name="CardViewBorder">
+        <item name="strokeColor">#737373</item>
+        <item name="strokeWidth">1dp</item>
+    </style>
+
     <style name="MyTextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="android:textColorHint">@color/white</item>
         <item name="boxStrokeWidth">2dp</item>

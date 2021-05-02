@@ -28,21 +28,26 @@ import java.io.File
 class TripListFragment : Fragment(R.layout.fragment_trip_list) {
     lateinit var tripList: List<Trip>
     lateinit var emptyList: TextView
+    lateinit var emptyList2: TextView
     lateinit var sharedPref: SharedPreferences
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         sharedPref = requireActivity().getPreferences(Context.MODE_PRIVATE)
         emptyList = view.findViewById(R.id.emptyList)
+        emptyList2 = view.findViewById(R.id.emptyList2)
 
         val fab=view.findViewById<FloatingActionButton>(R.id.fab)
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView2)
+        recyclerView.setHasFixedSize(true)
+        recyclerView.setItemViewCacheSize(3)
         recyclerView.layoutManager = LinearLayoutManager(this.requireActivity())
 
         if(sharedPref.contains(ValueIds.JSON_OBJECT_TRIPS.value)) {
             loadTrips()
             emptyList.visibility = View.INVISIBLE
+            emptyList2.visibility = View.INVISIBLE
             recyclerView.adapter = TripsAdapter(tripList)
         }
 
@@ -159,9 +164,7 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
         }
 
         override fun onBindViewHolder(holder: TripViewHolder, position: Int) {
-
             holder.bind(data[position])
-
         }
 
         override fun getItemCount(): Int {

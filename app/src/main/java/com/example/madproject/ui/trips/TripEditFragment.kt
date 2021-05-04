@@ -1,39 +1,35 @@
-package com.example.madproject
+package com.example.madproject.ui.trips
 
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.text.InputType
-import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.core.content.FileProvider
 import androidx.core.content.edit
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
+import com.example.madproject.R
+import com.example.madproject.data.Trip
 import com.example.madproject.lib.FixOrientation
 import com.example.madproject.lib.Requests
 import com.example.madproject.lib.ValueIds
 import com.google.android.material.datepicker.CalendarConstraints
-import com.google.android.material.datepicker.DateValidatorPointBackward
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
-import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -41,10 +37,10 @@ import java.io.InputStream
 import java.math.BigDecimal
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.math.min
 
 class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     private var currentCarPath: String? = ""
+    private var newCarPath: String? = ""
     private lateinit var imageCar : ImageView
     private lateinit var photoCarURI: Uri
     private lateinit var departure : EditText
@@ -59,21 +55,9 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     private lateinit var sharedPref: SharedPreferences
     private var datepicker: MaterialDatePicker<Long>? = null
     private var timepicker: MaterialTimePicker? = null
+    private val sharedModel: SharedTripViewModel by activityViewModels()
+    private lateinit var trip: Trip
 
-    private lateinit var trip:Trip
-
-    private val args: TripEditFragmentArgs by navArgs()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        val resPath = savedInstanceState?.getString("currentCarPath")
-        currentCarPath = if (resPath === null) "" else resPath
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putString("currentCarPath", currentCarPath)
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         imageCar = view.findViewById(R.id.imageCar)
@@ -121,6 +105,8 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         closeKeyboard()
         if (datepicker?.isVisible == true) datepicker?.dismiss()
         if (timepicker?.isVisible == true) timepicker?.dismiss()
+        updateTrip()
+        sharedModel.select(trip)
     }
 
     override fun onCreateContextMenu(
@@ -154,7 +140,12 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == AppCompatActivity.RESULT_OK) {
             when (requestCode) {
-                Requests.INTENT_CAPTURE_PHOTO.value -> setCarPic()
+                Requests.INTENT_CAPTURE_PHOTO.value -> {
+                    val oldImgFile = File(currentCarPath!!)
+                    oldImgFile.delete()
+                    currentCarPath = newCarPath
+                    setCarPic()
+                }
 
                 Requests.INTENT_PHOTO_FROM_GALLERY.value -> {
                     val inputStream: InputStream? = data?.data?.let {
@@ -172,6 +163,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
                             "com.example.android.fileprovider",
                             outputFile
                     )
+                    currentCarPath = newCarPath
                     setCarPic()
                 }
             }
@@ -216,18 +208,6 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
                 setDatePicker()
             }
         }
-
-        /*
-        departureTime.setOnFocusChangeListener { _, hasFocus ->
-            if (!hasFocus) {  // lost focus
-                departureTime.setSelection(0, 0)
-                departureTime.hint = ""
-            } else {
-                departureTime.hint = "Departure time"
-                val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                imm.showSoftInput(departureTime, InputMethodManager.SHOW_IMPLICIT)
-            }
-        }*/
 
         departureTime.inputType = InputType.TYPE_NULL
 
@@ -322,8 +302,6 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         }
 
         datepicker?.addOnPositiveButtonClickListener {
-            //val selectedDate = DateFormat.getDateInstance(DateFormat.SHORT).format(Date(it))
-            //dateOfBirth.setText(selectedDate)
 
             val inputFormat = SimpleDateFormat("dd MMM yyyy")
             val outputFormat = SimpleDateFormat("MMM dd, yyyy")
@@ -388,18 +366,37 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         timepicker?.show(this.requireActivity().supportFragmentManager, timepicker.toString())
     }
 
+    private fun updateTrip() {
+        trip = Trip(
+                id = trip.id,
+                imagePath = currentCarPath!!,
+                from = departure.text.toString(),
+                to = arrival.text.toString(),
+                departureDate = departureDate.text.toString(),
+                departureTime = departureTime.text.toString(),
+                duration = duration.text.toString(),
+                availableSeat = availableSeats.text.toString(),
+                additionalInfo = additionalInfo.text.toString(),
+                intermediateStop = intermediateStop.text.toString(),
+                price = BigDecimal(if(price.text.toString()=="") "0" else price.text.toString())
+        )
+    }
+
     private fun setValues() {
-        departure.setText(args.group11Lab2TRIPDEPARTURE)
-        arrival.setText(args.group11Lab2TRIPARRIVAL)
-        departureDate.setText(args.group11Lab2TRIPDATE)
-        departureTime.setText(args.group11Lab2TRIPTIME)
-        duration.setText(args.group11Lab2TRIPDURATION)
-        availableSeats.setText(args.group11Lab2TRIPSEATS)
-        price.setText(args.group11Lab2TRIPPRICE)
-        additionalInfo.setText(args.group11Lab2TRIPINFO)
-        intermediateStop.setText(args.group11Lab2TRIPSTOPS)
-        if (currentCarPath == "") currentCarPath = args.group11Lab2CURRENTCARPHOTOPATH
-        setCarPic()
+        sharedModel.selected.observe(viewLifecycleOwner, { t ->
+            trip = t
+            departure.setText(t.from)
+            arrival.setText(t.to)
+            departureDate.setText(t.departureDate)
+            departureTime.setText(t.departureTime)
+            duration.setText(t.duration)
+            availableSeats.setText(t.availableSeat)
+            price.setText(t.price?.toEngineeringString())
+            additionalInfo.setText(t.additionalInfo)
+            intermediateStop.setText(t.intermediateStop)
+            currentCarPath = t.imagePath
+            setCarPic()
+        })
     }
 
     @SuppressLint("SimpleDateFormat")
@@ -414,7 +411,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
                 storageDir /* directory */
         ).apply {
             // Save a file: path for use with ACTION_VIEW intents
-            currentCarPath = absolutePath
+            newCarPath = absolutePath
         }
     }
 
@@ -454,18 +451,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     }
 
     private fun saveTripValues() {
-
-        val carPath:String = if(currentCarPath==null) "" else currentCarPath!!
-        trip = Trip(-1, carPath,
-            departure.text.toString(),
-            arrival.text.toString(),
-            departureDate.text.toString(),
-            departureTime.text.toString(),
-            duration.text.toString(),
-            availableSeats.text.toString(),
-            additionalInfo.text.toString(),
-            intermediateStop.text.toString(),
-            BigDecimal(if(price.text.toString()=="") "0" else price.text.toString()))
+        updateTrip()
 
         var tripList:MutableList<Trip> = mutableListOf()
         val gson = Gson()
@@ -474,16 +460,13 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
             val type = object : TypeToken<MutableList<Trip>>() {}.type
             if (pref != null) {
                 tripList = gson.fromJson(pref, type)
-                trip.id = tripList.size
             }
-
-            if (args.group11Lab2TRIPID == -1) {
+            if (trip.id == -1) {
+                trip.id = tripList.size
                 tripList.add(trip)
             } else {
-                trip.id = args.group11Lab2TRIPID
                 tripList[trip.id] = trip
             }
-
         }
         else{
             trip.id = 0

@@ -1,4 +1,4 @@
-package com.example.madproject
+package com.example.madproject.ui.trips
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -6,13 +6,12 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.appcompat.widget.Toolbar
 import androidx.core.content.FileProvider
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
+import com.example.madproject.R
 import com.example.madproject.lib.FixOrientation
 import java.io.File
 
@@ -30,8 +29,7 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
     private lateinit var additionalInfo : TextView
     private lateinit var intermediateStop : TextView
     private lateinit var sharedPref: SharedPreferences
-
-    private val args: TripDetailFragmentArgs by navArgs()
+    private val sharedModel: SharedTripViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         imageCar = view.findViewById(R.id.imageCar)
@@ -52,17 +50,19 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
     }
 
     private fun setValuesTrip() {
-        departure.text = args.group11Lab2TRIPDEPARTURE
-        arrival.text = args.group11Lab2TRIPARRIVAL
-        departureDate.text = args.group11Lab2TRIPDATE
-        departureTime.text = args.group11Lab2TRIPTIME
-        duration.text = args.group11Lab2TRIPDURATION
-        availableSeats.text = args.group11Lab2TRIPSEATS
-        price.text = args.group11Lab2TRIPPRICE
-        additionalInfo.text = args.group11Lab2TRIPINFO
-        intermediateStop.text = args.group11Lab2TRIPSTOPS
-        if (currentCarPath == "") currentCarPath = args.group11Lab2CURRENTCARPHOTOPATH
-        setCarPic()
+        sharedModel.selected.observe(viewLifecycleOwner, { trip ->
+            departure.text = trip.from
+            arrival.text = trip.to
+            departureDate.text = trip.departureDate
+            departureTime.text = trip.departureTime
+            duration.text = trip.duration
+            availableSeats.text = trip.availableSeat
+            price.text = trip.price?.toEngineeringString()
+            additionalInfo.text = trip.additionalInfo
+            intermediateStop.text = trip.intermediateStop
+            currentCarPath = trip.imagePath
+            setCarPic()
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -82,20 +82,7 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.editButton -> {
-                val action = TripDetailFragmentDirections.actionTripDetailToTripEdit(
-                        group11Lab2TRIPID = args.group11Lab2TRIPID,
-                        group11Lab2TRIPDEPARTURE = departure.text.toString(),
-                        group11Lab2TRIPARRIVAL = arrival.text.toString(),
-                        group11Lab2TRIPDATE = departureDate.text.toString(),
-                        group11Lab2TRIPTIME = departureTime.text.toString(),
-                        group11Lab2TRIPDURATION = duration.text.toString(),
-                        group11Lab2TRIPSEATS = availableSeats.text.toString(),
-                        group11Lab2TRIPPRICE = price.text.toString(),
-                        group11Lab2TRIPINFO = additionalInfo.text.toString(),
-                        group11Lab2TRIPSTOPS = intermediateStop.text.toString(),
-                        group11Lab2CURRENTCARPHOTOPATH = currentCarPath!!
-                )
-                findNavController().navigate(action)
+                findNavController().navigate(R.id.action_tripDetail_to_tripEdit)
                 true
             }
             else -> super.onOptionsItemSelected(item)

@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/showProfile"
-        android:name="com.example.madproject.ShowProfileFragment"
+        android:name="com.example.madproject.ui.profile.ShowProfileFragment"
         android:label="Your profile"
         tools:layout="@layout/fragment_show_profile" >
         <action
@@ -20,7 +20,7 @@
 
     <fragment
         android:id="@+id/editProfile"
-        android:name="com.example.madproject.EditProfileFragment"
+        android:name="com.example.madproject.ui.profile.EditProfileFragment"
         android:label="Edit your profile..."
         tools:layout="@layout/fragment_edit_profile" >
         <action
@@ -29,39 +29,11 @@
             app:enterAnim="@anim/fade_in"
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/slide_in" />
-        <argument
-            android:name="group11.lab2.FULL_NAME"
-            app:argType="string"
-            android:defaultValue="Guest profile" />
-        <argument
-            android:name="group11.lab2.NICKNAME"
-            app:argType="string"
-            android:defaultValue="" />
-        <argument
-            android:name="group11.lab2.EMAIL"
-            app:argType="string"
-            android:defaultValue="" />
-        <argument
-            android:name="group11.lab2.LOCATION"
-            app:argType="string"
-            android:defaultValue="" />
-        <argument
-            android:name="group11.lab2.PHONE_NUMBER"
-            app:argType="string"
-            android:defaultValue="" />
-        <argument
-            android:name="group11.lab2.DATE_OF_BIRTH"
-            app:argType="string"
-            android:defaultValue="" />
-        <argument
-            android:name="group11.lab2.CURRENT_PHOTO_PATH"
-            app:argType="string"
-            android:defaultValue="" />
     </fragment>
 
     <fragment
         android:id="@+id/tripList"
-        android:name="com.example.madproject.TripListFragment"
+        android:name="com.example.madproject.ui.trips.TripListFragment"
         android:label="Trip list"
         tools:layout="@layout/fragment_trip_list" >
 
@@ -81,7 +53,7 @@
 
     <fragment
         android:id="@+id/tripDetail"
-        android:name="com.example.madproject.TripDetailFragment"
+        android:name="com.example.madproject.ui.trips.TripDetailFragment"
         android:label="Trip details"
         tools:layout="@layout/fragment_trip_detail" >
 
@@ -91,54 +63,11 @@
             app:enterAnim="@anim/slide_in"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/slide_out" />
-        <argument
-            android:name="group11.lab2.TRIP_ID"
-            app:argType="integer" />
-        <argument
-            android:name="group11.lab2.TRIP_DEPARTURE"
-            app:argType="string"
-            android:defaultValue="" />
-        <argument
-            android:name="group11.lab2.TRIP_ARRIVAL"
-            app:argType="string"
-            android:defaultValue="" />
-        <argument
-            android:name="group11.lab2.TRIP_DATE"
-            app:argType="string"
-            android:defaultValue="" />
-        <argument
-            android:name="group11.lab2.TRIP_TIME"
-            app:argType="string"
-            android:defaultValue="" />
-        <argument
-            android:name="group11.lab2.TRIP_DURATION"
-            app:argType="string"
-            android:defaultValue="" />
-        <argument
-            android:name="group11.lab2.TRIP_SEATS"
-            app:argType="string"
-            android:defaultValue="" />
-        <argument
-            android:name="group11.lab2.TRIP_PRICE"
-            app:argType="string"
-            android:defaultValue="" />
-        <argument
-            android:name="group11.lab2.TRIP_INFO"
-            app:argType="string"
-            android:defaultValue="" />
-        <argument
-            android:name="group11.lab2.TRIP_STOPS"
-            app:argType="string"
-            android:defaultValue="" />
-        <argument
-            android:name="group11.lab2.CURRENT_CAR_PHOTO_PATH"
-            app:argType="string"
-            android:defaultValue="" />
     </fragment>
 
     <fragment
         android:id="@+id/tripEdit"
-        android:name="com.example.madproject.TripEditFragment"
+        android:name="com.example.madproject.ui.trips.TripEditFragment"
         android:label="Edit your trip..."
         tools:layout="@layout/fragment_trip_edit" >
 
@@ -148,49 +77,6 @@
             app:enterAnim="@anim/fade_in"
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/slide_in" />
-        <argument
-            android:name="group11.lab2.TRIP_ID"
-            app:argType="integer" />
-        <argument
-            android:name="group11.lab2.TRIP_DEPARTURE"
-            app:argType="string"
-            android:defaultValue="" />
-        <argument
-            android:name="group11.lab2.TRIP_ARRIVAL"
-            app:argType="string"
-            android:defaultValue="" />
-        <argument
-            android:name="group11.lab2.TRIP_DATE"
-            app:argType="string"
-            android:defaultValue="" />
-        <argument
-            android:name="group11.lab2.TRIP_TIME"
-            app:argType="string"
-            android:defaultValue="" />
-        <argument
-            android:name="group11.lab2.TRIP_DURATION"
-            app:argType="string"
-            android:defaultValue="" />
-        <argument
-            android:name="group11.lab2.TRIP_SEATS"
-            app:argType="string"
-            android:defaultValue="" />
-        <argument
-            android:name="group11.lab2.TRIP_PRICE"
-            app:argType="string"
-            android:defaultValue="" />
-        <argument
-            android:name="group11.lab2.TRIP_INFO"
-            app:argType="string"
-            android:defaultValue="" />
-        <argument
-            android:name="group11.lab2.TRIP_STOPS"
-            app:argType="string"
-            android:defaultValue="" />
-        <argument
-            android:name="group11.lab2.CURRENT_CAR_PHOTO_PATH"
-            app:argType="string"
-            android:defaultValue="" />
     </fragment>
 
 </navigation>

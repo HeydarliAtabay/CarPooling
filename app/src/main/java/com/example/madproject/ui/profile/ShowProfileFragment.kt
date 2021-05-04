@@ -1,4 +1,4 @@
-package com.example.madproject
+package com.example.madproject.ui.profile
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -11,9 +11,12 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.FileProvider
 import androidx.core.content.edit
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
-import com.example.madproject.lib.FixOrientation
-import com.example.madproject.lib.ValueIds
+import com.example.madproject.R
+import com.example.madproject.data.Profile
+import com.example.madproject.lib.*
 import com.google.android.material.navigation.NavigationView
 import org.json.JSONObject
 import java.io.File
@@ -29,7 +32,9 @@ class ShowProfileFragment : Fragment(R.layout.fragment_show_profile) {
     private lateinit var image : ImageView
     private var currentPhotoPath: String? = ""
     private lateinit var photoURI: Uri
+    private lateinit var profile: Profile
     private lateinit var sharedPref: SharedPreferences
+    private val model: SharedProfileViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
@@ -44,7 +49,8 @@ class ShowProfileFragment : Fragment(R.layout.fragment_show_profile) {
 
         // If the sharedPref does not exist (first run) it is created with the default values
         if (!sharedPref.contains(ValueIds.JSON_OBJECT_PROFILE.value)) saveValues()
-        loadValues()
+        loadValuesDB()
+
         //aggiorna il navigation header
         setNavigationHeader()
 
@@ -59,16 +65,16 @@ class ShowProfileFragment : Fragment(R.layout.fragment_show_profile) {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.editButton -> {
-                val action = ShowProfileFragmentDirections.actionShowProfileToEditProfile(
-                    group11Lab2FULLNAME = fullName.text.toString(),
-                    group11Lab2NICKNAME = nickName.text.toString(),
-                    group11Lab2EMAIL = email.text.toString(),
-                    group11Lab2DATEOFBIRTH = dateOfBirth.text.toString(),
-                    group11Lab2LOCATION = location.text.toString(),
-                    group11Lab2PHONENUMBER = phoneNumber.text.toString(),
-                    group11Lab2CURRENTPHOTOPATH = currentPhotoPath!!
-                )
-                findNavController().navigate(action)
+                model.select(Profile(
+                        fullName = fullName.text.toString(),
+                        nickName = nickName.text.toString(),
+                        email = email.text.toString(),
+                        dateOfBirth = dateOfBirth.text.toString(),
+                        location = location.text.toString(),
+                        phoneNumber = phoneNumber.text.toString(),
+                        currentPhotoPath = currentPhotoPath
+                ))
+                findNavController().navigate(R.id.action_showProfile_to_editProfile)
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -94,7 +100,7 @@ class ShowProfileFragment : Fragment(R.layout.fragment_show_profile) {
         }
     }
 
-    private fun loadValues() {
+    private fun loadValuesDB() {
         val pref = sharedPref.getString(ValueIds.JSON_OBJECT_PROFILE.value, null)
 
         if (pref != null) {
@@ -107,7 +113,6 @@ class ShowProfileFragment : Fragment(R.layout.fragment_show_profile) {
             phoneNumber.text = dataObj.getString(ValueIds.PHONE_NUMBER.value)
             location.text = dataObj.getString(ValueIds.LOCATION.value)
             currentPhotoPath = dataObj.getString(ValueIds.CURRENT_PHOTO_PATH.value)
-
             setPic()
         }
     }

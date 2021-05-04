@@ -1,15 +1,15 @@
-package com.example.madproject
+package com.example.madproject.ui.profile
 
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.text.InputType
+import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
@@ -17,16 +17,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.core.content.edit
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
-import com.example.madproject.lib.FixOrientation
-import com.example.madproject.lib.Requests
-import com.example.madproject.lib.ValueIds
+import com.example.madproject.R
+import androidx.lifecycle.Observer
+import com.example.madproject.data.Profile
+import com.example.madproject.lib.*
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointBackward
 import com.google.android.material.datepicker.MaterialDatePicker
-import com.google.android.material.snackbar.Snackbar
-import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
@@ -45,17 +44,12 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     private lateinit var dateOfBirth: EditText
     private lateinit var image:ImageView
     private var currentPhotoPath: String? = ""
+    private var newPhotoPath: String? = ""
     private lateinit var photoURI: Uri
     private lateinit var sharedPref: SharedPreferences
+    private lateinit var profile: Profile
     private var picker: MaterialDatePicker<Long>? = null
-
-    private val args: EditProfileFragmentArgs by navArgs()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        val resPath = savedInstanceState?.getString("currentPhotoPath")
-        currentPhotoPath = if (resPath === null) "" else resPath
-    }
+    private val model: SharedProfileViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
@@ -82,11 +76,8 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         super.onPause()
         closeKeyboard()
         if (picker?.isVisible == true) picker?.dismiss()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putString("currentPhotoPath", currentPhotoPath)
+        updateProfile()
+        model.select(profile)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -98,16 +89,6 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         return when (item.itemId) {
             R.id.saveButton -> {
                 Toast.makeText(context, "Profile information saved!", Toast.LENGTH_LONG).show()
-                /*
-                val snack = Snackbar.make(this.requireActivity().findViewById(R.id.cLayout), R.string.profile_save, Snackbar.LENGTH_SHORT)
-
-                val tv = snack.view.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-                    tv.textAlignment = View.TEXT_ALIGNMENT_CENTER;
-                } else {
-                    tv.gravity = Gravity.CENTER_HORIZONTAL;
-                }
-                snack.show()*/
                 saveValues()
                 findNavController().navigate(R.id.action_editProfile_to_showProfile)
                 true
@@ -147,7 +128,10 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == AppCompatActivity.RESULT_OK) {
             when (requestCode) {
-                Requests.INTENT_CAPTURE_PHOTO.value -> setPic()
+                Requests.INTENT_CAPTURE_PHOTO.value -> {
+                    currentPhotoPath = newPhotoPath
+                    setPic()
+                }
 
                 Requests.INTENT_PHOTO_FROM_GALLERY.value -> {
                     val inputStream: InputStream? = data?.data?.let {
@@ -160,11 +144,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                     inputStream?.copyTo(fileOutputStream)
                     fileOutputStream.close()
                     inputStream?.close()
-                    photoURI = FileProvider.getUriForFile(
-                            this.requireActivity(),
-                            "com.example.android.fileprovider",
-                            outputFile
-                    )
+                    currentPhotoPath = newPhotoPath
                     setPic()
                 }
             }
@@ -281,17 +261,35 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     }
 
     private fun setValues() {
-        if (args.group11Lab2FULLNAME == "Guest profile") fullName.setText("") else fullName.setText(args.group11Lab2FULLNAME)
-        nickName.setText(args.group11Lab2NICKNAME)
-        email.setText(args.group11Lab2EMAIL)
-        dateOfBirth.setText(args.group11Lab2DATEOFBIRTH)
-        phoneNumber.setText(args.group11Lab2PHONENUMBER)
-        location.setText(args.group11Lab2LOCATION)
-        if (currentPhotoPath == "") currentPhotoPath = args.group11Lab2CURRENTPHOTOPATH
-        setPic()
+        model.profile.observe(viewLifecycleOwner, Observer { profile ->
+            this.profile = profile
+            if (profile.fullName == "Guest profile") fullName.setText("") else fullName.setText(profile.fullName)
+            nickName.setText(profile.nickName)
+            email.setText(profile.email)
+            dateOfBirth.setText(profile.dateOfBirth)
+            phoneNumber.setText(profile.phoneNumber)
+            location.setText(profile.location)
+            currentPhotoPath = profile.currentPhotoPath
+            setPic()
+        })
+    }
+
+    private fun updateProfile() {
+        profile = Profile(
+            fullName = fullName.text.toString(),
+            nickName = nickName.text.toString(),
+            dateOfBirth = dateOfBirth.text.toString(),
+            email = email.text.toString(),
+            phoneNumber = phoneNumber.text.toString(),
+            location = location.text.toString(),
+            currentPhotoPath = currentPhotoPath
+        )
     }
 
     private fun saveValues() {
+        updateProfile()
+        model.select(profile)
+
         val dataObj = JSONObject()
 
         dataObj.put(ValueIds.FULL_NAME.value, fullName.text.toString())
@@ -320,7 +318,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                 storageDir /* directory */
         ).apply {
             // Save a file: path for use with ACTION_VIEW intents
-            currentPhotoPath = absolutePath
+            newPhotoPath = absolutePath
         }
     }
 

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "288387279015",
+    "project_id": "car-pooling-4c086",
+    "storage_bucket": "car-pooling-4c086.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:288387279015:android:ba88688a22bdde06a61382",
+        "android_client_info": {
+          "package_name": "it.polito.mad.firebaseapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "288387279015-l6oam65i9m0ep2ne9b9iip0p5nn90sdr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDB1PFYhTSkI9aXiekBCg0UGdLOdD1jOR8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "288387279015-l6oam65i9m0ep2ne9b9iip0p5nn90sdr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

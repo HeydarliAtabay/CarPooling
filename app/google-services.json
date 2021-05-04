@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:288387279015:android:ba88688a22bdde06a61382",
+        "mobilesdk_app_id": "1:288387279015:android:b9d7884bf907bb25a61382",
         "android_client_info": {
-          "package_name": "it.polito.mad.firebaseapplication"
+          "package_name": "com.example.madproject"
         }
       },
       "oauth_client": [

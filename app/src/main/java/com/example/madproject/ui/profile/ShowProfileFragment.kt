@@ -49,10 +49,8 @@ class ShowProfileFragment : Fragment(R.layout.fragment_show_profile) {
             if (it == null) {
                 Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
             } else {
-                Log.d("test", "$it")
                 profile = it
                 setProfile()
-
             }
         })
         setProfile()

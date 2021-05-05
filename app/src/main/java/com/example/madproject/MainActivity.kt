@@ -1,34 +1,33 @@
 package com.example.madproject
 
-import android.content.Context
-import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.FileProvider
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.example.madproject.data.Profile
 import com.example.madproject.lib.FixOrientation
-import com.example.madproject.lib.ValueIds
+import com.example.madproject.ui.profile.SharedProfileViewModel
 import com.google.android.material.navigation.NavigationView
-import org.json.JSONObject
 import java.io.File
-import java.lang.RuntimeException
-
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
-    private lateinit var sharedPref: SharedPreferences
     private lateinit var navView: NavigationView
+    private var profile = Profile()
+    private lateinit var model: SharedProfileViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,26 +46,30 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
-        sharedPref = getPreferences(Context.MODE_PRIVATE)
+        model = ViewModelProviders.of(this)
+            .get(SharedProfileViewModel::class.java)
 
-        if (!sharedPref.contains(ValueIds.JSON_OBJECT_PROFILE.value)) setDefaultNavigationHeader() else loadNavigationHeader()
 
-
+        model.getUser().observe(this, {
+            if (it == null) {
+                Toast.makeText(this, "Firebase Failure!", Toast.LENGTH_LONG).show()
+            } else {
+                profile = it
+                loadNavigationHeader()
+            }
+        })
+        loadNavigationHeader()
     }
 
     private fun loadNavigationHeader() {
-        val pref = sharedPref.getString(ValueIds.JSON_OBJECT_PROFILE.value, null)
         val header: View = navView.getHeaderView(0)
         val profilePictureHeader: ImageView = header.findViewById(R.id.imageViewHeader)
         val profileNameHeader: TextView = header.findViewById(R.id.nameHeader)
 
-        if (pref != null) {
-            val dataObj = JSONObject(pref)
-            val profileName = dataObj.getString(ValueIds.FULL_NAME.value)
-            val currentPhotoPath = dataObj.getString(ValueIds.CURRENT_PHOTO_PATH.value)
-            setPic(currentPhotoPath, profilePictureHeader)
-            profileNameHeader.text = profileName
-        }
+        val profileName = profile.fullName
+        val currentPhotoPath = profile.currentPhotoPath ?: ""
+        setPic(currentPhotoPath, profilePictureHeader)
+        profileNameHeader.text = profileName
     }
 
     private fun setPic(currentPhotoPath: String, profilePicture: ImageView) {
@@ -76,14 +79,6 @@ class MainActivity : AppCompatActivity() {
             val pic = FixOrientation.handleSamplingAndRotationBitmap(this.applicationContext, photoURI)
             profilePicture.setImageBitmap(pic)
         } else profilePicture.setImageResource(R.drawable.avatar)
-    }
-
-    private fun setDefaultNavigationHeader() {
-        val header : View = navView.getHeaderView(0)
-        val profilePicture:ImageView  = header.findViewById(R.id.imageViewHeader)
-        val profileName: TextView = header.findViewById(R.id.nameHeader)
-        profilePicture.setImageResource(R.drawable.avatar)
-        profileName.text = "Guest profile"
     }
 
     override fun onSupportNavigateUp(): Boolean {

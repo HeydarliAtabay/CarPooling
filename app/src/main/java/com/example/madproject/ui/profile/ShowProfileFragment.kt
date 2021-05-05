@@ -2,6 +2,7 @@ package com.example.madproject.ui.profile
 
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
@@ -44,8 +45,9 @@ class ShowProfileFragment : Fragment(R.layout.fragment_show_profile) {
         model = ViewModelProviders.of(this)
             .get(SharedProfileViewModel::class.java)
 
+        val storageDir: File? = this.requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
 
-        model.getUser().observe(viewLifecycleOwner, {
+        model.getUser(storageDir).observe(viewLifecycleOwner, {
             if (it == null) {
                 Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
             } else {

@@ -46,6 +46,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     private var picker: MaterialDatePicker<Long>? = null
     private lateinit var model: SharedProfileViewModel
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
         fullName = view.findViewById(R.id.fullName)

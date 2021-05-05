@@ -1,4 +1,14 @@
 <resources>
     <string name="app_name">Car Pooling</string>
     <string name="profile_save">Profile information saved!</string>
+    <string name="required_string"> <sup><small>*</small></sup>Required field </string>
+    <string name="departure"> Departure<sup><small>*</small></sup> </string>
+    <string name="arrival"> Arrival<sup><small>*</small></sup> </string>
+    <string name="date"> Date<sup><small>*</small></sup> </string>
+    <string name="time"> Time<sup><small>*</small></sup> </string>
+    <string name="seats"> Available seats<sup><small>*</small></sup> </string>
+    <string name="price"> Price<sup><small>*</small></sup> </string>
+    <string name="duration"> Estimated duration (hours) </string>
+    <string name="info"> Additional information </string>
+    <string name="stops"> Intermediate stops </string>
 </resources>

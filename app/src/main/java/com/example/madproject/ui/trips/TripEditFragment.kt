@@ -86,8 +86,13 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.saveButton -> {
-                saveTripValues()
-                findNavController().navigate(R.id.action_tripEdit_to_tripList)
+
+                if (formCheck()) {
+                    saveTripValues()
+                    findNavController().navigate(R.id.action_tripEdit_to_tripList)
+                } else {
+                    Toast.makeText(context, "Insert the required fields to save the trip!", Toast.LENGTH_LONG).show()
+                }
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -442,6 +447,13 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
                 }
             }
         }
+    }
+
+    private fun formCheck(): Boolean {
+
+
+
+        return false
     }
 
     private fun saveTripValues() {

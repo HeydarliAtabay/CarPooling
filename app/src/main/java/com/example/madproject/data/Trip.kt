@@ -1,6 +1,7 @@
 package com.example.madproject.data
 
-data class Trip(var id: String = "",
+data class Trip(val user: String = "",
+                var id: String = "",
                 val imagePath: String = "",
                 val from: String = "",
                 val to: String = "",
@@ -10,5 +11,5 @@ data class Trip(var id: String = "",
                 val availableSeat: String = "",
                 val additionalInfo: String = "",
                 val intermediateStop: String = "",
-                var price: String = ""
-                ){}
+                val price: String = ""
+                )

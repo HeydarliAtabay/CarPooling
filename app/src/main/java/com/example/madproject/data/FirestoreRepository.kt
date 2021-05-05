@@ -10,16 +10,16 @@ class FirestoreRepository {
     //var user = FirebaseAuth.getInstance().currentUser  Use it when the auth is implemented
 
     fun addTrip(t: Trip): Task<Void> {
-        val id = firestoreDB.collection("Trips").document().id
+        val id = firestoreDB.collection("users/user@gmail.com/createdTrips").document().id
         t.id = id
-        return firestoreDB.collection("Trips").document(id).set(t)
+        return firestoreDB.collection("users/user@gmail.com/createdTrips").document(id).set(t)
     }
 
     fun updateTrip(t: Trip): Task<Void> {
-        return firestoreDB.collection("Trips").document(t.id).set(t)
+        return firestoreDB.collection("users/user@gmail.com/createdTrips").document(t.id).set(t)
     }
 
     fun getTrips(): CollectionReference {
-        return firestoreDB.collection("Trips")
+        return firestoreDB.collection("users/user@gmail.com/createdTrips")
     }
 }

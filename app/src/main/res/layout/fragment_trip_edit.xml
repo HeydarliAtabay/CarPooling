@@ -66,8 +66,6 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-
-
     <ScrollView
         android:id="@+id/scrollView5"
         android:layout_width="match_parent"
@@ -76,6 +74,7 @@
         android:layout_marginLeft="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
+        android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -85,16 +84,16 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/text_input_layout6"
+                android:id="@+id/tilDeparture"
                 style="@style/MyTextInputLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:hint="@string/departure"
                 app:endIconMode="clear_text"
-                app:startIconDrawable="@drawable/outline_trip_origin_black_24"
-                android:hint="Departure" >
+                app:startIconDrawable="@drawable/outline_trip_origin_black_24">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/departure_location"
@@ -110,57 +109,56 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/text_input_layout7"
+                android:id="@+id/tilArrival"
                 style="@style/MyTextInputLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:hint="@string/arrival"
                 app:endIconMode="clear_text"
-                app:startIconDrawable="@drawable/outline_location_on_black_24"
-                android:hint="Arrival" >
+                app:startIconDrawable="@drawable/outline_location_on_black_24">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/arrival_location"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:textSize="16sp"
-                android:textColor="?attr/color"
-                android:maxLength="30"
-                android:ems="18"
-                android:inputType="textCapSentences"  />
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/arrival_location"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:ems="18"
+                    android:inputType="textCapSentences"
+                    android:maxLength="30"
+                    android:textColor="?attr/color"
+                    android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/text_input_layout8"
+                android:id="@+id/tilDate"
                 style="@style/MyTextInputLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:hint="@string/date"
                 app:endIconMode="clear_text"
-                android:hint="Date"
                 app:startIconDrawable="@drawable/outline_calendar_today_black_24">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/date"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:textSize="16sp"
-                android:textColor="?attr/color"
-                android:maxLength="30"
-                android:ems="18"
-                android:inputType="date"  />
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/date"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:ems="18"
+                    android:inputType="date"
+                    android:textColor="?attr/color"
+                    android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/text_input_layout9"
+                android:id="@+id/tilTime"
                 style="@style/MyTextInputLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:hint="@string/time"
                 app:endIconMode="clear_text"
-                app:startIconDrawable="@drawable/outline_schedule_black_24"
-                android:hint="Time" >
+                app:startIconDrawable="@drawable/outline_schedule_black_24">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/time"
@@ -170,7 +168,6 @@
                     android:layout_marginBottom="10dp"
                     android:ems="18"
                     android:inputType="time"
-                    android:maxLength="30"
                     android:textColor="?attr/color"
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -180,9 +177,9 @@
                 style="@style/MyTextInputLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:hint="@string/duration"
                 app:endIconMode="clear_text"
-                app:startIconDrawable="@drawable/outline_hourglass_top_black_24"
-                android:hint="Estimated duration (hours)" >
+                app:startIconDrawable="@drawable/outline_hourglass_top_black_24">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/duration"
@@ -192,19 +189,19 @@
                     android:layout_marginBottom="10dp"
                     android:ems="18"
                     android:inputType="numberDecimal"
-                    android:maxLength="30"
+                    android:maxLength="4"
                     android:textColor="?attr/color"
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/text_input_layout11"
+                android:id="@+id/til_seats"
                 style="@style/MyTextInputLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:hint="@string/seats"
                 app:endIconMode="clear_text"
-                app:startIconDrawable="@drawable/outline_chair_black_24"
-                android:hint="Available seats" >
+                app:startIconDrawable="@drawable/outline_chair_black_24">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/seats"
@@ -214,19 +211,19 @@
                     android:layout_marginBottom="10dp"
                     android:ems="18"
                     android:inputType="number"
-                    android:maxLength="30"
+                    android:maxLength="1"
                     android:textColor="?attr/color"
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/text_input_layout12"
+                android:id="@+id/til_price"
                 style="@style/MyTextInputLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:hint="@string/price"
                 app:endIconMode="clear_text"
-                app:startIconDrawable="@drawable/outline_euro_black_24"
-                android:hint="Price" >
+                app:startIconDrawable="@drawable/outline_euro_black_24">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/price"
@@ -236,7 +233,6 @@
                     android:layout_marginBottom="10dp"
                     android:ems="18"
                     android:inputType="number"
-                    android:maxLength="30"
                     android:textColor="?attr/color"
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -246,9 +242,9 @@
                 style="@style/MyTextInputLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:hint="@string/info"
                 app:endIconMode="clear_text"
-                app:startIconDrawable="@drawable/outline_info_black_24"
-                android:hint="Additional information" >
+                app:startIconDrawable="@drawable/outline_info_black_24">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/info"
@@ -258,7 +254,7 @@
                     android:layout_marginBottom="10dp"
                     android:ems="18"
                     android:inputType="textCapSentences"
-                    android:maxLength="50"
+                    android:maxLength="500"
                     android:textColor="?attr/color"
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -268,9 +264,9 @@
                 style="@style/MyTextInputLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:hint="@string/stops"
                 app:endIconMode="clear_text"
-                app:startIconDrawable="@drawable/outline_add_location_alt_black_24"
-                android:hint="Intermediate stops" >
+                app:startIconDrawable="@drawable/outline_add_location_alt_black_24">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/intermediate_stops"
@@ -280,16 +276,16 @@
                     android:layout_marginBottom="10dp"
                     android:ems="18"
                     android:inputType="textCapWords"
-                    android:maxLength="30"
+                    android:maxLength="500"
                     android:textColor="?attr/color"
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
-
-
-
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/required_string" />
 
         </LinearLayout>
-
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

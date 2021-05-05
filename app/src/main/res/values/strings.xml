@@ -6,9 +6,15 @@
     <string name="arrival"> Arrival<sup><small>*</small></sup> </string>
     <string name="date"> Date<sup><small>*</small></sup> </string>
     <string name="time"> Time<sup><small>*</small></sup> </string>
-    <string name="seats"> Available seats<sup><small>*</small></sup> </string>
+    <string name="seats"> Available Seats<sup><small>*</small></sup> </string>
     <string name="price"> Price<sup><small>*</small></sup> </string>
-    <string name="duration"> Estimated duration (hours) </string>
-    <string name="info"> Additional information </string>
-    <string name="stops"> Intermediate stops </string>
+    <string name="duration"> Estimated Duration (hours) </string>
+    <string name="info"> Additional Information </string>
+    <string name="stops"> Intermediate Stops </string>
+    <string name="fullName"> Full Name<sup><small>*</small></sup> </string>
+    <string name="nickName"> Nickname<sup><small>*</small></sup> </string>
+    <string name="birth"> Date of Birth<sup><small>*</small></sup> </string>
+    <string name="email"> E-Mail </string>
+    <string name="phone"> Phone Number </string>
+    <string name="location"> Location </string>
 </resources>

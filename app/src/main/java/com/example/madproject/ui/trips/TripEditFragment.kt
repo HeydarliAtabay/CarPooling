@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.text.InputType
+import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.view.inputmethod.InputMethodManager
@@ -87,7 +88,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.saveButton -> {
-
+                updateTrip()
                 if (formCheck()) {
                     saveTripValues()
                     findNavController().navigate(R.id.action_tripEdit_to_tripList)
@@ -184,6 +185,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
                 departure.setSelection(0, 0)
                 departure.hint = ""
             }  else {
+                view?.findViewById<TextInputLayout>(R.id.tilDeparture)?.error = null
                 departure.hint = "Departure location"
                 val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.showSoftInput(departure, InputMethodManager.SHOW_IMPLICIT)
@@ -195,6 +197,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
                 arrival.setSelection(0, 0)
                 arrival.hint = ""
             } else {
+                view?.findViewById<TextInputLayout>(R.id.tilArrival)?.error = null
                 arrival.hint = "Arrival location"
                 val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.showSoftInput(arrival, InputMethodManager.SHOW_IMPLICIT)
@@ -205,6 +208,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
 
         departureDate.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
+                view?.findViewById<TextInputLayout>(R.id.tilDate)?.error = null
                 setDatePicker()
             }
         }
@@ -213,6 +217,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
 
         departureTime.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
+                view?.findViewById<TextInputLayout>(R.id.tilTime)?.error = null
                 setTimePicker()
             }
         }
@@ -233,6 +238,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
                 availableSeats.setSelection(0, 0)
                 availableSeats.hint = ""
             } else {
+                view?.findViewById<TextInputLayout>(R.id.tilSeats)?.error = null
                 availableSeats.hint = "Available seats"
                 val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.showSoftInput(availableSeats, InputMethodManager.SHOW_IMPLICIT)
@@ -244,6 +250,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
                 price.setSelection(0, 0)
                 price.hint = ""
             } else {
+                view?.findViewById<TextInputLayout>(R.id.tilPrice)?.error = null
                 price.hint = "Price"
                 val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.showSoftInput(price, InputMethodManager.SHOW_IMPLICIT)
@@ -453,24 +460,34 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     private fun formCheck(): Boolean {
         var flag = true
         if (trip.from == "") {
-            view?.findViewById<TextInputLayout>(R.id.tilDeparture)?.error = "Missing field!"
+            view?.findViewById<TextInputLayout>(R.id.tilDeparture)?.error = " "
             flag = false
         }
         if (trip.to == "") {
-            view?.findViewById<TextInputLayout>(R.id.tilArrival)?.error = "Missing field!"
+            view?.findViewById<TextInputLayout>(R.id.tilArrival)?.error = " "
             flag = false
         }
         if (trip.departureDate == "") {
-            view?.findViewById<TextInputLayout>(R.id.tilDate)?.error = "Missing field!"
+            view?.findViewById<TextInputLayout>(R.id.tilDate)?.error = " "
             flag = false
         }
-
+        if (trip.departureTime == "") {
+            view?.findViewById<TextInputLayout>(R.id.tilTime)?.error = " "
+            flag = false
+        }
+        if (trip.availableSeat == "") {
+            view?.findViewById<TextInputLayout>(R.id.tilSeats)?.error = " "
+            flag = false
+        }
+        if (trip.price == "") {
+            view?.findViewById<TextInputLayout>(R.id.tilPrice)?.error = " "
+            flag = false
+        }
 
         return flag
     }
 
     private fun saveTripValues() {
-        updateTrip()
         if (trip.id == "") {
             // New trip, perform the add
             FirestoreRepository().addTrip(trip)

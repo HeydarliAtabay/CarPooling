@@ -60,6 +60,8 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_margin="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_weight="2"
         app:layout_constraintStart_toEndOf="@+id/RelativeLayout2"
@@ -189,7 +191,7 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/til_seats"
+                android:id="@+id/tilSeats"
                 style="@style/MyTextInputLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -211,7 +213,7 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/til_price"
+                android:id="@+id/tilPrice"
                 style="@style/MyTextInputLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

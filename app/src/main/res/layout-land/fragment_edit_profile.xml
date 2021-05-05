@@ -81,7 +81,7 @@
                 android:textSize="12sp" />
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/text_input_layout"
+                android:id="@+id/tilFullName"
                 style="@style/MyTextInputLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -103,7 +103,7 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/text_input_layout1"
+                android:id="@+id/tilNickName"
                 style="@style/MyTextInputLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -125,7 +125,7 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/text_input_layout2"
+                android:id="@+id/tilBirth"
                 style="@style/MyTextInputLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

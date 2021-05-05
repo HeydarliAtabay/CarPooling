@@ -20,20 +20,8 @@ class SharedProfileViewModel(): ViewModel() {
                 profile.value = null
                 return@EventListener
             }
-/*
-            val retrievedUser : Profile = Profile(
-                        fullName = value!!["fullName"] as String,
-                        nickName= value["nickName"] as String,
-                        dateOfBirth = value["dateOfBirth"] as String,
-                        email = value["email"] as String,
-                        phoneNumber = value["phoneNumber"] as String,
-                        location = value["location"] as String,
-                        currentPhotoPath = value["currentPhotoPath"] as String
-            )*/
 
-            Log.d("test", "${value!!["fullName"]}")
             val p = value?.toObject(Profile::class.java)
-            Log.d("test", "$p")
 
             profile.value = p
         })

@@ -1,7 +1,5 @@
 package com.example.madproject.ui.trips
 
-import android.content.Context
-import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.view.*
@@ -28,7 +26,6 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
     private lateinit var price : TextView
     private lateinit var additionalInfo : TextView
     private lateinit var intermediateStop : TextView
-    private lateinit var sharedPref: SharedPreferences
     private val sharedModel: SharedTripViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -42,7 +39,6 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
         price = view.findViewById(R.id.price)
         additionalInfo = view.findViewById(R.id.info)
         intermediateStop = view.findViewById(R.id.intermediate_stops)
-        sharedPref = this.requireActivity().getPreferences(Context.MODE_PRIVATE)
 
         setHasOptionsMenu(true)
 

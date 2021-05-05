@@ -10,6 +10,7 @@ enum class Requests(val value: Int)
     }
 }
 
+/*
 enum class ValueIds(val value: String) {
     FULL_NAME("group11.lab2.FULL_NAME"),
     NICKNAME("group11.lab2.NICKNAME"),
@@ -20,4 +21,4 @@ enum class ValueIds(val value: String) {
     CURRENT_PHOTO_PATH("group11.lab2.CURRENT_PHOTO_PATH"),
     JSON_OBJECT_PROFILE("group11.lab2.JSON_OBJECT"),
     JSON_OBJECT_TRIPS("group11.lab2.JSON_OBJECT_TRIPS");
-}
+}*/

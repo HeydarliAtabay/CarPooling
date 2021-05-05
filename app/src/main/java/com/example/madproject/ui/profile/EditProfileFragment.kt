@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.text.InputType
-import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
@@ -34,7 +33,6 @@ import java.util.*
 class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     private lateinit var fullName: EditText
     private lateinit var nickName: EditText
-    private lateinit var email: EditText
     private lateinit var location: EditText
     private lateinit var phoneNumber: EditText
     private lateinit var dateOfBirth: EditText
@@ -51,7 +49,6 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
 
         fullName = view.findViewById(R.id.fullName)
         nickName = view.findViewById(R.id.nickName)
-        email = view.findViewById(R.id.email)
         location = view.findViewById(R.id.location)
         image = view.findViewById(R.id.imageView)
         phoneNumber = view.findViewById(R.id.phoneNumber)
@@ -66,7 +63,6 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             if (it == null) {
                 Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
             } else {
-                Log.d("test", "$it")
                 profile = it
                 getProfileFromShowProfile()
 
@@ -87,7 +83,6 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     private fun getProfileFromShowProfile() {
         fullName.setText(profile.fullName)
         nickName.setText(profile.nickName)
-        email.setText(profile.email)
         dateOfBirth.setText(profile.dateOfBirth)
         phoneNumber.setText(profile.phoneNumber)
         location.setText(profile.location)
@@ -110,9 +105,14 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.saveButton -> {
-                Toast.makeText(context, "Profile information saved!", Toast.LENGTH_LONG).show()
-                saveValues()
-                findNavController().navigate(R.id.action_editProfile_to_showProfile)
+                updateProfile()
+
+                if (formCheck()) {
+                    saveValues()
+                    findNavController().navigate(R.id.action_editProfile_to_showProfile)
+                } else {
+                    Toast.makeText(context, "Insert the required fields to save the profile information!", Toast.LENGTH_LONG).show()
+                }
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -120,9 +120,9 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     }
 
     override fun onCreateContextMenu(
-        menu: ContextMenu,
-        v: View,
-        menuInfo: ContextMenu.ContextMenuInfo?
+            menu: ContextMenu,
+            v: View,
+            menuInfo: ContextMenu.ContextMenuInfo?
     ) {
         super.onCreateContextMenu(menu, v, menuInfo)
         when (v.id) {
@@ -158,7 +158,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                 Requests.INTENT_PHOTO_FROM_GALLERY.value -> {
                     val inputStream: InputStream? = data?.data?.let {
                         this.requireActivity().contentResolver.openInputStream(
-                            it
+                                it
                         )
                     }
                     val outputFile = createImageFile()
@@ -190,10 +190,10 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             if (!hasFocus) {  // lost focus
                 fullName.setSelection(0, 0)
                 fullName.hint = ""
-            } else {
+            }  else {
+                view?.findViewById<TextInputLayout>(R.id.tilFullName)?.error = null
                 fullName.hint = "Enter your full name"
-                val imm =
-                    context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.showSoftInput(fullName, InputMethodManager.SHOW_IMPLICIT)
             }
         }
@@ -203,22 +203,10 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                 nickName.setSelection(0, 0)
                 nickName.hint = ""
             } else {
+                view?.findViewById<TextInputLayout>(R.id.tilNickName)?.error = null
                 nickName.hint = "Enter your nickname"
-                val imm =
-                    context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.showSoftInput(nickName, InputMethodManager.SHOW_IMPLICIT)
-            }
-        }
-
-        email.setOnFocusChangeListener { _, hasFocus ->
-            if (!hasFocus) {  // lost focus
-                email.setSelection(0, 0)
-                email.hint = ""
-            } else {
-                email.hint = "email@email.com"
-                val imm =
-                    context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                imm.showSoftInput(email, InputMethodManager.SHOW_IMPLICIT)
             }
         }
 
@@ -228,8 +216,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                 location.hint = ""
             } else {
                 location.hint = "Enter your location"
-                val imm =
-                    context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.showSoftInput(location, InputMethodManager.SHOW_IMPLICIT)
             }
         }
@@ -238,6 +225,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
 
         dateOfBirth.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
+                view?.findViewById<TextInputLayout>(R.id.tilBirth)?.error = null
                 setDatePicker()
             }
         }
@@ -248,8 +236,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                 phoneNumber.hint = ""
             } else {
                 phoneNumber.hint = "Enter your phone number"
-                val imm =
-                    context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.showSoftInput(phoneNumber, InputMethodManager.SHOW_IMPLICIT)
             }
         }
@@ -257,7 +244,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
 
     private fun setDatePicker() {
         val constraintsBuilder = CalendarConstraints.Builder().setValidator(
-            DateValidatorPointBackward.now()
+                DateValidatorPointBackward.now()
         )
         var datePicker = MaterialDatePicker.Builder.datePicker()
             .setTitleText("Select your date of birth")
@@ -285,7 +272,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             val inputFormat = SimpleDateFormat("dd MMM yyyy")
             val outputFormat = SimpleDateFormat("MMM dd, yyyy")
             dateOfBirth.setText(outputFormat.format(inputFormat.parse(picker?.headerText!!)!!))
-            email.requestFocus()
+            phoneNumber.requestFocus()
         }
 
         picker?.show(this.requireActivity().supportFragmentManager, picker.toString())
@@ -296,15 +283,31 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             fullName = fullName.text.toString(),
             nickName = nickName.text.toString(),
             dateOfBirth = dateOfBirth.text.toString(),
-            email = email.text.toString(),
+            email = profile.email,
             phoneNumber = phoneNumber.text.toString(),
             location = location.text.toString(),
             currentPhotoPath = currentPhotoPath
         )
     }
 
+    private fun formCheck(): Boolean {
+        var flag = true
+        if (profile.fullName == "") {
+            view?.findViewById<TextInputLayout>(R.id.tilFullName)?.error = " "
+            flag = false
+        }
+        if (profile.nickName == "") {
+            view?.findViewById<TextInputLayout>(R.id.tilNickName)?.error = " "
+            flag = false
+        }
+        if (profile.dateOfBirth == "") {
+            view?.findViewById<TextInputLayout>(R.id.tilBirth)?.error = " "
+            flag = false
+        }
+        return flag
+    }
+
     private fun saveValues() {
-        updateProfile()
         model.setUser(profile)
             .addOnSuccessListener {
                 Toast.makeText(context, "Profile information saved!", Toast.LENGTH_LONG).show()
@@ -327,12 +330,11 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     private fun createImageFile(): File {
         // Create an image file name
         val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-        val storageDir: File? =
-            this.requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        val storageDir: File? = this.requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         return File.createTempFile(
-            "JPEG_${timeStamp}_", /* prefix */
-            ".jpg", /* suffix */
-            storageDir /* directory */
+                "JPEG_${timeStamp}_", /* prefix */
+                ".jpg", /* suffix */
+                storageDir /* directory */
         ).apply {
             // Save a file: path for use with ACTION_VIEW intents
             newPhotoPath = absolutePath

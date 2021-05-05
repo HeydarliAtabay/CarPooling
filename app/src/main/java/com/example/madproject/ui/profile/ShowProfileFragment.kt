@@ -1,7 +1,5 @@
 package com.example.madproject.ui.profile
 
-import android.content.Context
-import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -9,16 +7,14 @@ import android.view.*
 import androidx.fragment.app.Fragment
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.content.FileProvider
-import androidx.core.content.edit
-import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.example.madproject.R
 import com.example.madproject.data.Profile
 import com.example.madproject.lib.*
 import com.google.android.material.navigation.NavigationView
-import org.json.JSONObject
 import java.io.File
 
 class ShowProfileFragment : Fragment(R.layout.fragment_show_profile) {
@@ -32,9 +28,8 @@ class ShowProfileFragment : Fragment(R.layout.fragment_show_profile) {
     private lateinit var image : ImageView
     private var currentPhotoPath: String? = ""
     private lateinit var photoURI: Uri
-    private lateinit var profile: Profile
-    private lateinit var sharedPref: SharedPreferences
-    private val model: SharedProfileViewModel by activityViewModels()
+    private var profile: Profile = Profile()
+    private lateinit var model: SharedProfileViewModel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
@@ -45,11 +40,22 @@ class ShowProfileFragment : Fragment(R.layout.fragment_show_profile) {
         phoneNumber = view.findViewById(R.id.phoneNumber)
         location = view.findViewById(R.id.location)
         image = view.findViewById(R.id.imageView3)
-        sharedPref = this.requireActivity().getPreferences(Context.MODE_PRIVATE)
 
-        // If the sharedPref does not exist (first run) it is created with the default values
-        if (!sharedPref.contains(ValueIds.JSON_OBJECT_PROFILE.value)) saveValues()
-        loadValuesDB()
+        model = ViewModelProviders.of(this)
+            .get(SharedProfileViewModel::class.java)
+
+
+        model.getUser().observe(viewLifecycleOwner, {
+            if (it == null) {
+                Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
+            } else {
+                Log.d("test", "$it")
+                profile = it
+                setProfile()
+
+            }
+        })
+        setProfile()
 
         //aggiorna il navigation header
         setNavigationHeader()
@@ -65,15 +71,6 @@ class ShowProfileFragment : Fragment(R.layout.fragment_show_profile) {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.editButton -> {
-                model.select(Profile(
-                        fullName = fullName.text.toString(),
-                        nickName = nickName.text.toString(),
-                        email = email.text.toString(),
-                        dateOfBirth = dateOfBirth.text.toString(),
-                        location = location.text.toString(),
-                        phoneNumber = phoneNumber.text.toString(),
-                        currentPhotoPath = currentPhotoPath
-                ))
                 findNavController().navigate(R.id.action_showProfile_to_editProfile)
                 true
             }
@@ -81,40 +78,15 @@ class ShowProfileFragment : Fragment(R.layout.fragment_show_profile) {
         }
     }
 
-    private fun saveValues() {
-        val dataObj = JSONObject()
-
-        if (fullName.text.toString() == "Guest profile") dataObj.put(ValueIds.FULL_NAME.value, "")
-        else dataObj.put(ValueIds.FULL_NAME.value, fullName.text.toString())
-
-        dataObj.put(ValueIds.NICKNAME.value, nickName.text.toString())
-        dataObj.put(ValueIds.DATE_OF_BIRTH.value, dateOfBirth.text.toString())
-        dataObj.put(ValueIds.EMAIL.value, email.text.toString())
-        dataObj.put(ValueIds.PHONE_NUMBER.value, phoneNumber.text.toString())
-        dataObj.put(ValueIds.LOCATION.value, location.text.toString())
-        dataObj.put(ValueIds.CURRENT_PHOTO_PATH.value, currentPhotoPath)
-
-        sharedPref.edit {
-            putString(ValueIds.JSON_OBJECT_PROFILE.value, dataObj.toString())
-            apply()
-        }
-    }
-
-    private fun loadValuesDB() {
-        val pref = sharedPref.getString(ValueIds.JSON_OBJECT_PROFILE.value, null)
-
-        if (pref != null) {
-            val dataObj = JSONObject(pref)
-            if (dataObj.getString(ValueIds.FULL_NAME.value) == "") fullName.text = "Guest profile"
-            else fullName.text = dataObj.getString(ValueIds.FULL_NAME.value)
-            nickName.text = dataObj.getString(ValueIds.NICKNAME.value)
-            dateOfBirth.text = dataObj.getString(ValueIds.DATE_OF_BIRTH.value)
-            email.text = dataObj.getString(ValueIds.EMAIL.value)
-            phoneNumber.text = dataObj.getString(ValueIds.PHONE_NUMBER.value)
-            location.text = dataObj.getString(ValueIds.LOCATION.value)
-            currentPhotoPath = dataObj.getString(ValueIds.CURRENT_PHOTO_PATH.value)
-            setPic()
-        }
+    private fun setProfile(){
+        fullName.text = profile.fullName
+        nickName.text = profile.nickName
+        dateOfBirth.text = profile.dateOfBirth
+        email.text = profile.email
+        phoneNumber.text = profile.phoneNumber
+        location.text = profile.location
+        currentPhotoPath = profile.currentPhotoPath
+        setPic()
     }
 
     private fun setPic() {

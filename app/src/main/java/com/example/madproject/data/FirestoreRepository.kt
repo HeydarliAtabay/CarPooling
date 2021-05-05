@@ -3,6 +3,7 @@ package com.example.madproject.data
 import android.widget.Toast
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 
 class FirestoreRepository {
@@ -21,5 +22,13 @@ class FirestoreRepository {
 
     fun getTrips(): CollectionReference {
         return firestoreDB.collection("users/user@gmail.com/createdTrips")
+    }
+
+    fun getUser() : DocumentReference {
+        return firestoreDB.collection("users").document("user@gmail.com")
+    }
+
+    fun setUser(p : Profile) : Task<Void> {
+        return firestoreDB.collection("users").document("user@gmail.com").set(p)
     }
 }

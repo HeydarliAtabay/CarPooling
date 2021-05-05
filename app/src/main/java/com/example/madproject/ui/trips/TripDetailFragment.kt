@@ -57,7 +57,7 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
             departureTime.text = trip.departureTime
             duration.text = trip.duration
             availableSeats.text = trip.availableSeat
-            price.text = trip.price?.toEngineeringString()
+            price.text = trip.price
             additionalInfo.text = trip.additionalInfo
             intermediateStop.text = trip.intermediateStop
             currentCarPath = trip.imagePath

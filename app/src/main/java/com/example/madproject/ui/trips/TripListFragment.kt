@@ -11,9 +11,11 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.cardview.widget.CardView
 import androidx.core.content.FileProvider
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.LiveData
 import androidx.navigation.Navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -23,21 +25,21 @@ import com.example.madproject.data.Trip
 import com.example.madproject.lib.FixOrientation
 import com.example.madproject.lib.ValueIds
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.io.File
 
 
 class TripListFragment : Fragment(R.layout.fragment_trip_list) {
-    private lateinit var tripList: List<Trip>
+    private lateinit var tripList: MutableList<Trip>
     private lateinit var emptyList: TextView
     private lateinit var emptyList2: TextView
-    private lateinit var sharedPref: SharedPreferences
     private val sharedModel: SharedTripViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        sharedPref = requireActivity().getPreferences(Context.MODE_PRIVATE)
         emptyList = view.findViewById(R.id.emptyList)
         emptyList2 = view.findViewById(R.id.emptyList2)
 
@@ -48,12 +50,23 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
         recyclerView.setItemViewCacheSize(3)
         recyclerView.layoutManager = LinearLayoutManager(this.requireActivity())
 
-        if(sharedPref.contains(ValueIds.JSON_OBJECT_TRIPS.value)) {
-            loadTrips()
-            emptyList.visibility = View.INVISIBLE
-            emptyList2.visibility = View.INVISIBLE
-            recyclerView.adapter = TripsAdapter(tripList, sharedModel)
-        }
+        val db = FirebaseFirestore.getInstance()
+
+        db.collection("Trips").get()
+                .addOnSuccessListener { documents ->
+                    tripList = mutableListOf()
+                    for (doc in documents) {
+                        tripList.add(doc.toObject(Trip::class.java))
+                    }
+                    if(tripList.size != 0) {
+                        emptyList.visibility = View.INVISIBLE
+                        emptyList2.visibility = View.INVISIBLE
+                        recyclerView.adapter = TripsAdapter(tripList.toList(), sharedModel)
+                    }
+                }
+                .addOnFailureListener {
+                    Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
+                }
 
         fab.setOnClickListener{
             sharedModel.select(Trip())
@@ -61,21 +74,12 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
         }
     }
 
-    private fun loadTrips(){
-        val gson = Gson()
-        val pref = sharedPref.getString(ValueIds.JSON_OBJECT_TRIPS.value, null)
-        val type = object : TypeToken<List<Trip>>() {}.type
-        if (pref != null) {
-            tripList = gson.fromJson(pref, type)
-        }
-    }
-
-    class TripsAdapter(val data: List<Trip>, val sharedModel: SharedTripViewModel): RecyclerView.Adapter<TripsAdapter.TripViewHolder>(){
+    class TripsAdapter(val data: List<Trip>, private val sharedModel: SharedTripViewModel): RecyclerView.Adapter<TripsAdapter.TripViewHolder>(){
 
         class TripViewHolder(itemView: View):RecyclerView.ViewHolder(itemView){
             private val image = itemView.findViewById<ImageView>(R.id.image1)
-            private val from_dest = itemView.findViewById<TextView>(R.id.from_dest)
-            private val to_dest = itemView.findViewById<TextView>(R.id.to_dest)
+            private val from = itemView.findViewById<TextView>(R.id.from_dest)
+            private val to = itemView.findViewById<TextView>(R.id.to_dest)
             private val date = itemView.findViewById<TextView>(R.id.date_txt)
             private val time = itemView.findViewById<TextView>(R.id.time_txt)
             private val price = itemView.findViewById<TextView>(R.id.price_txt)
@@ -84,11 +88,11 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
             private var currentPhotoPath:String = ""
 
             fun bind(t: Trip, sharedModel: SharedTripViewModel) {
-                from_dest.text = t.from
-                to_dest.text = t.to
+                from.text = t.from
+                to.text = t.to
                 date.text = t.departureDate
                 time.text = t.departureTime
-                price.text = t.price?.toEngineeringString()
+                price.text = t.price
                 currentPhotoPath = t.imagePath
 
                 setPic()

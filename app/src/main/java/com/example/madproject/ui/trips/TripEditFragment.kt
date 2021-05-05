@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.text.InputType
+import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.view.inputmethod.InputMethodManager
@@ -28,6 +29,7 @@ import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.io.File
@@ -58,6 +60,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     private val sharedModel: SharedTripViewModel by activityViewModels()
     private lateinit var trip: Trip
 
+    private val db = FirebaseFirestore.getInstance()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         imageCar = view.findViewById(R.id.imageCar)
@@ -92,7 +95,15 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         return when (item.itemId) {
             R.id.saveButton -> {
                 saveTripValues()
-                Toast.makeText(context, "Trip information saved!", Toast.LENGTH_LONG).show()
+
+                db.collection("Trips")
+                    .add(trip)
+                    .addOnSuccessListener {
+                        Toast.makeText(context, "Trip information saved!", Toast.LENGTH_LONG).show()
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
+                    }
                 findNavController().navigate(R.id.action_tripEdit_to_tripList)
                 true
             }
@@ -378,7 +389,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
                 availableSeat = availableSeats.text.toString(),
                 additionalInfo = additionalInfo.text.toString(),
                 intermediateStop = intermediateStop.text.toString(),
-                price = BigDecimal(if(price.text.toString()=="") "0" else price.text.toString())
+                price = price.text.toString()
         )
     }
 
@@ -391,7 +402,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
             departureTime.setText(t.departureTime)
             duration.setText(t.duration)
             availableSeats.setText(t.availableSeat)
-            price.setText(t.price?.toEngineeringString())
+            price.setText(t.price)
             additionalInfo.setText(t.additionalInfo)
             intermediateStop.setText(t.intermediateStop)
             currentCarPath = t.imagePath
@@ -478,8 +489,6 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
             putString(ValueIds.JSON_OBJECT_TRIPS.value, stringToSave)
             apply()
         }
-
-
     }
 
     private fun setCarPic() {

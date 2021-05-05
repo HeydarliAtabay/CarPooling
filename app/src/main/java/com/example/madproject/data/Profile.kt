@@ -6,5 +6,5 @@ data class Profile(val fullName: String = "",
                    val email: String = "",
                    val phoneNumber: String = "",
                    val location: String = "",
-                   val currentPhotoPath: String? = ""
+                   var currentPhotoPath: String? = ""
                    )

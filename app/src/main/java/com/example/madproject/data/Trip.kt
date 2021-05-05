@@ -1,6 +1,6 @@
 package com.example.madproject.data
 
-data class Trip(var id: Int = -1,
+data class Trip(var id: String = "",
                 val imagePath: String = "",
                 val from: String = "",
                 val to: String = "",

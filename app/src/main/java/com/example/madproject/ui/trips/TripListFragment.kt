@@ -1,7 +1,5 @@
 package com.example.madproject.ui.trips
 
-import android.content.Context
-import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -15,7 +13,7 @@ import android.widget.Toast
 import androidx.cardview.widget.CardView
 import androidx.core.content.FileProvider
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.Navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -23,25 +21,22 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.madproject.R
 import com.example.madproject.data.Trip
 import com.example.madproject.lib.FixOrientation
-import com.example.madproject.lib.ValueIds
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.ktx.Firebase
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import java.io.File
 
-
 class TripListFragment : Fragment(R.layout.fragment_trip_list) {
-    private lateinit var tripList: MutableList<Trip>
+    private var tripList = listOf<Trip>()
     private lateinit var emptyList: TextView
     private lateinit var emptyList2: TextView
     private val sharedModel: SharedTripViewModel by activityViewModels()
+    private lateinit var tripsViewModel: TripsViewModel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         emptyList = view.findViewById(R.id.emptyList)
         emptyList2 = view.findViewById(R.id.emptyList2)
+        tripsViewModel = ViewModelProviders.of(this)
+            .get(TripsViewModel::class.java)
 
         val fab=view.findViewById<FloatingActionButton>(R.id.fab)
 
@@ -50,11 +45,25 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
         recyclerView.setItemViewCacheSize(3)
         recyclerView.layoutManager = LinearLayoutManager(this.requireActivity())
 
+        tripsViewModel.getTrips().observe(viewLifecycleOwner, {
+            if (it == null) {
+                Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
+            } else {
+                tripList = it
+                if (tripList.isNotEmpty()) {
+                    emptyList.visibility = View.INVISIBLE
+                    emptyList2.visibility = View.INVISIBLE
+                    recyclerView.adapter = TripsAdapter(tripList.toList(), sharedModel)
+                }
+            }
+        })
+
+        /*
         val db = FirebaseFirestore.getInstance()
 
         db.collection("Trips").get()
                 .addOnSuccessListener { documents ->
-                    tripList = mutableListOf()
+
                     for (doc in documents) {
                         tripList.add(doc.toObject(Trip::class.java))
                     }
@@ -67,7 +76,7 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
                 .addOnFailureListener {
                     Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
                 }
-
+*/
         fab.setOnClickListener{
             sharedModel.select(Trip())
             findNavController().navigate(R.id.action_tripList_to_tripEdit)

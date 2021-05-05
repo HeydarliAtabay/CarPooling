@@ -9,34 +9,28 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.text.InputType
-import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
-import androidx.core.content.edit
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.madproject.R
+import com.example.madproject.data.FirestoreRepository
 import com.example.madproject.data.Trip
 import com.example.madproject.lib.FixOrientation
 import com.example.madproject.lib.Requests
-import com.example.madproject.lib.ValueIds
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
-import java.math.BigDecimal
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -59,8 +53,6 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     private var timepicker: MaterialTimePicker? = null
     private val sharedModel: SharedTripViewModel by activityViewModels()
     private lateinit var trip: Trip
-
-    private val db = FirebaseFirestore.getInstance()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         imageCar = view.findViewById(R.id.imageCar)
@@ -95,15 +87,6 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         return when (item.itemId) {
             R.id.saveButton -> {
                 saveTripValues()
-
-                db.collection("Trips")
-                    .add(trip)
-                    .addOnSuccessListener {
-                        Toast.makeText(context, "Trip information saved!", Toast.LENGTH_LONG).show()
-                    }
-                    .addOnFailureListener {
-                        Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
-                    }
                 findNavController().navigate(R.id.action_tripEdit_to_tripList)
                 true
             }
@@ -463,31 +446,23 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
 
     private fun saveTripValues() {
         updateTrip()
-
-        var tripList:MutableList<Trip> = mutableListOf()
-        val gson = Gson()
-        if (sharedPref.contains(ValueIds.JSON_OBJECT_TRIPS.value)) {
-            val pref = sharedPref.getString(ValueIds.JSON_OBJECT_TRIPS.value, null)
-            val type = object : TypeToken<MutableList<Trip>>() {}.type
-            if (pref != null) {
-                tripList = gson.fromJson(pref, type)
-            }
-            if (trip.id == -1) {
-                trip.id = tripList.size
-                tripList.add(trip)
-            } else {
-                tripList[trip.id] = trip
-            }
-        }
-        else{
-            trip.id = 0
-            tripList.add(trip)
-        }
-
-        val stringToSave:String = gson.toJson(tripList)
-        sharedPref.edit {
-            putString(ValueIds.JSON_OBJECT_TRIPS.value, stringToSave)
-            apply()
+        if (trip.id == "") {
+            // New trip, perform the add
+            FirestoreRepository().addTrip(trip)
+                    .addOnSuccessListener {
+                        Toast.makeText(context, "Trip information saved!", Toast.LENGTH_LONG).show()
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
+                    }
+        } else {
+            FirestoreRepository().updateTrip(trip)
+                    .addOnSuccessListener {
+                        Toast.makeText(context, "Trip information saved!", Toast.LENGTH_LONG).show()
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
+                    }
         }
     }
 

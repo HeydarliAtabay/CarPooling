@@ -503,7 +503,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
                         Toast.makeText(context, "Trip information saved!", Toast.LENGTH_LONG).show()
                     }
                     .addOnFailureListener {
-                        Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, "Failed saving trip!", Toast.LENGTH_LONG).show()
                     }
         }
     }

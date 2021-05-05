@@ -25,19 +25,24 @@ class SharedProfileViewModel(): ViewModel() {
 
             val p = value?.toObject(Profile::class.java)
 
-            /*
+
             val photo = File(p!!.currentPhotoPath!!)
+            Log.d("test2", "${photo.exists()}" + "${p.currentPhotoPath}")
             if(!photo.exists()){
-                FirestoreRepository().getUserImage(file)
+                val pair = FirestoreRepository().getUserImage(file)
+                //first -> File dov'è salvata l'immagine
+                //second -> FileDownloadTask
+                pair.second
                     .addOnSuccessListener {
-                        p.currentPhotoPath = file?.absolutePath
+                        Log.d("test", "${pair.first.absolutePath}")
+                        p.currentPhotoPath = pair.first.absolutePath
                         profile.value = p
                     }
                     .addOnFailureListener{
                         p.currentPhotoPath = ""
                         profile.value = p
                     }
-            }*/
+            }
             profile.value = p
         })
 

@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.text.InputType
+import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
@@ -332,6 +333,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                 storageDir /* directory */
         ).apply {
             // Save a file: path for use with ACTION_VIEW intents
+            Log.d("test", "$absolutePath")
             newPhotoPath = absolutePath
         }
     }

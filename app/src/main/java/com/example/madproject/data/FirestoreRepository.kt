@@ -1,6 +1,7 @@
 package com.example.madproject.data
 
 import android.net.Uri
+import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
@@ -44,11 +45,12 @@ class FirestoreRepository {
         return imageRef.putFile(file)
     }
 
-    fun getUserImage(file: File?): FileDownloadTask {
+    fun getUserImage(file: File?): Pair<File, FileDownloadTask> {
         val imageRef = storageRef.child("user@gmail.com/profileImage.jpg")
-        File.createTempFile("profileImage", ".jpg", file)
+        File.createTempFile("JPEG_", ".jpg", file)
             .apply {
-                return imageRef.getFile(this)
+                Log.d("test","${this.absolutePath}")
+                return Pair<File,FileDownloadTask>(this,imageRef.getFile(this))
             }
 
     }

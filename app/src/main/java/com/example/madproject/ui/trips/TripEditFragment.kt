@@ -25,6 +25,7 @@ import com.example.madproject.lib.Requests
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import java.io.File
@@ -450,10 +451,22 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     }
 
     private fun formCheck(): Boolean {
+        var flag = true
+        if (trip.from == "") {
+            view?.findViewById<TextInputLayout>(R.id.tilDeparture)?.error = "Missing field!"
+            flag = false
+        }
+        if (trip.to == "") {
+            view?.findViewById<TextInputLayout>(R.id.tilArrival)?.error = "Missing field!"
+            flag = false
+        }
+        if (trip.departureDate == "") {
+            view?.findViewById<TextInputLayout>(R.id.tilDate)?.error = "Missing field!"
+            flag = false
+        }
 
 
-
-        return false
+        return flag
     }
 
     private fun saveTripValues() {

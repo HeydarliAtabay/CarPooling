@@ -71,6 +71,13 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:text="@string/required_string"
+                android:textSize="12sp" />
+
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilDeparture"
                 style="@style/MyTextInputLayout"
@@ -268,12 +275,6 @@
                     android:textColor="?attr/color"
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/required_string" />
-
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

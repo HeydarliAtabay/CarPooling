@@ -12,9 +12,12 @@ import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.madproject.R
 import androidx.lifecycle.ViewModelProviders
@@ -44,6 +47,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     private var newPhotoPath: String? = ""
     private lateinit var photoURI: Uri
     private var profile: Profile = Profile()
+    private var storageDir: File? = null
     private var picker: MaterialDatePicker<Long>? = null
     private lateinit var model: SharedProfileViewModel
 
@@ -56,11 +60,13 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         image = view.findViewById(R.id.imageView)
         phoneNumber = view.findViewById(R.id.phoneNumber)
         dateOfBirth = view.findViewById(R.id.dateOfBirth)
+        storageDir = this.requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
 
-        model = ViewModelProviders.of(this).get(SharedProfileViewModel::class.java)
+        model = ViewModelProvider(this, ViewModelFactory(storageDir))
+            .get(SharedProfileViewModel::class.java)
+        //model = ViewModelProviders.of(this).get(SharedProfileViewModel::class.java)
 
-        val storageDir: File? = this.requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        model.getUser(storageDir).observe(viewLifecycleOwner, {
+        model.getUser().observe(viewLifecycleOwner, {
             if (it == null) {
                 Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_SHORT).show()
             } else {
@@ -313,7 +319,8 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                 Toast.makeText(context, "Failed saving profile!", Toast.LENGTH_SHORT).show()
             }
         if(profile.currentPhotoPath!=null && profile.currentPhotoPath!="" && newPhotoPath != "") {
-            model.setUserImage(profile)
+            Log.d("test", "Profile saved")
+            model.setUserImage(profile, storageDir)
                 .addOnFailureListener {
                     Toast.makeText(context, "Failed saving profile picture!", Toast.LENGTH_SHORT)
                         .show()
@@ -326,15 +333,12 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     private fun createImageFile(): File {
         // Create an image file name
         val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-        val storageDir: File? = this.requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        return File.createTempFile(
-                "JPEG_${timeStamp}_", /* prefix */
-                ".jpg", /* suffix */
-                storageDir /* directory */
-        ).apply {
+
+        val filename = "${storageDir?.absolutePath}/profile.jpg"
+
+        return File(filename).apply {
             // Save a file: path for use with ACTION_VIEW intents
-            Log.d("test", "$absolutePath")
-            newPhotoPath = absolutePath
+            newPhotoPath = "profile.jpg"
         }
     }
 
@@ -375,7 +379,8 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
 
     private fun setPic() {
         if (currentPhotoPath != "") {
-            val imgFile = File(currentPhotoPath!!)
+            val filename = "${storageDir?.absolutePath}/${currentPhotoPath}"
+            val imgFile = File(filename)
             photoURI = FileProvider.getUriForFile(
                     this.requireActivity().applicationContext,
                     "com.example.android.fileprovider",

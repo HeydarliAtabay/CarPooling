@@ -13,7 +13,58 @@ import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.storage.UploadTask
 import java.io.File
 
-class SharedProfileViewModel(): ViewModel() {
+class SharedProfileViewModel(private val file: File?): ViewModel() {
+
+    /*
+    private val profile: MutableLiveData<Profile> by lazy {
+        MutableLiveData<Profile>().also {
+            loadUser()
+        }
+    }*/
+
+    private var profile: MutableLiveData<Profile> = MutableLiveData(Profile())
+
+    init {
+        loadUser()
+    }
+
+    private fun loadUser() {
+        FirestoreRepository().getUser().addSnapshotListener(EventListener { value, e ->
+            if (e != null) {
+                profile.value = null
+                return@EventListener
+            }
+            Log.d("test", "loadUser")
+            val p = value?.toObject(Profile::class.java)
+
+            val filename = "${file?.absolutePath}/${p!!.currentPhotoPath}"
+            val photo = File(filename)
+            if(!photo.exists()){
+
+                val pair = FirestoreRepository().getUserImage(file)
+                //first -> File dov'è salvata l'immagine
+                //second -> FileDownloadTask
+                pair.second
+                    .addOnSuccessListener {
+                        //p.currentPhotoPath = pair.first.absolutePath
+                        profile.value = p
+                    }
+                    .addOnFailureListener{
+                        p.currentPhotoPath = ""
+                        profile.value = p
+                    }
+            } else {
+                profile.value = p
+            }
+        })
+    }
+
+    fun getUser(): LiveData<Profile> {
+        Log.d("test", "getUser")
+        return profile
+    }
+
+    /*
     val profile : MutableLiveData<Profile> = MutableLiveData(Profile())
 
     fun getUser(file: File?): LiveData<Profile> {
@@ -25,36 +76,37 @@ class SharedProfileViewModel(): ViewModel() {
 
             val p = value?.toObject(Profile::class.java)
 
-
-            val photo = File(p!!.currentPhotoPath!!)
-            Log.d("test2", "${photo.exists()}" + "${p.currentPhotoPath}")
+            val filename = "${file?.absolutePath}/${p!!.currentPhotoPath}"
+            val photo = File(filename)
             if(!photo.exists()){
+
                 val pair = FirestoreRepository().getUserImage(file)
                 //first -> File dov'è salvata l'immagine
                 //second -> FileDownloadTask
                 pair.second
                     .addOnSuccessListener {
-                        Log.d("test", "${pair.first.absolutePath}")
-                        p.currentPhotoPath = pair.first.absolutePath
+                        //p.currentPhotoPath = pair.first.absolutePath
                         profile.value = p
                     }
                     .addOnFailureListener{
                         p.currentPhotoPath = ""
                         profile.value = p
                     }
+            } else {
+                profile.value = p
             }
-            profile.value = p
         })
 
         return profile
-    }
+    }*/
 
     fun setUser(p:Profile) : Task<Void> {
         return FirestoreRepository().setUser(p)
     }
 
-    fun setUserImage(profile: Profile) : UploadTask {
-        return FirestoreRepository().setUserImage(profile)
+    fun setUserImage(profile: Profile, file: File?) : UploadTask {
+        Log.d("test", "set")
+        return FirestoreRepository().setUserImage(profile, file)
     }
 
 }

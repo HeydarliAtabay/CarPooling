@@ -9,7 +9,10 @@ import androidx.fragment.app.Fragment
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.core.content.FileProvider
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.example.madproject.R
@@ -29,6 +32,7 @@ class ShowProfileFragment : Fragment(R.layout.fragment_show_profile) {
     private lateinit var image : ImageView
     private var currentPhotoPath: String? = ""
     private lateinit var photoURI: Uri
+    private var storageDir: File? = null
     private var profile: Profile = Profile()
     private lateinit var model: SharedProfileViewModel
 
@@ -41,13 +45,14 @@ class ShowProfileFragment : Fragment(R.layout.fragment_show_profile) {
         phoneNumber = view.findViewById(R.id.phoneNumber)
         location = view.findViewById(R.id.location)
         image = view.findViewById(R.id.imageView3)
+        storageDir = this.requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
 
-        model = ViewModelProviders.of(this)
+        model = ViewModelProvider(this, ViewModelFactory(storageDir))
             .get(SharedProfileViewModel::class.java)
+        /*model = ViewModelProviders.of(this)
+            .get(SharedProfileViewModel::class.java)*/
 
-
-        val storageDir: File? = this.requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        model.getUser(storageDir).observe(viewLifecycleOwner, {
+        model.getUser().observe(viewLifecycleOwner, {
             if (it == null) {
                 Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
             } else {
@@ -91,7 +96,8 @@ class ShowProfileFragment : Fragment(R.layout.fragment_show_profile) {
 
     private fun setPic() {
         if (currentPhotoPath != "") {
-            val imgFile = File(currentPhotoPath!!)
+            val filename = "${storageDir?.absolutePath}/${currentPhotoPath}"
+            val imgFile = File(filename)
             photoURI = FileProvider.getUriForFile(this.requireActivity().applicationContext, "com.example.android.fileprovider", imgFile)
             val pic = FixOrientation.handleSamplingAndRotationBitmap(this.requireActivity().applicationContext, photoURI)
             image.setImageBitmap(pic)
@@ -107,7 +113,8 @@ class ShowProfileFragment : Fragment(R.layout.fragment_show_profile) {
         profileNameHeader.text = fullName.text
 
         if (currentPhotoPath != "") {
-            val imgFile = File(currentPhotoPath!!)
+            val filename = "${storageDir?.absolutePath}/${currentPhotoPath}"
+            val imgFile = File(filename)
             photoURI = FileProvider.getUriForFile(this.requireActivity().applicationContext, "com.example.android.fileprovider", imgFile)
             val pic = FixOrientation.handleSamplingAndRotationBitmap(this.requireActivity().applicationContext, photoURI)
             profilePictureHeader.setImageBitmap(pic)

@@ -3,14 +3,17 @@ package com.example.madproject
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.FileProvider
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -20,6 +23,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.example.madproject.data.Profile
 import com.example.madproject.lib.FixOrientation
 import com.example.madproject.ui.profile.SharedProfileViewModel
+import com.example.madproject.ui.profile.ViewModelFactory
 import com.google.android.material.navigation.NavigationView
 import java.io.File
 
@@ -47,12 +51,13 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
-        model = ViewModelProviders.of(this)
+        val storageDir: File? = this.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+
+        model = ViewModelProvider(this, ViewModelFactory(storageDir))
             .get(SharedProfileViewModel::class.java)
 
 
-        val storageDir: File? = this.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        model.getUser(storageDir).observe(this, {
+        model.getUser().observe(this, {
             if (it == null) {
                 Toast.makeText(this, "Firebase Failure!", Toast.LENGTH_LONG).show()
             } else {
@@ -76,7 +81,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun setPic(currentPhotoPath: String, profilePicture: ImageView) {
         if (currentPhotoPath != "") {
-            val imgFile = File(currentPhotoPath)
+            val filename = "${this.getExternalFilesDir(Environment.DIRECTORY_PICTURES)?.absolutePath}/$currentPhotoPath"
+            val imgFile = File(filename)
             val photoURI: Uri = FileProvider.getUriForFile(this.applicationContext, "com.example.android.fileprovider", imgFile)
             val pic = FixOrientation.handleSamplingAndRotationBitmap(this.applicationContext, photoURI)
             profilePicture.setImageBitmap(pic)

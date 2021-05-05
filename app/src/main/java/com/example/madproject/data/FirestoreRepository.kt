@@ -39,17 +39,20 @@ class FirestoreRepository {
         return firestoreDB.collection("users").document("user@gmail.com").set(p)
     }
 
-    fun setUserImage(profile: Profile): UploadTask {
-        val file = Uri.fromFile(File(profile.currentPhotoPath!!))
+    fun setUserImage(profile: Profile, file: File?): UploadTask {
+        val filename = "${file?.absolutePath}/${profile.currentPhotoPath}"
+        val file = Uri.fromFile(File(filename))
         val imageRef = storageRef.child("${profile.email}/profileImage.jpg")
         return imageRef.putFile(file)
     }
 
     fun getUserImage(file: File?): Pair<File, FileDownloadTask> {
         val imageRef = storageRef.child("user@gmail.com/profileImage.jpg")
-        File.createTempFile("JPEG_", ".jpg", file)
+
+        val filename = "${file?.absolutePath}/profile.jpg"
+
+        File(filename)
             .apply {
-                Log.d("test","${this.absolutePath}")
                 return Pair<File,FileDownloadTask>(this,imageRef.getFile(this))
             }
 

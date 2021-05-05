@@ -3,24 +3,20 @@ package com.example.madproject.ui.profile
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.text.InputType
-import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
-import androidx.core.content.edit
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.madproject.R
-import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import com.example.madproject.data.Profile
 import com.example.madproject.lib.*
 import com.google.android.material.datepicker.CalendarConstraints
@@ -39,7 +35,6 @@ import java.util.*
 class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     private lateinit var fullName: EditText
     private lateinit var nickName: EditText
-    private lateinit var email: EditText
     private lateinit var location: EditText
     private lateinit var phoneNumber: EditText
     private lateinit var dateOfBirth: EditText
@@ -47,21 +42,31 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     private var currentPhotoPath: String? = ""
     private var newPhotoPath: String? = ""
     private lateinit var photoURI: Uri
-    private lateinit var sharedPref: SharedPreferences
-    private lateinit var profile: Profile
+    private var profile: Profile = Profile()
     private var picker: MaterialDatePicker<Long>? = null
-    private val model: SharedProfileViewModel by activityViewModels()
+    private lateinit var model: SharedProfileViewModel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
         fullName = view.findViewById(R.id.fullName)
         nickName = view.findViewById(R.id.nickName)
-        email = view.findViewById(R.id.email)
         location = view.findViewById(R.id.location)
         image = view.findViewById(R.id.imageView)
         phoneNumber = view.findViewById(R.id.phoneNumber)
         dateOfBirth = view.findViewById(R.id.dateOfBirth)
-        sharedPref = this.requireActivity().getPreferences(Context.MODE_PRIVATE)
+
+        model = ViewModelProviders.of(this).get(SharedProfileViewModel::class.java)
+
+        model.getUser().observe(viewLifecycleOwner, {
+            if (it == null) {
+                Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_SHORT).show()
+            } else {
+                profile = it
+                getProfileFromShowProfile()
+            }
+        })
+
+        getProfileFromShowProfile()
 
         fixEditText()
 
@@ -70,7 +75,6 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         val editPhoto = view.findViewById<ImageButton>(R.id.imageButton)
         registerForContextMenu(editPhoto)
 
-        setValues()
     }
 
     override fun onPause() {
@@ -189,17 +193,6 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             }
         }
 
-        email.setOnFocusChangeListener { _, hasFocus ->
-            if (!hasFocus) {  // lost focus
-                email.setSelection(0, 0)
-                email.hint = ""
-            } else {
-                email.hint = "email@email.com"
-                val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                imm.showSoftInput(email, InputMethodManager.SHOW_IMPLICIT)
-            }
-        }
-
         location.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {  // lost focus
                 location.setSelection(0, 0)
@@ -262,24 +255,20 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             val inputFormat = SimpleDateFormat("dd MMM yyyy")
             val outputFormat = SimpleDateFormat("MMM dd, yyyy")
             dateOfBirth.setText(outputFormat.format(inputFormat.parse(picker?.headerText!!)!!))
-            email.requestFocus()
+            phoneNumber.requestFocus()
         }
 
         picker?.show(this.requireActivity().supportFragmentManager, picker.toString())
     }
 
-    private fun setValues() {
-        model.profile.observe(viewLifecycleOwner, Observer { profile ->
-            this.profile = profile
-            if (profile.fullName == "Guest profile") fullName.setText("") else fullName.setText(profile.fullName)
-            nickName.setText(profile.nickName)
-            email.setText(profile.email)
-            dateOfBirth.setText(profile.dateOfBirth)
-            phoneNumber.setText(profile.phoneNumber)
-            location.setText(profile.location)
-            currentPhotoPath = profile.currentPhotoPath
-            setPic()
-        })
+    private fun getProfileFromShowProfile() {
+        fullName.setText(profile.fullName)
+        nickName.setText(profile.nickName)
+        dateOfBirth.setText(profile.dateOfBirth)
+        phoneNumber.setText(profile.phoneNumber)
+        location.setText(profile.location)
+        currentPhotoPath = profile.currentPhotoPath
+        setPic()
     }
 
     private fun updateProfile() {
@@ -287,7 +276,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             fullName = fullName.text.toString(),
             nickName = nickName.text.toString(),
             dateOfBirth = dateOfBirth.text.toString(),
-            email = email.text.toString(),
+            email = profile.email,
             phoneNumber = phoneNumber.text.toString(),
             location = location.text.toString(),
             currentPhotoPath = currentPhotoPath
@@ -313,21 +302,13 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
 
     private fun saveValues() {
 
-
-        val dataObj = JSONObject()
-
-        dataObj.put(ValueIds.FULL_NAME.value, fullName.text.toString())
-        dataObj.put(ValueIds.NICKNAME.value, nickName.text.toString())
-        dataObj.put(ValueIds.DATE_OF_BIRTH.value, dateOfBirth.text.toString())
-        dataObj.put(ValueIds.EMAIL.value, email.text.toString())
-        dataObj.put(ValueIds.PHONE_NUMBER.value, phoneNumber.text.toString())
-        dataObj.put(ValueIds.LOCATION.value, location.text.toString())
-        dataObj.put(ValueIds.CURRENT_PHOTO_PATH.value, currentPhotoPath)
-
-        sharedPref.edit {
-            putString(ValueIds.JSON_OBJECT_PROFILE.value, dataObj.toString())
-            apply()
-        }
+        model.setUser(profile)
+            .addOnSuccessListener {
+                Toast.makeText(context, "Profile information saved!", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener {
+                Toast.makeText(context, "Failed saving profile!", Toast.LENGTH_SHORT).show()
+            }
     }
 
     @SuppressLint("SimpleDateFormat")

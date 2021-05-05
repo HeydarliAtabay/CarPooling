@@ -14,7 +14,6 @@
     <string name="fullName"> Full Name<sup><small>*</small></sup> </string>
     <string name="nickName"> Nickname<sup><small>*</small></sup> </string>
     <string name="birth"> Date of Birth<sup><small>*</small></sup> </string>
-    <string name="email"> E-Mail </string>
     <string name="phone"> Phone Number </string>
     <string name="location"> Location </string>
 </resources>

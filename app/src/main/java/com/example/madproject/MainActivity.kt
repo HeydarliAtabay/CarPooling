@@ -2,6 +2,7 @@ package com.example.madproject
 
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -50,7 +51,8 @@ class MainActivity : AppCompatActivity() {
             .get(SharedProfileViewModel::class.java)
 
 
-        model.getUser().observe(this, {
+        val storageDir: File? = this.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        model.getUser(storageDir).observe(this, {
             if (it == null) {
                 Toast.makeText(this, "Firebase Failure!", Toast.LENGTH_LONG).show()
             } else {

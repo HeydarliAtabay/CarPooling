@@ -58,7 +58,8 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
 
         model = ViewModelProviders.of(this).get(SharedProfileViewModel::class.java)
 
-        model.getUser().observe(viewLifecycleOwner, {
+        val storageDir: File? = this.requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        model.getUser(storageDir).observe(viewLifecycleOwner, {
             if (it == null) {
                 Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_SHORT).show()
             } else {
@@ -310,6 +311,13 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             .addOnFailureListener {
                 Toast.makeText(context, "Failed saving profile!", Toast.LENGTH_SHORT).show()
             }
+        if(profile.currentPhotoPath!=null && profile.currentPhotoPath!="" && newPhotoPath != "") {
+            model.setUserImage(profile)
+                .addOnFailureListener {
+                    Toast.makeText(context, "Failed saving profile picture!", Toast.LENGTH_SHORT)
+                        .show()
+                }
+        }
     }
 
     @SuppressLint("SimpleDateFormat")

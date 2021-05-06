@@ -2,7 +2,7 @@ package com.example.madproject.data
 
 data class Trip(val user: String = "",
                 var id: String = "",
-                val imagePath: String = "",
+                var imageUrl: String = "",
                 val from: String = "",
                 val to: String = "",
                 val departureDate: String = "",

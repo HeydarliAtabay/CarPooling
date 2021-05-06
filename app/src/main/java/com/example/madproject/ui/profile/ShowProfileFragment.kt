@@ -6,7 +6,7 @@ import androidx.fragment.app.Fragment
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.madproject.R
 import com.example.madproject.data.Profile
@@ -22,7 +22,7 @@ class ShowProfileFragment : Fragment(R.layout.fragment_show_profile) {
     private lateinit var location : TextView
     private lateinit var image : ImageView
     private var profile: Profile = Profile()
-    private lateinit var model: ProfileViewModel
+    private val model: ProfileViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
@@ -34,10 +34,7 @@ class ShowProfileFragment : Fragment(R.layout.fragment_show_profile) {
         location = view.findViewById(R.id.location)
         image = view.findViewById(R.id.imageView3)
 
-        model = ViewModelProvider(this, ProfileFactory())
-            .get(ProfileViewModel::class.java)
-
-        model.getUser().observe(viewLifecycleOwner, {
+        model.getDBUser().observe(viewLifecycleOwner, {
             if (it == null) {
                 Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
             } else {
@@ -58,6 +55,8 @@ class ShowProfileFragment : Fragment(R.layout.fragment_show_profile) {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.editButton -> {
+                model.localProfile = profile
+                model.useDBImage = true
                 findNavController().navigate(R.id.action_showProfile_to_editProfile)
                 true
             }

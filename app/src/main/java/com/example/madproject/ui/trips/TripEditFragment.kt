@@ -3,7 +3,8 @@ package com.example.madproject.ui.trips
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -19,28 +20,29 @@ import androidx.core.content.FileProvider
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.madproject.R
-import com.example.madproject.data.FirestoreRepository
+import com.example.madproject.data.Profile
 import com.example.madproject.data.Trip
 import com.example.madproject.lib.FixOrientation
 import com.example.madproject.lib.Requests
+import com.example.madproject.ui.profile.ProfileViewModel
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.io.InputStream
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
+import com.squareup.picasso.Picasso
+import java.io.*
 import java.text.SimpleDateFormat
 import java.util.*
 
 class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
-    private var currentCarPath: String? = ""
-    private var newCarPath: String? = ""
+    private var currentPhotoPath: String? = ""
+    private var bigPhotoPath: String? = ""
     private lateinit var imageCar : ImageView
-    private lateinit var photoCarURI: Uri
+    private lateinit var photoURI: Uri
     private lateinit var departure : EditText
     private lateinit var arrival : EditText
     private lateinit var departureDate : EditText
@@ -50,11 +52,13 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     private lateinit var price : EditText
     private lateinit var additionalInfo : EditText
     private lateinit var intermediateStop : EditText
-    private lateinit var sharedPref: SharedPreferences
     private var datepicker: MaterialDatePicker<Long>? = null
     private var timepicker: MaterialTimePicker? = null
-    private val sharedModel: SharedTripViewModel by activityViewModels()
+    private val sharedModel: TripListViewModel by activityViewModels()
+    private val profileModel: ProfileViewModel by activityViewModels()
     private lateinit var trip: Trip
+    private var profile = Profile()
+    private var storageDir: File? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         imageCar = view.findViewById(R.id.imageCar)
@@ -67,17 +71,35 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         price = view.findViewById(R.id.price)
         additionalInfo = view.findViewById(R.id.info)
         intermediateStop = view.findViewById(R.id.intermediate_stops)
-        sharedPref = this.requireActivity().getPreferences(Context.MODE_PRIVATE)
+        storageDir = this.requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+
+        profileModel.getDBUser().observe(viewLifecycleOwner, {
+            if (it == null) {
+                Toast.makeText(this.requireActivity(), "Firebase Failure!", Toast.LENGTH_LONG).show()
+            } else {
+                profile = it
+            }
+        })
+
+        trip = sharedModel.selected
+        currentPhotoPath = sharedModel.currentPhotoPath
+
+        setValues()
 
         fixEditText()
+
+        if (sharedModel.useDBImage && (currentPhotoPath != "")) {
+            File(currentPhotoPath!!).delete()
+            currentPhotoPath = ""
+            sharedModel.currentPhotoPath = ""
+        }
+
+        sharedModel.useDBImage = false
 
         setHasOptionsMenu(true)
 
         val editPhoto = view.findViewById<ImageButton>(R.id.imageButton2)
         registerForContextMenu(editPhoto)
-
-        setValues()
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -90,8 +112,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
             R.id.saveButton -> {
                 updateTrip()
                 if (formCheck()) {
-                    saveTripValues()
-                    findNavController().navigate(R.id.action_tripEdit_to_tripList)
+                    if (currentPhotoPath == "") saveValues() else saveValuesImage()
                 } else {
                     Toast.makeText(context, "Insert the required fields to save the trip!", Toast.LENGTH_LONG).show()
                 }
@@ -107,7 +128,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         if (datepicker?.isVisible == true) datepicker?.dismiss()
         if (timepicker?.isVisible == true) timepicker?.dismiss()
         updateTrip()
-        sharedModel.select(trip)
+        sharedModel.currentPhotoPath = currentPhotoPath ?: ""
     }
 
     override fun onCreateContextMenu(
@@ -142,16 +163,13 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         if (resultCode == AppCompatActivity.RESULT_OK) {
             when (requestCode) {
                 Requests.INTENT_CAPTURE_PHOTO.value -> {
-                    val oldImgFile = File(currentCarPath!!)
-                    oldImgFile.delete()
-                    currentCarPath = newCarPath
-                    setCarPic()
+                    resizeSetImage()
                 }
 
                 Requests.INTENT_PHOTO_FROM_GALLERY.value -> {
                     val inputStream: InputStream? = data?.data?.let {
                         this.requireActivity().contentResolver.openInputStream(
-                                it
+                            it
                         )
                     }
                     val outputFile = createImageFile()
@@ -159,16 +177,40 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
                     inputStream?.copyTo(fileOutputStream)
                     fileOutputStream.close()
                     inputStream?.close()
-                    photoCarURI = FileProvider.getUriForFile(
-                            this.requireActivity(),
-                            "com.example.android.fileprovider",
-                            outputFile
-                    )
-                    currentCarPath = newCarPath
-                    setCarPic()
+                    resizeSetImage()
                 }
             }
+        } else {
+            if (requestCode == Requests.INTENT_CAPTURE_PHOTO.value) {
+                File(bigPhotoPath!!).delete()
+                bigPhotoPath = ""
+            }
         }
+    }
+
+    private fun resizeSetImage() {
+        currentPhotoPath = "${storageDir?.absolutePath}/profileImage.jpg"
+        val smallImageFile = File(currentPhotoPath!!)
+        val fout: OutputStream = FileOutputStream(smallImageFile)
+
+        val bigImageFile = File(bigPhotoPath!!)
+        photoURI = FileProvider.getUriForFile(
+            this.requireActivity().applicationContext,
+            "com.example.android.fileprovider",
+            bigImageFile
+        )
+        val pic = FixOrientation.handleSamplingAndRotationBitmap(
+            this.requireActivity().applicationContext,
+            photoURI
+        )
+        pic?.compress(Bitmap.CompressFormat.JPEG, 30, fout)
+        fout.flush()
+        fout.close()
+
+        imageCar.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath!!))
+
+        bigImageFile.delete()
+        bigPhotoPath = ""
     }
 
     private fun closeKeyboard() {
@@ -281,6 +323,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
 
     }
 
+    @SuppressLint("SimpleDateFormat")
     private fun setDatePicker() {
         val constraintsBuilder = CalendarConstraints.Builder().setValidator(
                 DateValidatorPointForward.now()
@@ -337,10 +380,8 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     }
 
     private fun setTimePicker() {
-
         var h = 0
         var m = 0
-
 
         if (departureTime.text.toString() != "") {
             val s = departureTime.text.toString().split(":")
@@ -349,7 +390,6 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
                 m = unParseTime(s[1])
             }
         }
-
         timepicker = MaterialTimePicker.Builder()
             .setTitleText("Select trip departure time")
             .setTimeFormat(TimeFormat.CLOCK_24H)
@@ -374,51 +414,52 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     }
 
     private fun updateTrip() {
-        trip = Trip(
-                id = trip.id,
-                imagePath = currentCarPath!!,
-                from = departure.text.toString(),
-                to = arrival.text.toString(),
-                departureDate = departureDate.text.toString(),
-                departureTime = departureTime.text.toString(),
-                duration = duration.text.toString(),
-                availableSeat = availableSeats.text.toString(),
-                additionalInfo = additionalInfo.text.toString(),
-                intermediateStop = intermediateStop.text.toString(),
-                price = price.text.toString()
+        sharedModel.selected = Trip(
+            id = trip.id,
+            imageUrl = trip.imageUrl,
+            from = departure.text.toString(),
+            to = arrival.text.toString(),
+            departureDate = departureDate.text.toString(),
+            departureTime = departureTime.text.toString(),
+            duration = duration.text.toString(),
+            availableSeat = availableSeats.text.toString(),
+            additionalInfo = additionalInfo.text.toString(),
+            intermediateStop = intermediateStop.text.toString(),
+            price = price.text.toString()
         )
+        trip = sharedModel.selected
     }
 
     private fun setValues() {
-        sharedModel.selected.observe(viewLifecycleOwner, { t ->
-            trip = t
-            departure.setText(t.from)
-            arrival.setText(t.to)
-            departureDate.setText(t.departureDate)
-            departureTime.setText(t.departureTime)
-            duration.setText(t.duration)
-            availableSeats.setText(t.availableSeat)
-            price.setText(t.price)
-            additionalInfo.setText(t.additionalInfo)
-            intermediateStop.setText(t.intermediateStop)
-            currentCarPath = t.imagePath
-            setCarPic()
-        })
+        departure.setText(trip.from)
+        arrival.setText(trip.to)
+        departureDate.setText(trip.departureDate)
+        departureTime.setText(trip.departureTime)
+        duration.setText(trip.duration)
+        availableSeats.setText(trip.availableSeat)
+        price.setText(trip.price)
+        additionalInfo.setText(trip.additionalInfo)
+        intermediateStop.setText(trip.intermediateStop)
+
+        if ((trip.imageUrl == "") && (currentPhotoPath == "")) imageCar.setImageResource(R.drawable.car_example)
+        else if ((trip.imageUrl == "") && (currentPhotoPath != "")) imageCar.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath))
+        else if ((trip.imageUrl != "") && (currentPhotoPath == "")) Picasso.get().load(trip.imageUrl).into(imageCar)
+        else {
+            if (sharedModel.useDBImage) Picasso.get().load(trip.imageUrl).into(imageCar)
+            else imageCar.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath))
+        }
     }
 
     @SuppressLint("SimpleDateFormat")
-    @Throws(IOException::class)
     private fun createImageFile(): File {
         // Create an image file name
         val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-        val storageDir: File? = this.requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        return File.createTempFile(
-                "JPEG_${timeStamp}_", /* prefix */
-                ".jpg", /* suffix */
-                storageDir /* directory */
-        ).apply {
+
+        val filename = "${storageDir?.absolutePath}/$timeStamp.jpg"
+
+        return File(filename).apply {
             // Save a file: path for use with ACTION_VIEW intents
-            newCarPath = absolutePath
+            bigPhotoPath = absolutePath
         }
     }
 
@@ -442,12 +483,12 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
                 }
                 // Continue only if the File was successfully created
                 photoFile?.also {
-                    photoCarURI = FileProvider.getUriForFile(
+                    photoURI = FileProvider.getUriForFile(
                             this.requireActivity(),
                             "com.example.android.fileprovider",
                             it
                     )
-                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoCarURI)
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
                     startActivityForResult(
                             takePictureIntent,
                             Requests.INTENT_CAPTURE_PHOTO.value
@@ -487,40 +528,55 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         return flag
     }
 
-    private fun saveTripValues() {
+    private fun saveValues() {
         if (trip.id == "") {
-            // New trip, perform the add
-            FirestoreRepository().addTrip(trip)
-                    .addOnSuccessListener {
-                        Toast.makeText(context, "Trip information saved!", Toast.LENGTH_LONG).show()
-                    }
-                    .addOnFailureListener {
-                        Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
-                    }
-        } else {
-            FirestoreRepository().updateTrip(trip)
-                    .addOnSuccessListener {
-                        Toast.makeText(context, "Trip information saved!", Toast.LENGTH_LONG).show()
-                    }
-                    .addOnFailureListener {
-                        Toast.makeText(context, "Failed saving trip!", Toast.LENGTH_LONG).show()
-                    }
+            trip.id = FirebaseFirestore
+                .getInstance()
+                .collection("users/${profile.email}/createdTrips").document().id
         }
+
+        sharedModel.saveTrip(trip)
+            .addOnCompleteListener{
+                if (it.isSuccessful) Toast.makeText(context, "Trip information saved!", Toast.LENGTH_SHORT).show()
+                else Toast.makeText(context, "Failed saving trip!", Toast.LENGTH_SHORT).show()
+                findNavController().navigate(R.id.action_tripEdit_to_tripList)
+            }
     }
 
-    private fun setCarPic() {
-        if (currentCarPath != "") {
-            val imgFile = File(currentCarPath!!)
-            photoCarURI = FileProvider.getUriForFile(
-                    this.requireActivity().applicationContext,
-                    "com.example.android.fileprovider",
-                    imgFile
-            )
-            val pic = FixOrientation.handleSamplingAndRotationBitmap(
-                    this.requireActivity().applicationContext,
-                    photoCarURI
-            )
-            imageCar.setImageBitmap(pic)
-        } else imageCar.setImageResource(R.drawable.car_example)
+    private fun saveValuesImage() {
+        if (trip.id == "") {
+            trip.id = FirebaseFirestore
+                .getInstance()
+                .collection("users/${profile.email}/createdTrips").document().id
+        }
+
+        val storage = FirebaseStorage.getInstance()
+        val storageRef = storage.reference
+        val localPhoto = File(currentPhotoPath!!)
+        val file = Uri.fromFile(localPhoto)
+        val imageRef = storageRef.child("${profile.email}/${trip.id}.jpg")
+        imageRef.putFile(file)
+            .addOnCompleteListener {
+                if (it.isSuccessful) {
+                    imageRef.downloadUrl.addOnSuccessListener { uri ->
+                        trip.imageUrl = uri.toString()
+                        sharedModel.saveTrip(trip)
+                            .addOnCompleteListener{ task ->
+                                if (task.isSuccessful) Toast.makeText(context, "Trip information saved!", Toast.LENGTH_SHORT).show()
+                                else Toast.makeText(context, "Failed saving trip!", Toast.LENGTH_SHORT).show()
+                                findNavController().navigate(R.id.action_tripEdit_to_tripList)
+                            }
+                    }
+                } else {
+                    Toast.makeText(context, "Failed saving profile photo!", Toast.LENGTH_SHORT).show()
+                    sharedModel.saveTrip(trip)
+                        .addOnCompleteListener{ task ->
+                            if (!task.isSuccessful) Toast.makeText(context, "Failed saving trip!", Toast.LENGTH_SHORT).show()
+                            findNavController().navigate(R.id.action_tripEdit_to_tripList)
+                        }
+                }
+                currentPhotoPath = ""
+                localPhoto.delete()
+            }
     }
 }

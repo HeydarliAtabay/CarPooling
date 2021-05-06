@@ -1,6 +1,5 @@
 package com.example.madproject.ui.trips
 
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import androidx.fragment.app.Fragment
@@ -11,33 +10,26 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.cardview.widget.CardView
-import androidx.core.content.FileProvider
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.madproject.R
 import com.example.madproject.data.Trip
-import com.example.madproject.lib.FixOrientation
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import java.io.File
+import com.squareup.picasso.Picasso
 
 class TripListFragment : Fragment(R.layout.fragment_trip_list) {
     private var tripList = listOf<Trip>()
     private lateinit var emptyList: TextView
     private lateinit var emptyList2: TextView
-    private val sharedModel: SharedTripViewModel by activityViewModels()
-    private lateinit var tripListViewModel: TripListViewModel
+    private val tripListViewModel: TripListViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         emptyList = view.findViewById(R.id.emptyList)
         emptyList2 = view.findViewById(R.id.emptyList2)
-
-        tripListViewModel = ViewModelProvider(this, TripListFactory())
-            .get(TripListViewModel::class.java)
 
         val fab=view.findViewById<FloatingActionButton>(R.id.fab)
 
@@ -54,37 +46,19 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
                 if (tripList.isNotEmpty()) {
                     emptyList.visibility = View.INVISIBLE
                     emptyList2.visibility = View.INVISIBLE
-                    recyclerView.adapter = TripsAdapter(tripList.toList(), sharedModel)
+                    recyclerView.adapter = TripsAdapter(tripList.toList(), tripListViewModel)
                 }
             }
         })
 
-        /*
-        val db = FirebaseFirestore.getInstance()
-
-        db.collection("Trips").get()
-                .addOnSuccessListener { documents ->
-
-                    for (doc in documents) {
-                        tripList.add(doc.toObject(Trip::class.java))
-                    }
-                    if(tripList.size != 0) {
-                        emptyList.visibility = View.INVISIBLE
-                        emptyList2.visibility = View.INVISIBLE
-                        recyclerView.adapter = TripsAdapter(tripList.toList(), sharedModel)
-                    }
-                }
-                .addOnFailureListener {
-                    Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
-                }
-*/
         fab.setOnClickListener{
-            sharedModel.select(Trip())
+            tripListViewModel.selected = Trip()
+            tripListViewModel.useDBImage = true
             findNavController().navigate(R.id.action_tripList_to_tripEdit)
         }
     }
 
-    class TripsAdapter(val data: List<Trip>, private val sharedModel: SharedTripViewModel): RecyclerView.Adapter<TripsAdapter.TripViewHolder>(){
+    class TripsAdapter(val data: List<Trip>, private val sharedModel: TripListViewModel): RecyclerView.Adapter<TripsAdapter.TripViewHolder>(){
 
         class TripViewHolder(itemView: View):RecyclerView.ViewHolder(itemView){
             private val image = itemView.findViewById<ImageView>(R.id.image1)
@@ -95,43 +69,33 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
             private val price = itemView.findViewById<TextView>(R.id.price_txt)
             private val editTripButton = itemView.findViewById<Button>(R.id.editTripButton)
             private val cv = itemView.findViewById<CardView>(R.id.card_view)
-            private var currentPhotoPath:String = ""
 
-            fun bind(t: Trip, sharedModel: SharedTripViewModel) {
+            fun bind(t: Trip, sharedModel: TripListViewModel) {
                 from.text = t.from
                 to.text = t.to
                 date.text = t.departureDate
                 time.text = t.departureTime
                 price.text = t.price
-                currentPhotoPath = t.imagePath
-
-                setPic()
+                if (t.imageUrl != "") {
+                    Picasso.get().load(t.imageUrl).into(image)
+                } else image.setImageResource(R.drawable.car_example)
 
                 cv.setOnClickListener {
-                    sharedModel.select(t)
+                    sharedModel.selected = t
                     findNavController(itemView).navigate(R.id.action_tripList_to_tripDetail)
                 }
 
                 editTripButton.setOnClickListener {
-                    sharedModel.select(t)
+                    sharedModel.selected =t
+                    sharedModel.useDBImage = true
                     findNavController(itemView).navigate(R.id.action_tripList_to_tripEdit)
                 }
             }
 
             fun unbind() {
-                editTripButton.setOnClickListener { null }
-                cv.setOnClickListener { null }
+                editTripButton.setOnClickListener {  }
+                cv.setOnClickListener {  }
             }
-
-            private fun setPic() {
-                if (currentPhotoPath != "") {
-                    val imgFile = File(currentPhotoPath)
-                    val photoURI:Uri = FileProvider.getUriForFile(itemView.context.applicationContext, "com.example.android.fileprovider", imgFile)
-                    val pic = FixOrientation.handleSamplingAndRotationBitmap(itemView.context.applicationContext, photoURI)
-                    image.setImageBitmap(pic)
-                } else image.setImageResource(R.drawable.car_example)
-            }
-
         }
 
         override fun onViewRecycled(holder: TripViewHolder) {

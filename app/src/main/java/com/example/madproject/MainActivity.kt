@@ -8,7 +8,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -16,7 +16,6 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.madproject.data.Profile
 import com.example.madproject.ui.profile.ProfileViewModel
-import com.example.madproject.ui.profile.ProfileFactory
 import com.google.android.material.navigation.NavigationView
 import com.squareup.picasso.Picasso
 
@@ -44,10 +43,10 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
-        model = ViewModelProvider(this, ProfileFactory())
+        model = ViewModelProviders.of(this)
             .get(ProfileViewModel::class.java)
 
-        model.getUser().observe(this, {
+        model.getDBUser().observe(this, {
             if (it == null) {
                 Toast.makeText(this, "Firebase Failure!", Toast.LENGTH_LONG).show()
             } else {

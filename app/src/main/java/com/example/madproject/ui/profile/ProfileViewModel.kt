@@ -7,9 +7,12 @@ import com.example.madproject.data.Profile
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.EventListener
 
-class ProfileViewModel(): ViewModel() {
+class ProfileViewModel: ViewModel() {
 
     private var profile: MutableLiveData<Profile> = MutableLiveData(Profile())
+    var localProfile = Profile()
+    var currentPhotoPath = ""
+    var useDBImage = false
 
     init {
         loadProfile()
@@ -26,11 +29,12 @@ class ProfileViewModel(): ViewModel() {
         })
     }
 
-    fun getUser(): LiveData<Profile> {
+    fun getDBUser(): LiveData<Profile> {
         return profile
     }
 
-    fun setUser(p:Profile) : Task<Void> {
+    fun setDBUser(p:Profile) : Task<Void> {
         return FirestoreRepository().setUser(p)
     }
+
 }

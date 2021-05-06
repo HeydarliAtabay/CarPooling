@@ -5,7 +5,7 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 
-class FirestoreRepository {
+class FirestoreRepository() {
     var firestoreDB = FirebaseFirestore.getInstance()
     //var user = FirebaseAuth.getInstance().currentUser  Use it when the auth is implemented
 
@@ -15,7 +15,7 @@ class FirestoreRepository {
         return firestoreDB.collection("users/user@gmail.com/createdTrips").document(id).set(t)
     }
 
-    fun updateTrip(t: Trip): Task<Void> {
+    fun insertTrip(t: Trip): Task<Void> {
         return firestoreDB.collection("users/user@gmail.com/createdTrips").document(t.id).set(t)
     }
 

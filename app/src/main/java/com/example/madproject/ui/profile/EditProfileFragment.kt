@@ -16,7 +16,7 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.madproject.R
 import com.example.madproject.data.Profile
@@ -45,7 +45,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     private var profile: Profile = Profile()
     private var storageDir: File? = null
     private var picker: MaterialDatePicker<Long>? = null
-    private lateinit var model: ProfileViewModel
+    private val model: ProfileViewModel by activityViewModels()
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -58,19 +58,12 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         dateOfBirth = view.findViewById(R.id.dateOfBirth)
         storageDir = this.requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
 
-        model = ViewModelProvider(this, ProfileFactory())
-            .get(ProfileViewModel::class.java)
-
-        model.getUser().observe(viewLifecycleOwner, {
-            if (it == null) {
-                Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_SHORT).show()
-            } else {
-                profile = it
-                getProfileFromShowProfile()
-            }
-        })
+        profile = model.localProfile
+        currentPhotoPath = model.currentPhotoPath
 
         getProfileFromShowProfile()
+
+        model.useDBImage = false
 
         fixEditText()
 
@@ -78,7 +71,6 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
 
         val editPhoto = view.findViewById<ImageButton>(R.id.imageButton)
         registerForContextMenu(editPhoto)
-
     }
 
     override fun onPause() {
@@ -86,6 +78,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         closeKeyboard()
         if (picker?.isVisible == true) picker?.dismiss()
         updateProfile()
+        model.currentPhotoPath = currentPhotoPath ?: ""
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -139,31 +132,6 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         }
     }
 
-    private fun resizeSetImage() {
-        currentPhotoPath = "${storageDir?.absolutePath}/profileImage.jpg"
-        val smallImageFile = File(currentPhotoPath!!)
-        val fout: OutputStream = FileOutputStream(smallImageFile)
-
-        val bigImageFile = File(bigPhotoPath!!)
-        photoURI = FileProvider.getUriForFile(
-            this.requireActivity().applicationContext,
-            "com.example.android.fileprovider",
-            bigImageFile
-        )
-        val pic = FixOrientation.handleSamplingAndRotationBitmap(
-            this.requireActivity().applicationContext,
-            photoURI
-        )
-        pic?.compress(CompressFormat.JPEG, 30, fout)
-        fout.flush()
-        fout.close()
-
-        image.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath!!))
-
-        bigImageFile.delete()
-        bigPhotoPath = ""
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == AppCompatActivity.RESULT_OK) {
@@ -192,6 +160,31 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                 bigPhotoPath = ""
             }
         }
+    }
+
+    private fun resizeSetImage() {
+        currentPhotoPath = "${storageDir?.absolutePath}/profileImage.jpg"
+        val smallImageFile = File(currentPhotoPath!!)
+        val fout: OutputStream = FileOutputStream(smallImageFile)
+
+        val bigImageFile = File(bigPhotoPath!!)
+        photoURI = FileProvider.getUriForFile(
+            this.requireActivity().applicationContext,
+            "com.example.android.fileprovider",
+            bigImageFile
+        )
+        val pic = FixOrientation.handleSamplingAndRotationBitmap(
+            this.requireActivity().applicationContext,
+            photoURI
+        )
+        pic?.compress(CompressFormat.JPEG, 30, fout)
+        fout.flush()
+        fout.close()
+
+        image.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath!!))
+
+        bigImageFile.delete()
+        bigPhotoPath = ""
     }
 
     private fun closeKeyboard() {
@@ -264,6 +257,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         }
     }
 
+    @SuppressLint("SimpleDateFormat")
     private fun setDatePicker() {
         val constraintsBuilder = CalendarConstraints.Builder().setValidator(
             DateValidatorPointBackward.now()
@@ -306,13 +300,18 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         dateOfBirth.setText(profile.dateOfBirth)
         phoneNumber.setText(profile.phoneNumber)
         location.setText(profile.location)
-        if (profile.imageUrl != "") {
-            Picasso.get().load(profile.imageUrl).into(image)
-        } else image.setImageResource(R.drawable.avatar)
+
+        if ((profile.imageUrl == "") && (currentPhotoPath == "")) image.setImageResource(R.drawable.avatar)
+        else if ((profile.imageUrl == "") && (currentPhotoPath != "")) image.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath))
+        else if ((profile.imageUrl != "") && (currentPhotoPath == "")) Picasso.get().load(profile.imageUrl).into(image)
+        else {
+            if (model.useDBImage) Picasso.get().load(profile.imageUrl).into(image)
+            else image.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath))
+        }
     }
 
     private fun updateProfile() {
-        profile = Profile(
+        model.localProfile = Profile(
             fullName = fullName.text.toString(),
             nickName = nickName.text.toString(),
             dateOfBirth = dateOfBirth.text.toString(),
@@ -321,6 +320,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             location = location.text.toString(),
             imageUrl = profile.imageUrl
         )
+        profile = model.localProfile
     }
 
     private fun formCheck(): Boolean {
@@ -341,7 +341,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     }
 
     private fun saveValues() {
-        model.setUser(profile)
+        model.setDBUser(profile)
             .addOnCompleteListener{
                 if (it.isSuccessful) Toast.makeText(context, "Profile information saved!", Toast.LENGTH_SHORT).show()
                 else Toast.makeText(context, "Failed saving profile!", Toast.LENGTH_SHORT).show()
@@ -360,7 +360,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                 if (it.isSuccessful) {
                     imageRef.downloadUrl.addOnSuccessListener { uri ->
                         profile.imageUrl = uri.toString()
-                        model.setUser(profile)
+                        model.setDBUser(profile)
                             .addOnCompleteListener{ task ->
                                 if (task.isSuccessful) Toast.makeText(context, "Profile information saved!", Toast.LENGTH_SHORT).show()
                                 else Toast.makeText(context, "Failed saving profile!", Toast.LENGTH_SHORT).show()
@@ -369,18 +369,18 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                     }
                 } else {
                     Toast.makeText(context, "Failed saving profile photo!", Toast.LENGTH_SHORT).show()
-                    model.setUser(profile)
+                    model.setDBUser(profile)
                         .addOnCompleteListener { task ->
                             if(!task.isSuccessful) Toast.makeText(context, "Failed saving profile!", Toast.LENGTH_SHORT).show()
                             findNavController().navigate(R.id.action_editProfile_to_showProfile)
                         }
                 }
+                currentPhotoPath = ""
                 localPhoto.delete()
             }
     }
 
     @SuppressLint("SimpleDateFormat")
-    @Throws(IOException::class)
     private fun createImageFile(): File {
         // Create an image file name
         val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())

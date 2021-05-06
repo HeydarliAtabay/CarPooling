@@ -3,35 +3,31 @@ package com.example.madproject.ui.profile
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap.CompressFormat
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.text.InputType
-import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.example.madproject.R
-import androidx.lifecycle.ViewModelProviders
 import com.example.madproject.data.Profile
 import com.example.madproject.lib.*
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointBackward
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.textfield.TextInputLayout
-import org.json.JSONObject
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.io.InputStream
+import com.google.firebase.storage.FirebaseStorage
+import com.squareup.picasso.Picasso
+import java.io.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -42,9 +38,9 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     private lateinit var location: EditText
     private lateinit var phoneNumber: EditText
     private lateinit var dateOfBirth: EditText
-    private lateinit var image:ImageView
+    private lateinit var image: ImageView
     private var currentPhotoPath: String? = ""
-    private var newPhotoPath: String? = ""
+    private var bigPhotoPath: String? = ""
     private lateinit var photoURI: Uri
     private var profile: Profile = Profile()
     private var storageDir: File? = null
@@ -62,9 +58,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         dateOfBirth = view.findViewById(R.id.dateOfBirth)
         storageDir = this.requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
 
-        model = ViewModelProvider(this, ViewModelFactory(storageDir))
-            .get(SharedProfileViewModel::class.java)
-        //model = ViewModelProviders.of(this).get(SharedProfileViewModel::class.java)
+        model = ViewModelProviders.of(this).get(SharedProfileViewModel::class.java)
 
         model.getUser().observe(viewLifecycleOwner, {
             if (it == null) {
@@ -102,12 +96,15 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         return when (item.itemId) {
             R.id.saveButton -> {
                 updateProfile()
-
                 if (formCheck()) {
-                    saveValues()
-                    findNavController().navigate(R.id.action_editProfile_to_showProfile)
+                    if (currentPhotoPath == "") saveValues() else saveValuesImage()
+                    //findNavController().navigate(R.id.action_editProfile_to_showProfile)
                 } else {
-                    Toast.makeText(context, "Insert the required fields to save the profile information!", Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        context,
+                        "Insert the required fields to save the profile information!",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
                 true
             }
@@ -116,9 +113,9 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     }
 
     override fun onCreateContextMenu(
-            menu: ContextMenu,
-            v: View,
-            menuInfo: ContextMenu.ContextMenuInfo?
+        menu: ContextMenu,
+        v: View,
+        menuInfo: ContextMenu.ContextMenuInfo?
     ) {
         super.onCreateContextMenu(menu, v, menuInfo)
         when (v.id) {
@@ -142,19 +139,43 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         }
     }
 
+    private fun resizeSetImage() {
+        currentPhotoPath = "${storageDir?.absolutePath}/profileImage.jpg"
+        val smallImageFile = File(currentPhotoPath!!)
+        val fout: OutputStream = FileOutputStream(smallImageFile)
+
+        val bigImageFile = File(bigPhotoPath!!)
+        photoURI = FileProvider.getUriForFile(
+            this.requireActivity().applicationContext,
+            "com.example.android.fileprovider",
+            bigImageFile
+        )
+        val pic = FixOrientation.handleSamplingAndRotationBitmap(
+            this.requireActivity().applicationContext,
+            photoURI
+        )
+        pic?.compress(CompressFormat.JPEG, 30, fout)
+        fout.flush()
+        fout.close()
+
+        image.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath!!))
+
+        bigImageFile.delete()
+        bigPhotoPath = ""
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == AppCompatActivity.RESULT_OK) {
             when (requestCode) {
                 Requests.INTENT_CAPTURE_PHOTO.value -> {
-                    currentPhotoPath = newPhotoPath
-                    setPic()
+                    resizeSetImage()
                 }
 
                 Requests.INTENT_PHOTO_FROM_GALLERY.value -> {
                     val inputStream: InputStream? = data?.data?.let {
                         this.requireActivity().contentResolver.openInputStream(
-                                it
+                            it
                         )
                     }
                     val outputFile = createImageFile()
@@ -162,9 +183,13 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                     inputStream?.copyTo(fileOutputStream)
                     fileOutputStream.close()
                     inputStream?.close()
-                    currentPhotoPath = newPhotoPath
-                    setPic()
+                    resizeSetImage()
                 }
+            }
+        } else {
+            if (requestCode == Requests.INTENT_CAPTURE_PHOTO.value) {
+                File(bigPhotoPath!!).delete()
+                bigPhotoPath = ""
             }
         }
     }
@@ -172,7 +197,8 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     private fun closeKeyboard() {
         val v = this.requireActivity().currentFocus
         if (v != null) {
-            val imm = this.requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            val imm = this.requireActivity()
+                .getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(v.windowToken, 0)
         }
     }
@@ -182,10 +208,11 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             if (!hasFocus) {  // lost focus
                 fullName.setSelection(0, 0)
                 fullName.hint = ""
-            }  else {
+            } else {
                 view?.findViewById<TextInputLayout>(R.id.tilFullName)?.error = null
                 fullName.hint = "Enter your full name"
-                val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                val imm =
+                    context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.showSoftInput(fullName, InputMethodManager.SHOW_IMPLICIT)
             }
         }
@@ -197,7 +224,8 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             } else {
                 view?.findViewById<TextInputLayout>(R.id.tilNickName)?.error = null
                 nickName.hint = "Enter your nickname"
-                val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                val imm =
+                    context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.showSoftInput(nickName, InputMethodManager.SHOW_IMPLICIT)
             }
         }
@@ -208,7 +236,8 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                 location.hint = ""
             } else {
                 location.hint = "Enter your location"
-                val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                val imm =
+                    context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.showSoftInput(location, InputMethodManager.SHOW_IMPLICIT)
             }
         }
@@ -228,7 +257,8 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                 phoneNumber.hint = ""
             } else {
                 phoneNumber.hint = "Enter your phone number"
-                val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                val imm =
+                    context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.showSoftInput(phoneNumber, InputMethodManager.SHOW_IMPLICIT)
             }
         }
@@ -236,7 +266,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
 
     private fun setDatePicker() {
         val constraintsBuilder = CalendarConstraints.Builder().setValidator(
-                DateValidatorPointBackward.now()
+            DateValidatorPointBackward.now()
         )
         var datePicker = MaterialDatePicker.Builder.datePicker()
             .setTitleText("Select your date of birth")
@@ -276,8 +306,9 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         dateOfBirth.setText(profile.dateOfBirth)
         phoneNumber.setText(profile.phoneNumber)
         location.setText(profile.location)
-        currentPhotoPath = profile.currentPhotoPath
-        setPic()
+        if (profile.imageUrl != "") {
+            Picasso.get().load(profile.imageUrl).into(image)
+        } else image.setImageResource(R.drawable.avatar)
     }
 
     private fun updateProfile() {
@@ -288,7 +319,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             email = profile.email,
             phoneNumber = phoneNumber.text.toString(),
             location = location.text.toString(),
-            currentPhotoPath = currentPhotoPath
+            imageUrl = profile.imageUrl
         )
     }
 
@@ -310,22 +341,43 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     }
 
     private fun saveValues() {
-
         model.setUser(profile)
-            .addOnSuccessListener {
-                Toast.makeText(context, "Profile information saved!", Toast.LENGTH_SHORT).show()
+            .addOnCompleteListener{
+                findNavController().navigate(R.id.action_editProfile_to_showProfile)
+                if (it.isSuccessful) Toast.makeText(context, "Profile information saved!", Toast.LENGTH_SHORT).show()
+                else Toast.makeText(context, "Failed saving profile!", Toast.LENGTH_SHORT).show()
             }
-            .addOnFailureListener {
-                Toast.makeText(context, "Failed saving profile!", Toast.LENGTH_SHORT).show()
-            }
-        if(profile.currentPhotoPath!=null && profile.currentPhotoPath!="" && newPhotoPath != "") {
-            Log.d("test", "Profile saved")
-            model.setUserImage(profile, storageDir)
-                .addOnFailureListener {
-                    Toast.makeText(context, "Failed saving profile picture!", Toast.LENGTH_SHORT)
-                        .show()
+    }
+
+    private fun saveValuesImage() {
+
+        val storage = FirebaseStorage.getInstance()
+        val storageRef = storage.reference
+        val localPhoto = File(currentPhotoPath!!)
+        val file = Uri.fromFile(localPhoto)
+        val imageRef = storageRef.child("${profile.email}/profileImage.jpg")
+        imageRef.putFile(file)
+            .addOnCompleteListener {
+                if (it.isSuccessful) {
+                    imageRef.downloadUrl.addOnSuccessListener { uri ->
+                        profile.imageUrl = uri.toString()
+                        model.setUser(profile)
+                            .addOnCompleteListener{ task ->
+                                findNavController().navigate(R.id.action_editProfile_to_showProfile)
+                                if (task.isSuccessful) Toast.makeText(context, "Profile information saved!", Toast.LENGTH_SHORT).show()
+                                else Toast.makeText(context, "Failed saving profile!", Toast.LENGTH_SHORT).show()
+                            }
+                    }
+                } else {
+                    Toast.makeText(context, "Failed saving profile photo!", Toast.LENGTH_SHORT).show()
+                    model.setUser(profile)
+                        .addOnCompleteListener { task ->
+                            findNavController().navigate(R.id.action_editProfile_to_showProfile)
+                            if(!task.isSuccessful) Toast.makeText(context, "Failed saving profile!", Toast.LENGTH_SHORT).show()
+                        }
                 }
-        }
+                localPhoto.delete()
+            }
     }
 
     @SuppressLint("SimpleDateFormat")
@@ -334,11 +386,11 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         // Create an image file name
         val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
 
-        val filename = "${storageDir?.absolutePath}/profile.jpg"
+        val filename = "${storageDir?.absolutePath}/$timeStamp.jpg"
 
         return File(filename).apply {
             // Save a file: path for use with ACTION_VIEW intents
-            newPhotoPath = "profile.jpg"
+            bigPhotoPath = absolutePath
         }
     }
 
@@ -363,34 +415,17 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                 // Continue only if the File was successfully created
                 photoFile?.also {
                     photoURI = FileProvider.getUriForFile(
-                            this.requireActivity(),
-                            "com.example.android.fileprovider",
-                            it
+                        this.requireActivity(),
+                        "com.example.android.fileprovider",
+                        it
                     )
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
                     startActivityForResult(
-                            takePictureIntent,
-                            Requests.INTENT_CAPTURE_PHOTO.value
+                        takePictureIntent,
+                        Requests.INTENT_CAPTURE_PHOTO.value
                     )
                 }
             }
         }
-    }
-
-    private fun setPic() {
-        if (currentPhotoPath != "") {
-            val filename = "${storageDir?.absolutePath}/${currentPhotoPath}"
-            val imgFile = File(filename)
-            photoURI = FileProvider.getUriForFile(
-                    this.requireActivity().applicationContext,
-                    "com.example.android.fileprovider",
-                    imgFile
-            )
-            val pic = FixOrientation.handleSamplingAndRotationBitmap(
-                    this.requireActivity().applicationContext,
-                    photoURI
-            )
-            image.setImageBitmap(pic)
-        } else image.setImageResource(R.drawable.avatar)
     }
 }

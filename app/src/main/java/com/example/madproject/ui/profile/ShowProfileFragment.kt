@@ -34,7 +34,7 @@ class ShowProfileFragment : Fragment(R.layout.fragment_show_profile) {
         location = view.findViewById(R.id.location)
         image = view.findViewById(R.id.imageView3)
 
-        model = ViewModelProvider(this, ProfileViewModelFactory())
+        model = ViewModelProvider(this, ProfileFactory())
             .get(ProfileViewModel::class.java)
 
         model.getUser().observe(viewLifecycleOwner, {

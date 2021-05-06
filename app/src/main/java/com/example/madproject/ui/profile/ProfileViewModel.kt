@@ -12,10 +12,10 @@ class ProfileViewModel(): ViewModel() {
     private var profile: MutableLiveData<Profile> = MutableLiveData(Profile())
 
     init {
-        loadUser()
+        loadProfile()
     }
 
-    private fun loadUser() {
+    private fun loadProfile() {
         FirestoreRepository().getUser().addSnapshotListener(EventListener { value, e ->
             if (e != null) {
                 profile.value = null

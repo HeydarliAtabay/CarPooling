@@ -13,7 +13,7 @@ import android.widget.Toast
 import androidx.cardview.widget.CardView
 import androidx.core.content.FileProvider
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -29,14 +29,15 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
     private lateinit var emptyList: TextView
     private lateinit var emptyList2: TextView
     private val sharedModel: SharedTripViewModel by activityViewModels()
-    private lateinit var tripsViewModel: TripsViewModel
+    private lateinit var tripListViewModel: TripListViewModel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         emptyList = view.findViewById(R.id.emptyList)
         emptyList2 = view.findViewById(R.id.emptyList2)
-        tripsViewModel = ViewModelProviders.of(this)
-            .get(TripsViewModel::class.java)
+
+        tripListViewModel = ViewModelProvider(this, TripListFactory())
+            .get(TripListViewModel::class.java)
 
         val fab=view.findViewById<FloatingActionButton>(R.id.fab)
 
@@ -45,7 +46,7 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
         recyclerView.setItemViewCacheSize(3)
         recyclerView.layoutManager = LinearLayoutManager(this.requireActivity())
 
-        tripsViewModel.getTrips().observe(viewLifecycleOwner, {
+        tripListViewModel.getTrips().observe(viewLifecycleOwner, {
             if (it == null) {
                 Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
             } else {

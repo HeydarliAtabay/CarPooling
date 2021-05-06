@@ -58,7 +58,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         dateOfBirth = view.findViewById(R.id.dateOfBirth)
         storageDir = this.requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
 
-        model = ViewModelProvider(this, ProfileViewModelFactory())
+        model = ViewModelProvider(this, ProfileFactory())
             .get(ProfileViewModel::class.java)
 
         model.getUser().observe(viewLifecycleOwner, {

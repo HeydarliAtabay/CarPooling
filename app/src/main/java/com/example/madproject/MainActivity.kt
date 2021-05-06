@@ -16,7 +16,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.madproject.data.Profile
 import com.example.madproject.ui.profile.ProfileViewModel
-import com.example.madproject.ui.profile.ProfileViewModelFactory
+import com.example.madproject.ui.profile.ProfileFactory
 import com.google.android.material.navigation.NavigationView
 import com.squareup.picasso.Picasso
 
@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
-        model = ViewModelProvider(this, ProfileViewModelFactory())
+        model = ViewModelProvider(this, ProfileFactory())
             .get(ProfileViewModel::class.java)
 
         model.getUser().observe(this, {

@@ -8,11 +8,15 @@ import com.example.madproject.data.Trip
 import com.google.firebase.firestore.EventListener
 import com.google.firebase.firestore.QuerySnapshot
 
-class TripsViewModel: ViewModel() {
+class TripListViewModel: ViewModel() {
 
-    var trips : MutableLiveData<List<Trip>> = MutableLiveData()
+    private var trips : MutableLiveData<List<Trip>> = MutableLiveData()
 
-    fun getTrips(): LiveData<List<Trip>> {
+    init {
+        loadTrips()
+    }
+
+    private fun loadTrips() {
         FirestoreRepository().getTrips().addSnapshotListener(EventListener<QuerySnapshot> { value, e ->
             if (e != null) {
                 trips.value = null
@@ -26,6 +30,9 @@ class TripsViewModel: ViewModel() {
             trips.value = retrievedTrips
         })
 
+    }
+
+    fun getTrips(): LiveData<List<Trip>> {
         return trips
     }
 }

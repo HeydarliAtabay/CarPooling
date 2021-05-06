@@ -16,7 +16,7 @@
         <item name="colorOnSecondary">#000000</item>
         <item name="colorSecondaryVariant">#02B8A7</item>
 
-        <item name="colorOnSurface">#FF000000</item>
+        <item name="colorOnSurface">#000000</item>
 
         <item name="colorError">#CF6679</item>
         <item name="colorOnError">#000000</item>
@@ -24,7 +24,7 @@
         <item name="color">@color/white</item>
 
         <!-- Customize your theme here. -->
-        <item name="android:windowBackground">#FFFFFF</item>
+        <item name="android:windowBackground">#BEFFFFFF</item>
         <item name="android:scrollbarThumbVertical">?attr/colorPrimaryDark</item>
         <item name="snackbarStyle">@style/Widget.App.Snackbar</item>
 

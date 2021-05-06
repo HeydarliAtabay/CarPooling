@@ -7,7 +7,7 @@ import com.example.madproject.data.Profile
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.EventListener
 
-class SharedProfileViewModel(): ViewModel() {
+class ProfileViewModel(): ViewModel() {
 
     private var profile: MutableLiveData<Profile> = MutableLiveData(Profile())
 

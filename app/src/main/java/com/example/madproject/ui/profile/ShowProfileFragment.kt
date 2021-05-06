@@ -6,7 +6,7 @@ import androidx.fragment.app.Fragment
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.madproject.R
 import com.example.madproject.data.Profile
@@ -22,7 +22,7 @@ class ShowProfileFragment : Fragment(R.layout.fragment_show_profile) {
     private lateinit var location : TextView
     private lateinit var image : ImageView
     private var profile: Profile = Profile()
-    private lateinit var model: SharedProfileViewModel
+    private lateinit var model: ProfileViewModel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
@@ -34,8 +34,8 @@ class ShowProfileFragment : Fragment(R.layout.fragment_show_profile) {
         location = view.findViewById(R.id.location)
         image = view.findViewById(R.id.imageView3)
 
-        model = ViewModelProviders.of(this)
-            .get(SharedProfileViewModel::class.java)
+        model = ViewModelProvider(this, ProfileViewModelFactory())
+            .get(ProfileViewModel::class.java)
 
         model.getUser().observe(viewLifecycleOwner, {
             if (it == null) {

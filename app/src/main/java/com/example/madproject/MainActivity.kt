@@ -8,14 +8,15 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.madproject.data.Profile
-import com.example.madproject.ui.profile.SharedProfileViewModel
+import com.example.madproject.ui.profile.ProfileViewModel
+import com.example.madproject.ui.profile.ProfileViewModelFactory
 import com.google.android.material.navigation.NavigationView
 import com.squareup.picasso.Picasso
 
@@ -24,7 +25,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var navView: NavigationView
     private var profile = Profile()
-    private lateinit var model: SharedProfileViewModel
+    private lateinit var model: ProfileViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,8 +44,8 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
-        model = ViewModelProviders.of(this)
-            .get(SharedProfileViewModel::class.java)
+        model = ViewModelProvider(this, ProfileViewModelFactory())
+            .get(ProfileViewModel::class.java)
 
         model.getUser().observe(this, {
             if (it == null) {

@@ -16,7 +16,7 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.madproject.R
 import com.example.madproject.data.Profile
@@ -45,7 +45,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     private var profile: Profile = Profile()
     private var storageDir: File? = null
     private var picker: MaterialDatePicker<Long>? = null
-    private lateinit var model: SharedProfileViewModel
+    private lateinit var model: ProfileViewModel
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -58,7 +58,8 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         dateOfBirth = view.findViewById(R.id.dateOfBirth)
         storageDir = this.requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
 
-        model = ViewModelProviders.of(this).get(SharedProfileViewModel::class.java)
+        model = ViewModelProvider(this, ProfileViewModelFactory())
+            .get(ProfileViewModel::class.java)
 
         model.getUser().observe(viewLifecycleOwner, {
             if (it == null) {
@@ -98,7 +99,6 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                 updateProfile()
                 if (formCheck()) {
                     if (currentPhotoPath == "") saveValues() else saveValuesImage()
-                    //findNavController().navigate(R.id.action_editProfile_to_showProfile)
                 } else {
                     Toast.makeText(
                         context,
@@ -343,14 +343,13 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     private fun saveValues() {
         model.setUser(profile)
             .addOnCompleteListener{
-                findNavController().navigate(R.id.action_editProfile_to_showProfile)
                 if (it.isSuccessful) Toast.makeText(context, "Profile information saved!", Toast.LENGTH_SHORT).show()
                 else Toast.makeText(context, "Failed saving profile!", Toast.LENGTH_SHORT).show()
+                findNavController().navigate(R.id.action_editProfile_to_showProfile)
             }
     }
 
     private fun saveValuesImage() {
-
         val storage = FirebaseStorage.getInstance()
         val storageRef = storage.reference
         val localPhoto = File(currentPhotoPath!!)
@@ -363,17 +362,17 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                         profile.imageUrl = uri.toString()
                         model.setUser(profile)
                             .addOnCompleteListener{ task ->
-                                findNavController().navigate(R.id.action_editProfile_to_showProfile)
                                 if (task.isSuccessful) Toast.makeText(context, "Profile information saved!", Toast.LENGTH_SHORT).show()
                                 else Toast.makeText(context, "Failed saving profile!", Toast.LENGTH_SHORT).show()
+                                findNavController().navigate(R.id.action_editProfile_to_showProfile)
                             }
                     }
                 } else {
                     Toast.makeText(context, "Failed saving profile photo!", Toast.LENGTH_SHORT).show()
                     model.setUser(profile)
                         .addOnCompleteListener { task ->
-                            findNavController().navigate(R.id.action_editProfile_to_showProfile)
                             if(!task.isSuccessful) Toast.makeText(context, "Failed saving profile!", Toast.LENGTH_SHORT).show()
+                            findNavController().navigate(R.id.action_editProfile_to_showProfile)
                         }
                 }
                 localPhoto.delete()

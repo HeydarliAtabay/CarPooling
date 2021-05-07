@@ -8,7 +8,7 @@
         app:showAsAction="always" />
     <item
         android:id="@+id/profilesButton"
-        android:icon="@drawable/outline_account_circle_black_24"
+        android:icon="@drawable/outline_account_circle_black_36"
         android:title="profilesButton"
         app:showAsAction="always" />
 </menu>

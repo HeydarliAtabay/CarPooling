@@ -6,4 +6,9 @@
         android:icon="@drawable/outline_mode_edit_36"
         android:title="editButton"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/profilesButton"
+        android:icon="@drawable/outline_account_circle_black_24"
+        android:title="profilesButton"
+        app:showAsAction="always" />
 </menu>

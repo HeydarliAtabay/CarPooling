@@ -37,6 +37,8 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
         additionalInfo = view.findViewById(R.id.info)
         intermediateStop = view.findViewById(R.id.intermediate_stops)
 
+
+
         trip = sharedModel.selected
 
         setHasOptionsMenu(true)
@@ -61,7 +63,8 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.edit_menu, menu)
+        if(!sharedModel.comingFromOther)
+            inflater.inflate(R.menu.edit_menu, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

@@ -14,6 +14,7 @@ class TripListViewModel: ViewModel() {
     var selected = Trip()
     var currentPhotoPath = ""
     var useDBImage = false
+    var comingFromOther = false
 
     init {
         loadTrips()

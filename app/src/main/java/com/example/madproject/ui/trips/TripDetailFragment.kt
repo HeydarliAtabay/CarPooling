@@ -43,10 +43,10 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
         intermediateStop = view.findViewById(R.id.intermediate_stops)
 
         val fab = view.findViewById<FloatingActionButton>(R.id.fab)
-        /*if(!sharedModel.comingFromOther) {
+        if(!sharedModel.comingFromOther) {
             fab.hide()
         }else {
-            fab.show()*/
+            fab.show()
             fab.setOnClickListener{
                 FirestoreRepository().controlBooking(trip)
                     .addOnSuccessListener {
@@ -84,9 +84,7 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
                         Toast.makeText(this.requireActivity(), "DB access failure", Toast.LENGTH_SHORT ).show()
                     }
             }
-        //}
-
-
+        }
 
         trip = sharedModel.selected
 

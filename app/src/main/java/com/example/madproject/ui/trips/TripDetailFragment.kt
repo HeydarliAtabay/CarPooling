@@ -1,6 +1,7 @@
 package com.example.madproject.ui.trips
 
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.widget.ImageView
@@ -63,8 +64,11 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
-        if(!sharedModel.comingFromOther)
+        Log.d("test", "onCreateOptions")
+        if(!sharedModel.comingFromOther) {
+            inflater.inflate(R.menu.show_profiles, menu)
             inflater.inflate(R.menu.edit_menu, menu)
+        } else sharedModel.comingFromOther = false
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -74,6 +78,7 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
                 findNavController().navigate(R.id.action_tripDetail_to_tripEdit)
                 true
             }
+            R.id.profilesButton -> true
             else -> super.onOptionsItemSelected(item)
         }
     }

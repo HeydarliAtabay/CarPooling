@@ -445,7 +445,8 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
             availableSeat = availableSeats.text.toString(),
             additionalInfo = additionalInfo.text.toString(),
             intermediateStop = intermediateStop.text.toString(),
-            price = price.text.toString()
+            price = price.text.toString(),
+            ownerEmail = profile.email
         )
         trip = sharedModel.selected
     }

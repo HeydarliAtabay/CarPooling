@@ -12,7 +12,7 @@ import com.example.madproject.R
 import com.example.madproject.data.Profile
 import com.squareup.picasso.Picasso
 
-class ShowProfileFragment : Fragment(R.layout.fragment_show_profile) {
+class ShowProfileFragment : Fragment() {
 
     private lateinit var fullName : TextView
     private lateinit var nickName : TextView
@@ -24,15 +24,30 @@ class ShowProfileFragment : Fragment(R.layout.fragment_show_profile) {
     private var profile: Profile = Profile()
     private val model: ProfileViewModel by activityViewModels()
 
+    override fun onCreateView(inflater: LayoutInflater,
+                              container: ViewGroup?,
+                              savedInstanceState: Bundle?):View?{
+
+        if (model.comingFromPrivacy) {
+            return inflater.inflate(R.layout.privacy_show_profile, container, false)
+        }
+
+        return inflater.inflate(R.layout.fragment_show_profile, container, false)
+    }
+
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
         fullName = view.findViewById(R.id.fullName)
         nickName = view.findViewById(R.id.nickName)
-        dateOfBirth = view.findViewById(R.id.dateOfBirth)
         email = view.findViewById(R.id.email)
-        phoneNumber = view.findViewById(R.id.phoneNumber)
-        location = view.findViewById(R.id.location)
         image = view.findViewById(R.id.imageView3)
+
+        if (!model.comingFromPrivacy) {
+            dateOfBirth = view.findViewById(R.id.dateOfBirth)
+            phoneNumber = view.findViewById(R.id.phoneNumber)
+            location = view.findViewById(R.id.location)
+        }
 
         model.getDBUser().observe(viewLifecycleOwner, {
             if (it == null) {
@@ -49,7 +64,10 @@ class ShowProfileFragment : Fragment(R.layout.fragment_show_profile) {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.edit_menu, menu)
+        if (!model.comingFromPrivacy)
+            inflater.inflate(R.menu.edit_menu, menu)
+        else
+            model.comingFromPrivacy = false
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -67,10 +85,14 @@ class ShowProfileFragment : Fragment(R.layout.fragment_show_profile) {
     private fun setProfile(){
         fullName.text = profile.fullName
         nickName.text = profile.nickName
-        dateOfBirth.text = profile.dateOfBirth
         email.text = profile.email
-        phoneNumber.text = profile.phoneNumber
-        location.text = profile.location
+
+        if (!model.comingFromPrivacy) {
+            dateOfBirth.text = profile.dateOfBirth
+            phoneNumber.text = profile.phoneNumber
+            location.text = profile.location
+        }
+
         if (profile.imageUrl != "") {
             Picasso.get().load(profile.imageUrl).into(image)
         } else image.setImageResource(R.drawable.avatar)

@@ -24,4 +24,5 @@ class FirestoreRepository() {
     fun setUser(p : Profile) : Task<Void> {
         return firestoreDB.collection("users").document("user@gmail.com").set(p)
     }
+
 }

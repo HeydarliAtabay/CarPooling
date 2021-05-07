@@ -13,6 +13,7 @@ class ProfileViewModel: ViewModel() {
     var localProfile = Profile()
     var currentPhotoPath = ""
     var useDBImage = false
+    var comingFromPrivacy = false
 
     init {
         loadProfile()

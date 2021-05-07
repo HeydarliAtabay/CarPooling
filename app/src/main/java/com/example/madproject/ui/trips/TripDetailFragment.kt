@@ -1,14 +1,19 @@
 package com.example.madproject.ui.trips
 
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.madproject.R
+import com.example.madproject.data.FirestoreRepository
 import com.example.madproject.data.Trip
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.firebase.firestore.FirebaseFirestoreException
 import com.squareup.picasso.Picasso
 
 class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
@@ -36,6 +41,50 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
         price = view.findViewById(R.id.price)
         additionalInfo = view.findViewById(R.id.info)
         intermediateStop = view.findViewById(R.id.intermediate_stops)
+
+        val fab = view.findViewById<FloatingActionButton>(R.id.fab)
+        /*if(!sharedModel.comingFromOther) {
+            fab.hide()
+        }else {
+            fab.show()*/
+            fab.setOnClickListener{
+                FirestoreRepository().controlBooking(trip)
+                    .addOnSuccessListener {
+                        Log.d("test" , it.documents.size.toString())
+                        if(it.documents.size != 0){
+                            Toast.makeText(this.requireActivity(), "Trip already booked", Toast.LENGTH_LONG ).show()
+                        }else{
+                            try {
+                                FirestoreRepository().bookingTransaction(trip)
+                                    .addOnSuccessListener {
+                                        Toast.makeText(
+                                            this.requireActivity(),
+                                            "Trip booked successfully",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                    }
+                                    .addOnFailureListener {
+                                        Toast.makeText(
+                                            this.requireActivity(),
+                                            it.message,
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                    }
+                            } catch (e: FirebaseFirestoreException){
+                                Toast.makeText(
+                                    this.requireActivity(),
+                                    e.message,
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+
+                        }
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(this.requireActivity(), "DB access failure", Toast.LENGTH_SHORT ).show()
+                    }
+            }
+        //}
 
 
 

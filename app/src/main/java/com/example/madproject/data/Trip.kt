@@ -11,5 +11,6 @@ data class Trip(val user: String = "",
                 val availableSeat: String = "",
                 val additionalInfo: String = "",
                 val intermediateStop: String = "",
-                val price: String = ""
+                val price: String = "",
+                val ownerEmail: String = ""
                 )

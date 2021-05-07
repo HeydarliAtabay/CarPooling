@@ -9,7 +9,9 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.text.Editable
 import android.text.InputType
+import android.text.TextWatcher
 import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
@@ -291,6 +293,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
             if (!hasFocus) {  // lost focus
                 price.setSelection(0, 0)
                 price.hint = ""
+                price.setText(parsePrice(price.text.toString()))
             } else {
                 view?.findViewById<TextInputLayout>(R.id.tilPrice)?.error = null
                 price.hint = "Price"
@@ -304,7 +307,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
                 additionalInfo.setSelection(0, 0)
                 additionalInfo.hint = ""
             } else {
-                additionalInfo.hint = "Additional informations"
+                additionalInfo.hint = "Additional information"
                 val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.showSoftInput(additionalInfo, InputMethodManager.SHOW_IMPLICIT)
             }
@@ -320,7 +323,24 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
                 imm.showSoftInput(intermediateStop, InputMethodManager.SHOW_IMPLICIT)
             }
         }
+    }
 
+    private fun parsePrice(s: String): String {
+        return if (s.contains(".")) {
+            val p = s.split(".")
+            val integer = if (p[0] == "") "0" else p[0]
+            val dec = p[1]
+            when (dec.length) {
+                0 -> "$integer.00"
+                1 -> "$integer.${dec}0"
+                else -> "$integer.${dec[0]}${dec[1]}"
+            }
+
+        } else {
+            if (s != "") {
+                "$s.00"
+            } else ""
+        }
     }
 
     @SuppressLint("SimpleDateFormat")

@@ -24,6 +24,7 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
     private var tripList = listOf<Trip>()
     private lateinit var emptyList: TextView
     private lateinit var emptyList2: TextView
+    private lateinit var fab: FloatingActionButton
     private val tripListViewModel: TripListViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -31,11 +32,11 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
         emptyList = view.findViewById(R.id.emptyList)
         emptyList2 = view.findViewById(R.id.emptyList2)
 
-        val fab=view.findViewById<FloatingActionButton>(R.id.fab)
+        fab = view.findViewById(R.id.fab)
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView2)
         recyclerView.setHasFixedSize(true)
-        recyclerView.setItemViewCacheSize(3)
+        recyclerView.setItemViewCacheSize(2)
         recyclerView.layoutManager = LinearLayoutManager(this.requireActivity())
 
         tripListViewModel.getTrips().observe(viewLifecycleOwner, {
@@ -52,7 +53,7 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
         })
 
         fab.setOnClickListener{
-            tripListViewModel.selected = Trip()
+            tripListViewModel.selectedLocal = Trip()
             tripListViewModel.useDBImage = true
             findNavController().navigate(R.id.action_tripList_to_tripEdit)
         }
@@ -77,16 +78,16 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
                 time.text = t.departureTime
                 price.text = t.price
                 if (t.imageUrl != "") {
-                    Picasso.get().load(t.imageUrl).into(image)
+                    Picasso.get().load(t.imageUrl).error(R.drawable.car_example).into(image)
                 } else image.setImageResource(R.drawable.car_example)
 
                 cv.setOnClickListener {
-                    sharedModel.selected = t
+                    sharedModel.selectedLocal = t
                     findNavController(itemView).navigate(R.id.action_tripList_to_tripDetail)
                 }
 
                 editTripButton.setOnClickListener {
-                    sharedModel.selected =t
+                    sharedModel.selectedLocal = t
                     sharedModel.useDBImage = true
                     findNavController(itemView).navigate(R.id.action_tripList_to_tripEdit)
                 }
@@ -105,7 +106,7 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TripViewHolder {
             val v= LayoutInflater.from(parent.context)
-                    .inflate(R.layout.recyclerview_card, parent,false)
+                    .inflate(R.layout.recyclerview_card_trip, parent,false)
             return TripViewHolder(v)
         }
 

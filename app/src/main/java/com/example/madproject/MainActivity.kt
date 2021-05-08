@@ -59,7 +59,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadNavigationHeader() {
         val header: View = navView.getHeaderView(0)
-        val profilePictureHeader: ImageView = header.findViewById(R.id.imageViewHeader)
+        val profilePictureHeader: ImageView = header.findViewById(R.id.imageUser)
         val profileNameHeader: TextView = header.findViewById(R.id.nameHeader)
         profileNameHeader.text = profile.fullName
         if (profile.imageUrl != "") {

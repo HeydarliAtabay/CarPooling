@@ -11,7 +11,8 @@ import com.google.firebase.firestore.EventListener
 class TripListViewModel: ViewModel() {
 
     private var trips : MutableLiveData<List<Trip>> = MutableLiveData()
-    var selected = Trip()
+    private var selectedDB: MutableLiveData<Trip> = MutableLiveData(Trip())
+    var selectedLocal = Trip()
     var currentPhotoPath = ""
     var useDBImage = false
     var comingFromOther = false
@@ -29,7 +30,9 @@ class TripListViewModel: ViewModel() {
 
             val retrievedTrips : MutableList<Trip> = mutableListOf()
             for (doc in value!!) {
-                retrievedTrips.add(doc.toObject(Trip::class.java))
+                val t = doc.toObject(Trip::class.java)
+                retrievedTrips.add(t)
+                if (t.id == selectedLocal.id) selectedDB.value = t
             }
             trips.value = retrievedTrips
         })
@@ -41,5 +44,16 @@ class TripListViewModel: ViewModel() {
 
     fun saveTrip(t: Trip): Task<Void> {
         return FirestoreRepository().insertTrip(t)
+    }
+
+    fun getSelectedDB(t: Trip): LiveData<Trip> {
+        if (trips.value == null) return selectedDB
+        for (trip in trips.value!!) {
+            if (trip.id == t.id) {
+                selectedDB.value = trip
+                break
+            }
+        }
+        return selectedDB
     }
 }

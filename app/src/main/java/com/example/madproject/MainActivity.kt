@@ -1,6 +1,8 @@
 package com.example.madproject
 
+import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -16,7 +18,9 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.madproject.data.Profile
 import com.example.madproject.ui.profile.ProfileViewModel
+import com.example.madproject.ui.trips.TripListFragment
 import com.google.android.material.navigation.NavigationView
+import com.google.firebase.auth.FirebaseAuth
 import com.squareup.picasso.Picasso
 
 class MainActivity : AppCompatActivity() {
@@ -25,6 +29,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navView: NavigationView
     private var profile = Profile()
     private lateinit var model: ProfileViewModel
+    private lateinit var mAuth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,9 +37,17 @@ class MainActivity : AppCompatActivity() {
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
+        mAuth = FirebaseAuth.getInstance()
+        val user=mAuth.currentUser
+
+
+
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         navView = findViewById(R.id.nav_view)
         val navController = findNavController(R.id.fragment)
+
+
+
 
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
@@ -55,6 +68,21 @@ class MainActivity : AppCompatActivity() {
             }
         })
         loadNavigationHeader()
+
+        Handler().postDelayed({
+            if(user != null){
+              /*  val Intent = Intent(this, MainActivity::class.java)
+                startActivity(Intent)
+                finish() */
+                findNavController(R.id.fragment).navigate(R.id.action_tripList_to_tripEdit)
+            }else{
+                val signInIntent = Intent(this, GoogleSignInActivity::class.java)
+                startActivity(signInIntent)
+                finish()
+            }
+        }, 2000)
+
+
     }
 
     private fun loadNavigationHeader() {

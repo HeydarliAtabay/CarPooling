@@ -1,7 +1,10 @@
 package com.example.madproject
 
 
+import android.content.Intent
 import android.os.Bundle
+import android.provider.MediaStore
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -15,9 +18,14 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.example.madproject.data.FirestoreRepository
 import com.example.madproject.data.Profile
+import com.example.madproject.lib.Requests
 import com.example.madproject.ui.profile.ProfileViewModel
 import com.google.android.material.navigation.NavigationView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.squareup.picasso.Picasso
 
 class MainActivity : AppCompatActivity() {
@@ -26,6 +34,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navView: NavigationView
     private var profile = Profile()
     private lateinit var model: ProfileViewModel
+    private lateinit var mAuth:FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +42,32 @@ class MainActivity : AppCompatActivity() {
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
+        mAuth = Firebase.auth
+
+        if(mAuth.currentUser == null){
+            val authIntend = Intent(this,AuthActivity::class.java)
+            startActivityForResult(authIntend, Requests.INTENT_LOGIN.value)
+        } else {
+            FirestoreRepository.auth = mAuth.currentUser!!
+            setNavigation()
+        }
+
+
+    }
+
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if(resultCode == RESULT_OK){
+            if(requestCode == Requests.INTENT_LOGIN.value){
+                FirestoreRepository.auth=mAuth.currentUser!!
+                setNavigation()
+            }
+        }
+
+    }
+    private fun setNavigation(){
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         navView = findViewById(R.id.nav_view)
         val navController = findNavController(R.id.fragment)
@@ -41,10 +76,9 @@ class MainActivity : AppCompatActivity() {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(setOf(
-                R.id.showProfile, R.id.tripList), drawerLayout)
+            R.id.showProfile, R.id.tripList), drawerLayout)
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
-
 
         model = ViewModelProviders.of(this)
             .get(ProfileViewModel::class.java)
@@ -58,7 +92,6 @@ class MainActivity : AppCompatActivity() {
             }
         })
         loadNavigationHeader()
-
 
     }
 

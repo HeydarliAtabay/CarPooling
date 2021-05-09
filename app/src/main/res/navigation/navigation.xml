@@ -9,7 +9,7 @@
         android:id="@+id/login"
         android:name="com.example.madproject.ui.profile.LoginFragment"
         android:label="Your profile"
-        tools:layout="@layout/fragment_login" >
+        tools:layout="@layout/auth_activity" >
         <action
             android:id="@+id/action_login_to_tripList"
             app:destination="@id/tripList" />

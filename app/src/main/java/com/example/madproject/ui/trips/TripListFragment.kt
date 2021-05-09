@@ -31,7 +31,6 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
     private lateinit var emptyList2: TextView
     private lateinit var fab: FloatingActionButton
     private val tripListViewModel: TripListViewModel by activityViewModels()
-    private lateinit var mAuth: FirebaseAuth
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -62,24 +61,6 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
             tripListViewModel.selectedLocal = Trip()
             tripListViewModel.useDBImage = true
             findNavController().navigate(R.id.action_tripList_to_tripEdit)
-        }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        mAuth = Firebase.auth
-    }
-
-    override fun onStart() {
-        super.onStart()
-        val currentUser = mAuth.currentUser
-        if(currentUser == null){
-            //TODO: COMPLETARE
-            Log.d("test", "user not logged")
-            findNavController().navigate(R.id.action_tripList_to_login)
-        } else {
-            FirestoreRepository().setLoggedUser(currentUser)
-            Log.d("test", "user logged")
         }
     }
 

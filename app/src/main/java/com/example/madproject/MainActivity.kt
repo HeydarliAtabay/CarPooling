@@ -40,14 +40,9 @@ class MainActivity : AppCompatActivity() {
         mAuth = FirebaseAuth.getInstance()
         val user=mAuth.currentUser
 
-
-
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         navView = findViewById(R.id.nav_view)
         val navController = findNavController(R.id.fragment)
-
-
-
 
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
@@ -68,6 +63,7 @@ class MainActivity : AppCompatActivity() {
             }
         })
         loadNavigationHeader()
+    /*
 
         Handler().postDelayed({
             if(user != null){
@@ -82,6 +78,7 @@ class MainActivity : AppCompatActivity() {
             }
         }, 2000)
 
+*/
 
     }
 

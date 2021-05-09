@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.Toast
 import com.example.madproject.R
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -20,7 +21,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val btn=view.findViewById<Button>(R.id.sbtn)
+        val btn = view.findViewById<Button>(R.id.sbtn)
 
 
         mAuth = FirebaseAuth.getInstance()
@@ -36,23 +37,12 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
 
 
-        /*btn.setOnClickListener{
+        btn.setOnClickListener{
 
-                findNavController().navigate(R.id.action_loginFragment_to_tripList)
+            Toast.makeText(this.requireActivity(), "Manage Login", Toast.LENGTH_LONG).show()
+            //findNavController().navigate(R.id.action_loginFragment_to_tripList)
 
-        }*/
-
-    }
-
-
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_login, container, false)
-    }
-
+        }
 
     }
+}

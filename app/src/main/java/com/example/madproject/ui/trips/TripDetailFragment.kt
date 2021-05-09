@@ -10,7 +10,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.madproject.R
 import com.example.madproject.data.FirestoreRepository
-import com.example.madproject.data.Profile
 import com.example.madproject.data.Trip
 import com.example.madproject.ui.profile.ProfileViewModel
 import com.example.madproject.ui.trips.interestedusers.UserListViewModel
@@ -19,17 +18,17 @@ import com.google.firebase.firestore.FirebaseFirestoreException
 import com.squareup.picasso.Picasso
 
 class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
-    private lateinit var imageCar : ImageView
-    private lateinit var departure : TextView
-    private lateinit var arrival : TextView
-    private lateinit var departureDate : TextView
-    private lateinit var departureTime : TextView
-    private lateinit var duration : TextView
-    private lateinit var availableSeats : TextView
+    private lateinit var imageCar: ImageView
+    private lateinit var departure: TextView
+    private lateinit var arrival: TextView
+    private lateinit var departureDate: TextView
+    private lateinit var departureTime: TextView
+    private lateinit var duration: TextView
+    private lateinit var availableSeats: TextView
     private lateinit var trip: Trip
-    private lateinit var price : TextView
-    private lateinit var additionalInfo : TextView
-    private lateinit var intermediateStop : TextView
+    private lateinit var price: TextView
+    private lateinit var additionalInfo: TextView
+    private lateinit var intermediateStop: TextView
     private lateinit var fab: FloatingActionButton
     private val sharedModel: TripListViewModel by activityViewModels()
     private val userListModel: UserListViewModel by activityViewModels()
@@ -56,7 +55,14 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
 
         fab = view.findViewById(R.id.fabBooking)
 
-        initializeFAB()
+        if (!sharedModel.comingFromOther) {
+            fab.hide()
+        } else {
+            fab.show()
+            fab.setOnClickListener {
+                findNavController().navigate(R.id.action_tripDetail_to_bookingDialog)
+            }
+        }
 
         trip = sharedModel.selectedLocal
         sharedModel.getSelectedDB(trip).observe(viewLifecycleOwner, {
@@ -70,12 +76,19 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
 
         setHasOptionsMenu(true)
 
+        sharedModel.getBookTheTrip().observe(viewLifecycleOwner, {
+            if (it != null && it) {
+                bookTheTrip()
+                sharedModel.setBookTheTrip(false)
+            }
+        })
+
         setValuesTrip()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
-        if(!sharedModel.comingFromOther) {
+        if (!sharedModel.comingFromOther) {
             inflater.inflate(R.menu.show_profiles, menu)
             inflater.inflate(R.menu.edit_menu, menu)
         }
@@ -99,38 +112,6 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
         }
     }
 
-    private fun initializeFAB() {
-        if(!sharedModel.comingFromOther) {
-            fab.hide()
-        }else {
-            fab.show()
-            fab.setOnClickListener{
-                FirestoreRepository().controlBooking(trip)
-                    .addOnSuccessListener {
-                        if(it.documents.size != 0){
-                            Toast.makeText(this.requireActivity(), "Trip already booked", Toast.LENGTH_LONG ).show()
-                        }else{
-                            try {
-                                FirestoreRepository().bookingTransaction(trip)
-                                    .addOnSuccessListener {
-                                        Toast.makeText(this.requireActivity(), "Trip booked successfully", Toast.LENGTH_LONG).show()
-                                    }
-                                    .addOnFailureListener { mes ->
-                                        Toast.makeText(this.requireActivity(), mes.message, Toast.LENGTH_LONG
-                                        ).show()
-                                    }
-                            } catch (e: FirebaseFirestoreException){
-                                Toast.makeText(this.requireActivity(), e.message, Toast.LENGTH_LONG).show()
-                            }
-                        }
-                    }
-                    .addOnFailureListener {
-                        Toast.makeText(this.requireActivity(), "DB access failure", Toast.LENGTH_SHORT ).show()
-                    }
-            }
-        }
-    }
-
     private fun setValuesTrip() {
         departure.text = trip.from
         arrival.text = trip.to
@@ -145,4 +126,37 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
             Picasso.get().load(trip.imageUrl).error(R.drawable.car_example).into(imageCar)
         } else imageCar.setImageResource(R.drawable.car_example)
     }
+
+    private fun bookTheTrip() {
+        FirestoreRepository().controlBooking(trip)
+            .addOnSuccessListener {
+                if (it.documents.size != 0) {
+                    Toast.makeText(this.requireActivity(), "Trip already booked", Toast.LENGTH_LONG)
+                        .show()
+                } else {
+                    try {
+                        FirestoreRepository().bookingTransaction(trip)
+                            .addOnSuccessListener {
+                                Toast.makeText(
+                                    this.requireActivity(),
+                                    "Trip booked successfully",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                            .addOnFailureListener { mes ->
+                                Toast.makeText(
+                                    this.requireActivity(), mes.message, Toast.LENGTH_LONG
+                                ).show()
+                            }
+                    } catch (e: FirebaseFirestoreException) {
+                        Toast.makeText(this.requireActivity(), e.message, Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+            .addOnFailureListener {
+                Toast.makeText(this.requireActivity(), "DB access failure", Toast.LENGTH_SHORT)
+                    .show()
+            }
+    }
+
 }

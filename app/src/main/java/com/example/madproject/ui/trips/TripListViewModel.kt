@@ -15,7 +15,10 @@ class TripListViewModel: ViewModel() {
     var selectedLocal = Trip()
     var currentPhotoPath = ""
     var useDBImage = false
+
+    // Flags used to manage the trip booking
     var comingFromOther = false
+    private var bookTheTrip: MutableLiveData<Boolean> = MutableLiveData(false)
 
     init {
         loadTrips()
@@ -55,5 +58,13 @@ class TripListViewModel: ViewModel() {
             }
         }
         return selectedDB
+    }
+
+    fun getBookTheTrip(): LiveData<Boolean> {
+        return bookTheTrip
+    }
+
+    fun setBookTheTrip(f: Boolean) {
+        bookTheTrip.value = f
     }
 }

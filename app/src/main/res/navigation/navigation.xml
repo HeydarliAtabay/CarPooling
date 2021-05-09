@@ -66,6 +66,9 @@
         <action
             android:id="@+id/action_tripDetail_to_userList"
             app:destination="@id/userList" />
+        <action
+            android:id="@+id/action_tripDetail_to_bookingDialog"
+            app:destination="@id/bookingDialog" />
     </fragment>
 
     <fragment
@@ -98,5 +101,10 @@
         android:label="Profile details"
         tools:layout="@layout/fragment_show_profile" >
     </fragment>
+
+    <dialog
+        android:id="@+id/bookingDialog"
+        android:name="com.example.madproject.ui.trips.BookingAlertDialog" >
+    </dialog>
 
 </navigation>

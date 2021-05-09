@@ -1,10 +1,8 @@
 package com.example.madproject.ui.trips
 
 import android.os.Bundle
-import android.view.LayoutInflater
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.View
-import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -56,6 +54,23 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
             tripListViewModel.selectedLocal = Trip()
             tripListViewModel.useDBImage = true
             findNavController().navigate(R.id.action_tripList_to_tripEdit)
+        }
+    }
+
+    // The following two methods will go in OtherTripsFragment
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.filters_menu, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.filtersButton -> {
+
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 

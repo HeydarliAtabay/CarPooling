@@ -6,6 +6,16 @@
     app:startDestination="@id/tripList">
 
     <fragment
+        android:id="@+id/login"
+        android:name="com.example.madproject.ui.profile.LoginFragment"
+        android:label="Your profile"
+        tools:layout="@layout/fragment_login" >
+        <action
+            android:id="@+id/action_login_to_tripList"
+            app:destination="@id/tripList" />
+    </fragment>
+
+    <fragment
         android:id="@+id/showProfile"
         android:name="com.example.madproject.ui.profile.ShowProfileFragment"
         android:label="Your profile"
@@ -49,6 +59,9 @@
             app:enterAnim="@anim/slide_in"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/slide_out" />
+        <action
+            android:id="@+id/action_tripList_to_login"
+            app:destination="@id/login" />
     </fragment>
 
     <fragment

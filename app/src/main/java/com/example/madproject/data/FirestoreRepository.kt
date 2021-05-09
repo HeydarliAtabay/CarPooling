@@ -1,27 +1,34 @@
 package com.example.madproject.data
 
+import android.util.Log
 import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.*
 
 class FirestoreRepository() {
-    var firestoreDB = FirebaseFirestore.getInstance()
-    //var user = FirebaseAuth.getInstance().currentUser  Use it when the auth is implemented
-    var user = Profile(email = "user@gmail.com")
+    private var firestoreDB = FirebaseFirestore.getInstance()
+    private var authEmail: String = "user@gmail.com"
+
+    //SET CURRENT LOGGED USER
+    fun setLoggedUser(u: FirebaseUser){
+        Log.d("test",u.email!!)
+        authEmail = u.email!!
+    }
 
     fun insertTrip(t: Trip): Task<Void> {
-        return firestoreDB.collection("users/${user.email}/createdTrips").document(t.id).set(t)
+        return firestoreDB.collection("users/${authEmail}/createdTrips").document(t.id).set(t)
     }
 
     fun getTrips(): CollectionReference {
-        return firestoreDB.collection("users/${user.email}/createdTrips")
+        return firestoreDB.collection("users/${authEmail}/createdTrips")
     }
 
     fun getUser(): DocumentReference {
-        return firestoreDB.collection("users").document(user.email)
+        return firestoreDB.collection("users").document(authEmail)
     }
 
     fun setUser(p: Profile): Task<Void> {
-        return firestoreDB.collection("users").document(user.email).set(p)
+        return firestoreDB.collection("users").document(authEmail).set(p)
     }
 
     fun controlBooking(t: Trip): Task<QuerySnapshot> {
@@ -33,7 +40,7 @@ class FirestoreRepository() {
     }
 
     fun bookingTransaction(t: Trip): Task<Transaction> {
-        val booking = Booking(user.email, t.id)
+        val booking = Booking(authEmail, t.id)
         val tripIWantToBook =
             firestoreDB.collection("users/${t.ownerEmail}/createdTrips").document(t.id)
         val newBooking = firestoreDB.collection("bookings").document()
@@ -58,7 +65,7 @@ class FirestoreRepository() {
     }
 
     fun getUsersList(): Query {
-        return firestoreDB.collection("users").whereNotEqualTo("email", user.email)
+        return firestoreDB.collection("users").whereNotEqualTo("email", authEmail)
     }
 
 }

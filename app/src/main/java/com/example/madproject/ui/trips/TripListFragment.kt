@@ -1,6 +1,7 @@
 package com.example.madproject.ui.trips
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import androidx.fragment.app.Fragment
 import android.view.View
@@ -16,8 +17,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.madproject.R
+import com.example.madproject.data.FirestoreRepository
 import com.example.madproject.data.Trip
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.squareup.picasso.Picasso
 
 class TripListFragment : Fragment(R.layout.fragment_trip_list) {
@@ -26,6 +31,7 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
     private lateinit var emptyList2: TextView
     private lateinit var fab: FloatingActionButton
     private val tripListViewModel: TripListViewModel by activityViewModels()
+    private lateinit var mAuth: FirebaseAuth
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -56,6 +62,24 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
             tripListViewModel.selectedLocal = Trip()
             tripListViewModel.useDBImage = true
             findNavController().navigate(R.id.action_tripList_to_tripEdit)
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        mAuth = Firebase.auth
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val currentUser = mAuth.currentUser
+        if(currentUser == null){
+            //TODO: COMPLETARE
+            Log.d("test", "user not logged")
+            findNavController().navigate(R.id.action_tripList_to_login)
+        } else {
+            FirestoreRepository().setLoggedUser(currentUser)
+            Log.d("test", "user logged")
         }
     }
 

@@ -15,14 +15,17 @@ import com.google.firebase.firestore.ktx.toObject
 
 class TripListViewModel: ViewModel() {
 
+    private var trips : MutableLiveData<List<Trip>> = MutableLiveData()
+    private var selectedDB: MutableLiveData<Trip> = MutableLiveData(Trip())
+    var selectedLocal = Trip()
     private var userTrips : MutableLiveData<List<Trip>> = MutableLiveData()
     private var otherTrips : MutableLiveData<List<Trip>> = MutableLiveData()
-    var selected = Trip()
     var currentPhotoPath = ""
     var useDBImage = false
+
+    // Flags used to manage the trip booking
     var comingFromOther = false
-    var currentUser = "user3@gmail.com"
-    //var user = FirebaseAuth.getInstance().currentUser  Use it when the auth is implemented
+    private var bookTheTrip: MutableLiveData<Boolean> = MutableLiveData(false)
 
     init {
         loadUserTrips()
@@ -38,7 +41,9 @@ class TripListViewModel: ViewModel() {
 
             val retrievedTrips : MutableList<Trip> = mutableListOf()
             for (doc in value!!) {
-                retrievedTrips.add(doc.toObject(Trip::class.java))
+                val t = doc.toObject(Trip::class.java)
+                retrievedTrips.add(t)
+                if (t.id == selectedLocal.id) selectedDB.value = t
             }
             userTrips.value = retrievedTrips
         })
@@ -63,7 +68,9 @@ class TripListViewModel: ViewModel() {
                                 return@EventListener
                             }
                             for (trip in value!!) {
-                                retrievedTrips.add(trip.toObject(Trip::class.java))
+                                val t = trip.toObject(Trip::class.java)
+                                if (t.id == selectedLocal.id) selectedDB.value = t
+                                retrievedTrips.add(t)
                             }
                         })
                 }
@@ -85,7 +92,9 @@ class TripListViewModel: ViewModel() {
                                 return@EventListener
                             }
                             for (trip in value!!) {
-                                retrievedTrips.add(trip.toObject(Trip::class.java))
+                                val t = trip.toObject(Trip::class.java)
+                                if (t.id == selectedLocal.id) selectedDB.value = t
+                                retrievedTrips.add(t)
                             }
                         })
                 }
@@ -105,5 +114,24 @@ class TripListViewModel: ViewModel() {
 
     fun saveTrip(t: Trip): Task<Void> {
         return FirestoreRepository().insertTrip(t)
+    }
+
+    fun getSelectedDB(t: Trip): LiveData<Trip> {
+        if (trips.value == null) return selectedDB
+        for (trip in trips.value!!) {
+            if (trip.id == t.id) {
+                selectedDB.value = trip
+                break
+            }
+        }
+        return selectedDB
+    }
+
+    fun getBookTheTrip(): LiveData<Boolean> {
+        return bookTheTrip
+    }
+
+    fun setBookTheTrip(f: Boolean) {
+        bookTheTrip.value = f
     }
 }

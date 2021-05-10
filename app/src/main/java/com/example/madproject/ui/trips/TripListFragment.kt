@@ -16,30 +16,31 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.madproject.R
+import com.example.madproject.data.FirestoreRepository
 import com.example.madproject.data.Trip
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.squareup.picasso.Picasso
 
 class TripListFragment : Fragment(R.layout.fragment_trip_list) {
     private var tripList = listOf<Trip>()
     private lateinit var emptyList: TextView
     private lateinit var emptyList2: TextView
+    private lateinit var fab: FloatingActionButton
     private val tripListViewModel: TripListViewModel by activityViewModels()
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         emptyList = view.findViewById(R.id.emptyList)
         emptyList2 = view.findViewById(R.id.emptyList2)
 
-
-
-        val fab=view.findViewById<FloatingActionButton>(R.id.fab)
-        val button = view.findViewById<Button>(R.id.button)
+        fab = view.findViewById(R.id.fab)
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
         recyclerView.setHasFixedSize(true)
-        recyclerView.setItemViewCacheSize(3)
+        recyclerView.setItemViewCacheSize(2)
         recyclerView.layoutManager = LinearLayoutManager(this.requireActivity())
 
         tripListViewModel.getUserTrips().observe(viewLifecycleOwner, {
@@ -56,14 +57,26 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
         })
 
         fab.setOnClickListener{
-            tripListViewModel.selected = Trip()
+            tripListViewModel.selectedLocal = Trip()
             tripListViewModel.useDBImage = true
             findNavController().navigate(R.id.action_tripList_to_tripEdit)
         }
+    }
 
-        button.setOnClickListener {
-            findNavController().navigate(R.id.action_tripList_to_othersTripList)
+    // The following two methods will go in OtherTripsFragment
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.filters_menu, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.filtersButton -> {
+
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 
@@ -86,20 +99,19 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
                 time.text = t.departureTime
                 price.text = t.price
                 if (t.imageUrl != "") {
-                    Picasso.get().load(t.imageUrl).into(image)
+                    Picasso.get().load(t.imageUrl).error(R.drawable.car_example).into(image)
                 } else image.setImageResource(R.drawable.car_example)
 
                 cv.setOnClickListener {
-                    sharedModel.selected = t
+                    sharedModel.selectedLocal = t
                     findNavController(itemView).navigate(R.id.action_tripList_to_tripDetail)
                 }
 
                 editTripButton.setOnClickListener {
-                    sharedModel.selected =t
+                    sharedModel.selectedLocal = t
                     sharedModel.useDBImage = true
                     findNavController(itemView).navigate(R.id.action_tripList_to_tripEdit)
                 }
-
             }
 
             fun unbind() {
@@ -115,7 +127,7 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TripViewHolder {
             val v= LayoutInflater.from(parent.context)
-                    .inflate(R.layout.recyclerview_card, parent,false)
+                    .inflate(R.layout.recyclerview_card_trip, parent,false)
             return TripViewHolder(v)
         }
 

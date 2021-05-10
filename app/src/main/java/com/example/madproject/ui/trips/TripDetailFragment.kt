@@ -1,7 +1,6 @@
 package com.example.madproject.ui.trips
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.widget.ImageView
@@ -12,23 +11,28 @@ import androidx.navigation.fragment.findNavController
 import com.example.madproject.R
 import com.example.madproject.data.FirestoreRepository
 import com.example.madproject.data.Trip
+import com.example.madproject.ui.profile.ProfileViewModel
+import com.example.madproject.ui.trips.interestedusers.UserListViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.squareup.picasso.Picasso
 
 class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
-    private lateinit var imageCar : ImageView
-    private lateinit var departure : TextView
-    private lateinit var arrival : TextView
-    private lateinit var departureDate : TextView
-    private lateinit var departureTime : TextView
-    private lateinit var duration : TextView
-    private lateinit var availableSeats : TextView
+    private lateinit var imageCar: ImageView
+    private lateinit var departure: TextView
+    private lateinit var arrival: TextView
+    private lateinit var departureDate: TextView
+    private lateinit var departureTime: TextView
+    private lateinit var duration: TextView
+    private lateinit var availableSeats: TextView
     private lateinit var trip: Trip
-    private lateinit var price : TextView
-    private lateinit var additionalInfo : TextView
-    private lateinit var intermediateStop : TextView
+    private lateinit var price: TextView
+    private lateinit var additionalInfo: TextView
+    private lateinit var intermediateStop: TextView
+    private lateinit var fab: FloatingActionButton
     private val sharedModel: TripListViewModel by activityViewModels()
+    private val userListModel: UserListViewModel by activityViewModels()
+    private val profileModel: ProfileViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         imageCar = view.findViewById(R.id.imageCar)
@@ -42,55 +46,70 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
         additionalInfo = view.findViewById(R.id.info)
         intermediateStop = view.findViewById(R.id.intermediate_stops)
 
-        val fab = view.findViewById<FloatingActionButton>(R.id.fab)
-        if(!sharedModel.comingFromOther) {
-            fab.hide()
-        }else {
-            fab.show()
-            fab.setOnClickListener{
-                FirestoreRepository().controlBooking(trip)
-                    .addOnSuccessListener {
-                        Log.d("test" , it.documents.size.toString())
-                        if(it.documents.size != 0){
-                            Toast.makeText(this.requireActivity(), "Trip already booked", Toast.LENGTH_LONG ).show()
-                        }else{
-                            try {
-                                FirestoreRepository().bookingTransaction(trip)
-                                    .addOnSuccessListener {
-                                        Toast.makeText(
-                                            this.requireActivity(),
-                                            "Trip booked successfully",
-                                            Toast.LENGTH_LONG
-                                        ).show()
-                                    }
-                                    .addOnFailureListener {
-                                        Toast.makeText(
-                                            this.requireActivity(),
-                                            it.message,
-                                            Toast.LENGTH_LONG
-                                        ).show()
-                                    }
-                            } catch (e: FirebaseFirestoreException){
-                                Toast.makeText(
-                                    this.requireActivity(),
-                                    e.message,
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            }
+        // reset the flag to "false", since this fragment will set it to "true" if the required navigation is selected
+        profileModel.comingFromPrivacy = false
 
-                        }
-                    }
-                    .addOnFailureListener {
-                        Toast.makeText(this.requireActivity(), "DB access failure", Toast.LENGTH_SHORT ).show()
-                    }
+        if (!sharedModel.comingFromOther) {
+            userListModel.resetFilteredUsers()
+        }
+
+        fab = view.findViewById(R.id.fabBooking)
+
+        if (!sharedModel.comingFromOther) {
+            fab.hide()
+        } else {
+            fab.show()
+            fab.setOnClickListener {
+                findNavController().navigate(R.id.action_tripDetail_to_bookingDialog)
             }
         }
 
-        trip = sharedModel.selected
+        trip = sharedModel.selectedLocal
+        sharedModel.getSelectedDB(trip).observe(viewLifecycleOwner, {
+            if (it == null) {
+                Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
+            } else {
+                trip = it
+                setValuesTrip()
+            }
+        })
 
         setHasOptionsMenu(true)
 
+        sharedModel.getBookTheTrip().observe(viewLifecycleOwner, {
+            if (it != null && it) {
+                bookTheTrip()
+                sharedModel.setBookTheTrip(false)
+            }
+        })
+
         setValuesTrip()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        if (!sharedModel.comingFromOther) {
+            inflater.inflate(R.menu.show_profiles, menu)
+            inflater.inflate(R.menu.edit_menu, menu)
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.editButton -> {
+                sharedModel.useDBImage = true
+                sharedModel.selectedLocal = trip
+                findNavController().navigate(R.id.action_tripDetail_to_tripEdit)
+                true
+            }
+            R.id.profilesButton -> {
+                userListModel.selectedLocalTrip = trip
+                profileModel.comingFromPrivacy = true
+                findNavController().navigate(R.id.action_tripDetail_to_userList)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     private fun setValuesTrip() {
@@ -104,28 +123,40 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
         additionalInfo.text = trip.additionalInfo
         intermediateStop.text = trip.intermediateStop
         if (trip.imageUrl != "") {
-            Picasso.get().load(trip.imageUrl).into(imageCar)
+            Picasso.get().load(trip.imageUrl).error(R.drawable.car_example).into(imageCar)
         } else imageCar.setImageResource(R.drawable.car_example)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        Log.d("test", "onCreateOptions")
-        if(!sharedModel.comingFromOther) {
-            inflater.inflate(R.menu.show_profiles, menu)
-            inflater.inflate(R.menu.edit_menu, menu)
-        } else sharedModel.comingFromOther = false
+    private fun bookTheTrip() {
+        FirestoreRepository().controlBooking(trip)
+            .addOnSuccessListener {
+                if (it.documents.size != 0) {
+                    Toast.makeText(this.requireActivity(), "Trip already booked", Toast.LENGTH_LONG)
+                        .show()
+                } else {
+                    try {
+                        FirestoreRepository().bookingTransaction(trip)
+                            .addOnSuccessListener {
+                                Toast.makeText(
+                                    this.requireActivity(),
+                                    "Trip booked successfully",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                            .addOnFailureListener { mes ->
+                                Toast.makeText(
+                                    this.requireActivity(), mes.message, Toast.LENGTH_LONG
+                                ).show()
+                            }
+                    } catch (e: FirebaseFirestoreException) {
+                        Toast.makeText(this.requireActivity(), e.message, Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+            .addOnFailureListener {
+                Toast.makeText(this.requireActivity(), "DB access failure", Toast.LENGTH_SHORT)
+                    .show()
+            }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.editButton -> {
-                sharedModel.useDBImage = true
-                findNavController().navigate(R.id.action_tripDetail_to_tripEdit)
-                true
-            }
-            R.id.profilesButton -> true
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
 }

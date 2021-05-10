@@ -1,4 +1,5 @@
 package com.example.madproject.ui.profile
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -15,11 +16,9 @@ class ProfileViewModel: ViewModel() {
     var useDBImage = false
     var comingFromPrivacy = false
 
-    init {
-        loadProfile()
-    }
 
-    private fun loadProfile() {
+    fun getDBUser() : LiveData<Profile>{
+        Log.d("test","getDBUser")
         FirestoreRepository().getUser().addSnapshotListener(EventListener { value, e ->
             if (e != null) {
                 profile.value = null
@@ -28,11 +27,9 @@ class ProfileViewModel: ViewModel() {
 
             profile.value = value?.toObject(Profile::class.java)
         })
-    }
-
-    fun getDBUser(): LiveData<Profile> {
         return profile
     }
+
 
     fun setDBUser(p:Profile) : Task<Void> {
         return FirestoreRepository().setUser(p)

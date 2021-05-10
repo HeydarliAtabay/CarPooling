@@ -6,10 +6,12 @@ import androidx.fragment.app.Fragment
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.ActionBar
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.madproject.R
 import com.example.madproject.data.Profile
+import com.example.madproject.ui.trips.interestedusers.UserListViewModel
 import com.squareup.picasso.Picasso
 
 class ShowProfileFragment : Fragment() {
@@ -23,6 +25,7 @@ class ShowProfileFragment : Fragment() {
     private lateinit var image : ImageView
     private var profile: Profile = Profile()
     private val model: ProfileViewModel by activityViewModels()
+    private val listModel: UserListViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?,
@@ -49,14 +52,25 @@ class ShowProfileFragment : Fragment() {
             location = view.findViewById(R.id.location)
         }
 
-        model.getDBUser().observe(viewLifecycleOwner, {
-            if (it == null) {
-                Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
-            } else {
-                profile = it
-                setProfile()
-            }
-        })
+        if (model.comingFromPrivacy) {
+            listModel.getSelectedDB().observe(viewLifecycleOwner, {
+                if (it == null) {
+                    Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
+                } else {
+                    profile = it
+                    setProfile()
+                }
+            })
+        } else {
+            model.getDBUser().observe(viewLifecycleOwner, {
+                if (it == null) {
+                    Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
+                } else {
+                    profile = it
+                    setProfile()
+                }
+            })
+        }
         setProfile()
 
         setHasOptionsMenu(true)
@@ -66,8 +80,6 @@ class ShowProfileFragment : Fragment() {
         super.onCreateOptionsMenu(menu, inflater)
         if (!model.comingFromPrivacy)
             inflater.inflate(R.menu.edit_menu, menu)
-        else
-            model.comingFromPrivacy = false
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -94,7 +106,7 @@ class ShowProfileFragment : Fragment() {
         }
 
         if (profile.imageUrl != "") {
-            Picasso.get().load(profile.imageUrl).into(image)
+            Picasso.get().load(profile.imageUrl).error(R.drawable.avatar).into(image)
         } else image.setImageResource(R.drawable.avatar)
     }
 }

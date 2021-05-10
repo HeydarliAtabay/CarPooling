@@ -6,6 +6,16 @@
     app:startDestination="@id/tripList">
 
     <fragment
+        android:id="@+id/login"
+        android:name="com.example.madproject.ui.profile.LoginFragment"
+        android:label="Your profile"
+        tools:layout="@layout/auth_activity" >
+        <action
+            android:id="@+id/action_login_to_tripList"
+            app:destination="@id/tripList" />
+    </fragment>
+
+    <fragment
         android:id="@+id/showProfile"
         android:name="com.example.madproject.ui.profile.ShowProfileFragment"
         android:label="Your profile"
@@ -34,7 +44,7 @@
     <fragment
         android:id="@+id/tripList"
         android:name="com.example.madproject.ui.trips.TripListFragment"
-        android:label="Trip list"
+        android:label="Your Trips"
         tools:layout="@layout/fragment_trip_list" >
 
         <action
@@ -50,8 +60,8 @@
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/slide_out" />
         <action
-            android:id="@+id/action_tripList_to_othersTripList"
-            app:destination="@id/othersTripList" />
+            android:id="@+id/action_tripList_to_login"
+            app:destination="@id/login" />
     </fragment>
 
     <fragment
@@ -66,6 +76,12 @@
             app:enterAnim="@anim/slide_in"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/slide_out" />
+        <action
+            android:id="@+id/action_tripDetail_to_userList"
+            app:destination="@id/userList" />
+        <action
+            android:id="@+id/action_tripDetail_to_bookingDialog"
+            app:destination="@id/bookingDialog" />
     </fragment>
 
     <fragment
@@ -90,5 +106,27 @@
             android:id="@+id/action_othersTripList_to_tripDetail"
             app:destination="@id/tripDetail" />
     </fragment>
+
+    <fragment
+        android:id="@+id/userList"
+        android:name="com.example.madproject.ui.trips.interestedusers.UserListFragment"
+        android:label="Users list"
+        tools:layout="@layout/fragment_user_list" >
+        <action
+            android:id="@+id/action_userList_to_showProfilePrivacy"
+            app:destination="@id/showProfilePrivacy" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/showProfilePrivacy"
+        android:name="com.example.madproject.ui.profile.ShowProfileFragment"
+        android:label="Profile details"
+        tools:layout="@layout/fragment_show_profile" >
+    </fragment>
+
+    <dialog
+        android:id="@+id/bookingDialog"
+        android:name="com.example.madproject.ui.trips.BookingAlertDialog" >
+    </dialog>
 
 </navigation>

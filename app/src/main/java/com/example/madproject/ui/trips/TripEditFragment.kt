@@ -83,7 +83,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
             }
         })
 
-        trip = sharedModel.selected
+        trip = sharedModel.selectedLocal
         currentPhotoPath = sharedModel.currentPhotoPath
 
         setValues()
@@ -434,7 +434,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     }
 
     private fun updateTrip() {
-        sharedModel.selected = Trip(
+        sharedModel.selectedLocal = Trip(
             id = trip.id,
             imageUrl = trip.imageUrl,
             from = departure.text.toString(),
@@ -448,7 +448,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
             price = price.text.toString(),
             ownerEmail = profile.email
         )
-        trip = sharedModel.selected
+        trip = sharedModel.selectedLocal
     }
 
     private fun setValues() {
@@ -464,9 +464,9 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
 
         if ((trip.imageUrl == "") && (currentPhotoPath == "")) imageCar.setImageResource(R.drawable.car_example)
         else if ((trip.imageUrl == "") && (currentPhotoPath != "")) imageCar.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath))
-        else if ((trip.imageUrl != "") && (currentPhotoPath == "")) Picasso.get().load(trip.imageUrl).into(imageCar)
+        else if ((trip.imageUrl != "") && (currentPhotoPath == "")) Picasso.get().load(trip.imageUrl).error(R.drawable.car_example).into(imageCar)
         else {
-            if (sharedModel.useDBImage) Picasso.get().load(trip.imageUrl).into(imageCar)
+            if (sharedModel.useDBImage) Picasso.get().load(trip.imageUrl).error(R.drawable.car_example).into(imageCar)
             else imageCar.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath))
         }
     }

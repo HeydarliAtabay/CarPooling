@@ -50,38 +50,13 @@ class TripListViewModel: ViewModel() {
     }
 
     private fun loadOtherTrips() {
-        val users = FirestoreRepository().getUsers()
+        val users = FirestoreRepository().getUsersList()
         val retrievedTrips : MutableList<Trip> = mutableListOf()
 
-        users.whereGreaterThan("email",currentUser)
-            .addSnapshotListener(EventListener { value, error ->
+        users.addSnapshotListener(EventListener { value, error ->
                 if (error != null) {
                 otherTrips.value = null
                 return@EventListener
-                }
-
-                for (user in value!!) {
-                    user.reference.collection("createdTrips")
-                        ?.addSnapshotListener(EventListener { value, error ->
-                            if (error != null) {
-                                otherTrips.value = null
-                                return@EventListener
-                            }
-                            for (trip in value!!) {
-                                val t = trip.toObject(Trip::class.java)
-                                if (t.id == selectedLocal.id) selectedDB.value = t
-                                retrievedTrips.add(t)
-                            }
-                        })
-                }
-
-            })
-
-        users.whereLessThan("email",currentUser)
-            .addSnapshotListener(EventListener { value, error ->
-                if (error != null) {
-                    otherTrips.value = null
-                    return@EventListener
                 }
 
                 for (user in value!!) {
@@ -108,7 +83,6 @@ class TripListViewModel: ViewModel() {
     }
 
     fun getOtherTrips(): LiveData<List<Trip>> {
-        //Log.d("Loriente", otherTrips.value.toString())
         return otherTrips
     }
 

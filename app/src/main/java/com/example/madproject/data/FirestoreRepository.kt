@@ -23,7 +23,6 @@ class FirestoreRepository() {
         return firestoreDB.collection("users")
     }
 
-    fun
     fun getUser(): DocumentReference {
         return firestoreDB.collection("users").document(auth.email!!)
     }
@@ -66,7 +65,10 @@ class FirestoreRepository() {
     }
 
     fun getUsersList(): Query {
-        return firestoreDB.collection("users").whereNotEqualTo("email", auth.email!!)
+        return firestoreDB.collection("users")
+            .whereGreaterThan("email", auth.email!!)
+            .whereLessThan("email", auth.email!!)
+        //return firestoreDB.collection("users").whereNotEqualTo("email", auth.email!!)
     }
 
 }

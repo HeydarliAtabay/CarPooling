@@ -15,7 +15,11 @@ class FirestoreRepository() {
         return firestoreDB.collection("users/user@gmail.com/createdTrips")
     }
 
-    fun getUser(): DocumentReference {
+    fun getUsers(): CollectionReference {
+        return firestoreDB.collection("users")
+    }
+
+    fun getUser() : DocumentReference {
         return firestoreDB.collection("users").document("user@gmail.com")
     }
 

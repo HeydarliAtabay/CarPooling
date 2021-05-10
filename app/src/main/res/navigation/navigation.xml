@@ -49,6 +49,9 @@
             app:enterAnim="@anim/slide_in"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/slide_out" />
+        <action
+            android:id="@+id/action_tripList_to_othersTripList"
+            app:destination="@id/othersTripList" />
     </fragment>
 
     <fragment
@@ -77,6 +80,15 @@
             app:enterAnim="@anim/fade_in"
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/slide_in" />
+    </fragment>
+    <fragment
+        android:id="@+id/othersTripList"
+        android:name="com.example.madproject.ui.trips.OthersTripListFragment"
+        android:label="Other trips"
+        tools:layout="@layout/fragment_others_trip_list">
+        <action
+            android:id="@+id/action_othersTripList_to_tripDetail"
+            app:destination="@id/tripDetail" />
     </fragment>
 
 </navigation>

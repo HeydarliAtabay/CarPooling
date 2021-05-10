@@ -6,12 +6,11 @@ import androidx.fragment.app.Fragment
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.ActionBar
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.madproject.R
 import com.example.madproject.data.Profile
-import com.example.madproject.ui.trips.interestedusers.UserListViewModel
+import com.example.madproject.ui.yourtrips.interestedusers.UserListViewModel
 import com.squareup.picasso.Picasso
 
 class ShowProfileFragment : Fragment() {

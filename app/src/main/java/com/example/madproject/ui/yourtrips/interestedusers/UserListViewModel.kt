@@ -1,4 +1,4 @@
-package com.example.madproject.ui.trips.interestedusers
+package com.example.madproject.ui.yourtrips.interestedusers
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

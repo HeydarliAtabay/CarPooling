@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.trips.TripEditFragment">
+    tools:context=".ui.yourtrips.TripEditFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/RelativeLayout"
@@ -217,7 +217,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
                     android:ems="18"
-                    android:digits="0123456789"
                     android:inputType="number"
                     android:maxLength="1"
                     android:textColor="?attr/color"
@@ -289,6 +288,7 @@
                     android:textColor="?attr/color"
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
+
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

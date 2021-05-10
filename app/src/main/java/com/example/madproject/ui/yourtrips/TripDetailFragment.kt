@@ -1,5 +1,6 @@
-package com.example.madproject.ui.trips
+package com.example.madproject.ui.yourtrips
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
@@ -12,7 +13,8 @@ import com.example.madproject.R
 import com.example.madproject.data.FirestoreRepository
 import com.example.madproject.data.Trip
 import com.example.madproject.ui.profile.ProfileViewModel
-import com.example.madproject.ui.trips.interestedusers.UserListViewModel
+import com.example.madproject.ui.yourtrips.interestedusers.UserListViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.squareup.picasso.Picasso
@@ -60,14 +62,14 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
         } else {
             fab.show()
             fab.setOnClickListener {
-                findNavController().navigate(R.id.action_tripDetail_to_bookingDialog)
+                createBookingDialog()
             }
         }
 
         trip = sharedModel.selectedLocal
         sharedModel.getSelectedDB(trip).observe(viewLifecycleOwner, {
             if (it == null) {
-                Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_SHORT).show()
             } else {
                 trip = it
                 setValuesTrip()
@@ -75,13 +77,6 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
         })
 
         setHasOptionsMenu(true)
-
-        sharedModel.getBookTheTrip().observe(viewLifecycleOwner, {
-            if (it != null && it) {
-                bookTheTrip()
-                sharedModel.setBookTheTrip(false)
-            }
-        })
 
         setValuesTrip()
     }
@@ -112,6 +107,20 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
         }
     }
 
+    private fun createBookingDialog() {
+        MaterialAlertDialogBuilder(this.requireActivity())
+            .setTitle("New Booking")
+            .setMessage("Are you sure to book this trip?")
+            .setPositiveButton("Yes",
+                DialogInterface.OnClickListener { _, _ ->
+                    bookTheTrip()
+                })
+            .setNegativeButton("No",
+                DialogInterface.OnClickListener { _, _ ->
+                })
+            .show()
+    }
+
     private fun setValuesTrip() {
         departure.text = trip.from
         arrival.text = trip.to
@@ -131,7 +140,7 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
         FirestoreRepository().controlBooking(trip)
             .addOnSuccessListener {
                 if (it.documents.size != 0) {
-                    Toast.makeText(this.requireActivity(), "Trip already booked", Toast.LENGTH_LONG)
+                    Toast.makeText(this.requireActivity(), "Trip already booked", Toast.LENGTH_SHORT)
                         .show()
                 } else {
                     try {
@@ -140,16 +149,16 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
                                 Toast.makeText(
                                     this.requireActivity(),
                                     "Trip booked successfully",
-                                    Toast.LENGTH_LONG
+                                    Toast.LENGTH_SHORT
                                 ).show()
                             }
                             .addOnFailureListener { mes ->
                                 Toast.makeText(
-                                    this.requireActivity(), mes.message, Toast.LENGTH_LONG
+                                    this.requireActivity(), mes.message, Toast.LENGTH_SHORT
                                 ).show()
                             }
                     } catch (e: FirebaseFirestoreException) {
-                        Toast.makeText(this.requireActivity(), e.message, Toast.LENGTH_LONG).show()
+                        Toast.makeText(this.requireActivity(), e.message, Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -158,5 +167,4 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
                     .show()
             }
     }
-
 }

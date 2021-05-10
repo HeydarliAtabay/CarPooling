@@ -1,0 +1,433 @@
+package com.example.madproject.ui.othertrips
+
+import android.annotation.SuppressLint
+import android.content.Context
+import android.content.DialogInterface
+import android.os.Bundle
+import android.text.InputType
+import android.view.*
+import android.view.inputmethod.InputMethodManager
+import android.widget.*
+import androidx.fragment.app.Fragment
+import androidx.cardview.widget.CardView
+import androidx.fragment.app.activityViewModels
+import androidx.navigation.Navigation.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.madproject.R
+import com.example.madproject.data.Filters
+import com.example.madproject.data.FirestoreRepository
+import com.example.madproject.data.Trip
+import com.example.madproject.ui.yourtrips.TripListViewModel
+import com.google.android.material.datepicker.CalendarConstraints
+import com.google.android.material.datepicker.DateValidatorPointForward
+import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.textfield.TextInputLayout
+import com.google.android.material.timepicker.MaterialTimePicker
+import com.google.android.material.timepicker.TimeFormat
+import com.google.firebase.firestore.FirebaseFirestoreException
+import com.squareup.picasso.Picasso
+import java.text.SimpleDateFormat
+import java.util.*
+
+class OthersTripListFragment : Fragment(R.layout.fragment_others_trip_list) {
+    private var tripList = listOf<Trip>()
+    private var filter = Filters()
+    private lateinit var emptyList: TextView
+    private lateinit var filterDialogBuilder: MaterialAlertDialogBuilder
+    private lateinit var filterDialogView : View
+    private lateinit var filterFrom: EditText
+    private lateinit var filterTo: EditText
+    private lateinit var filterDate: EditText
+    private lateinit var filterTime: EditText
+    private lateinit var filterPrice: EditText
+    private var datePicker: MaterialDatePicker<Long>? = null
+    private var timePicker: MaterialTimePicker? = null
+    private val tripListViewModel: TripListViewModel by activityViewModels()
+    private val filterViewModel: FilterViewModel by activityViewModels()
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        emptyList = view.findViewById(R.id.emptyList)
+        filterDialogBuilder = MaterialAlertDialogBuilder(this.requireActivity())
+
+        if (tripListViewModel.comingFromOther) tripListViewModel.comingFromOther = false
+
+        val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
+        recyclerView.setHasFixedSize(true)
+        recyclerView.setItemViewCacheSize(3)
+        recyclerView.layoutManager = LinearLayoutManager(this.requireActivity())
+
+        setHasOptionsMenu(true)
+
+        // Observe the dynamic list of trips
+        tripListViewModel.getOtherTrips().observe(viewLifecycleOwner, {
+            if (it == null) {
+                Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
+            } else {
+                tripList = it
+                if (tripList.isNotEmpty()) {
+                    emptyList.visibility = View.INVISIBLE
+                    recyclerView.adapter = TripsAdapter(filteredTripList(), tripListViewModel)
+                }
+            }
+        })
+
+        // Observe the dynamic filters
+        filterViewModel.getFilter().observe(viewLifecycleOwner, {
+            if (it == null) {
+                Toast.makeText(context, "Problem in setting the filters!", Toast.LENGTH_LONG).show()
+            } else {
+                filter = it
+                recyclerView.adapter = TripsAdapter(filteredTripList(), tripListViewModel)
+            }
+        })
+
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.filters_menu, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.filtersButton -> {
+                filterDialogView = LayoutInflater.from(this.requireActivity())
+                    .inflate(R.layout.filters_dialog, null, false)
+                launchFilterDialog()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun launchFilterDialog() {
+        filterFrom = filterDialogView.findViewById(R.id.filter_departure_location)
+        filterTo = filterDialogView.findViewById(R.id.filter_arrival_location)
+        filterDate = filterDialogView.findViewById(R.id.filter_date)
+        filterTime = filterDialogView.findViewById(R.id.filter_time)
+        filterPrice = filterDialogView.findViewById(R.id.filter_price)
+
+        filterFrom.setText(filter.from)
+        filterTo.setText(filter.to)
+        filterDate.setText(filter.date)
+        filterTime.setText(filter.time)
+        filterPrice.setText(filter.price)
+
+        fixEditText()
+
+        filterDialogBuilder.setView(filterDialogView)
+            .setTitle("Filter the trip list")
+            .setMessage("Fill the fields you want to filter")
+            .setPositiveButton("Apply",
+                DialogInterface.OnClickListener { _, _ ->
+                    filterViewModel.setFilter(Filters(
+                        from = filterFrom.text.toString(),
+                        to = filterTo.text.toString(),
+                        price = parsePrice(filterPrice.text.toString()),
+                        date = filterDate.text.toString(),
+                        time = filterTime.text.toString()
+                    ))
+                })
+            .setNegativeButton("Cancel",
+                DialogInterface.OnClickListener { _, _ ->
+                })
+            .show()
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    private fun filteredTripList(): List<Trip> {
+
+        var list = tripList
+            .filter {
+                // Filter the Departure Location
+                it.from.toLowerCase(Locale.ROOT).contains(filter.from.toLowerCase(Locale.ROOT))
+            }.filter {
+                // Filter the Arrival Location
+                it.to.toLowerCase(Locale.ROOT).contains(filter.to.toLowerCase(Locale.ROOT))
+            }.filter {
+                // Filter the Max Price
+                if (filter.price == "") true
+                else
+                    it.price.toDouble() <= filter.price.toDouble()
+            }.filter {
+                // Filter the Date
+                if (filter.date == "") true
+                else
+                    it.departureDate == filter.date
+            }
+
+        if (filter.time != "") {
+            list = list.filter {
+                // Filter the Time
+                if (filter.time == it.departureTime) true
+                else {
+                    // "HH" instead of "hh" represents the 24h format
+                    val filterTime = SimpleDateFormat("HH:mm").parse(filter.time)
+                    val tripTime = SimpleDateFormat("HH:mm").parse(it.departureTime)
+                    tripTime!!.after(filterTime)
+                }
+            }.sortedWith(compareBy<Trip> { it.departureTime.split(":")[0].toInt() }
+                .thenBy { it.departureTime.split(":")[1].toInt() })
+        }
+
+        return list
+    }
+
+    private fun fixEditText() {
+        filterFrom.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) {  // lost focus
+                filterFrom.setSelection(0, 0)
+            }  else {
+                view?.findViewById<TextInputLayout>(R.id.til_filterDeparture)?.error = null
+                val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.showSoftInput(filterFrom, InputMethodManager.SHOW_IMPLICIT)
+            }
+        }
+
+        filterTo.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) {  // lost focus
+                filterTo.setSelection(0, 0)
+            } else {
+                view?.findViewById<TextInputLayout>(R.id.til_filterArrival)?.error = null
+                val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.showSoftInput(filterTo, InputMethodManager.SHOW_IMPLICIT)
+            }
+        }
+
+        filterDate.inputType = InputType.TYPE_NULL
+
+        filterDate.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                view?.findViewById<TextInputLayout>(R.id.til_filterDate)?.error = null
+                setDatePicker()
+            }
+        }
+
+        filterTime.inputType = InputType.TYPE_NULL
+
+        filterTime.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                view?.findViewById<TextInputLayout>(R.id.til_filterTime)?.error = null
+                setTimePicker()
+            }
+        }
+
+        filterPrice.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) {  // lost focus
+                filterPrice.setSelection(0, 0)
+                filterPrice.setText(parsePrice(filterPrice.text.toString()))
+            } else {
+                view?.findViewById<TextInputLayout>(R.id.til_filterPrice)?.error = null
+                val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.showSoftInput(filterPrice, InputMethodManager.SHOW_IMPLICIT)
+            }
+        }
+    }
+
+    private fun parsePrice(s: String): String {
+        return if (s.contains(".")) {
+            val p = s.split(".")
+            val integer = if (p[0] == "") "0" else p[0]
+            val dec = p[1]
+            when (dec.length) {
+                0 -> "$integer.00"
+                1 -> "$integer.${dec}0"
+                else -> "$integer.${dec[0]}${dec[1]}"
+            }
+
+        } else {
+            if (s != "") {
+                "$s.00"
+            } else ""
+        }
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    private fun setDatePicker() {
+        val constraintsBuilder = CalendarConstraints.Builder().setValidator(
+            DateValidatorPointForward.now()
+        )
+
+        var dPicker = MaterialDatePicker.Builder.datePicker()
+            .setTitleText("Select trip departure date")
+            .setCalendarConstraints(
+                constraintsBuilder.build()
+            )
+
+        if (filterDate.text.toString() != "") {
+            val currentDate = SimpleDateFormat("MMM dd, yyyy")
+            currentDate.timeZone = TimeZone.getTimeZone("UTC")
+            val p = currentDate.parse(filterDate.text.toString())
+            dPicker = dPicker.setSelection(p?.time)
+        }
+        datePicker = dPicker.build()
+
+        datePicker?.addOnCancelListener {
+            filterDate.clearFocus()
+        }
+
+        datePicker?.addOnNegativeButtonClickListener {
+            filterDate.clearFocus()
+        }
+
+        datePicker?.addOnPositiveButtonClickListener {
+
+            val inputFormat = SimpleDateFormat("dd MMM yyyy")
+            val outputFormat = SimpleDateFormat("MMM dd, yyyy")
+            filterDate.setText(outputFormat.format(inputFormat.parse(datePicker?.headerText!!)!!))
+            filterTime.requestFocus()
+        }
+
+        datePicker?.show(this.requireActivity().supportFragmentManager, datePicker.toString())
+    }
+
+    private fun parseTime(hour: Int?, minute: Int?): String {
+        if ((hour == null) || (minute == null)) return ""
+
+        val h = if (hour < 10) "0$hour" else hour.toString()
+        val m = if (minute < 10) "0$minute" else minute.toString()
+
+        return "$h:$m"
+    }
+
+    private fun unParseTime(time: String): Int {
+        val first = time[0]
+        val second = time[1]
+        if (first.toInt() == 0) return second.toInt()
+
+        return time.toInt()
+    }
+
+    private fun setTimePicker() {
+        var h = 0
+        var m = 0
+
+        if (filterTime.text.toString() != "") {
+            val s = filterTime.text.toString().split(":")
+            if (s.size == 2) {
+                h = unParseTime(s[0])
+                m = unParseTime(s[1])
+            }
+        }
+        timePicker = MaterialTimePicker.Builder()
+            .setTitleText("Select trip departure time")
+            .setTimeFormat(TimeFormat.CLOCK_24H)
+            .setHour(h)
+            .setMinute(m)
+            .build()
+
+        timePicker?.addOnCancelListener {
+            filterTime.clearFocus()
+        }
+
+        timePicker?.addOnNegativeButtonClickListener {
+            filterTime.clearFocus()
+        }
+
+        timePicker?.addOnPositiveButtonClickListener {
+            filterTime.setText(parseTime(timePicker?.hour, timePicker?.minute))
+            filterPrice.requestFocus()
+        }
+
+        timePicker?.show(this.requireActivity().supportFragmentManager, timePicker.toString())
+    }
+
+    class TripsAdapter(val data: List<Trip>, private val sharedModel: TripListViewModel): RecyclerView.Adapter<TripsAdapter.TripViewHolder>(){
+
+        class TripViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
+            private val image = itemView.findViewById<ImageView>(R.id.image1)
+            private val from = itemView.findViewById<TextView>(R.id.from_dest)
+            private val to = itemView.findViewById<TextView>(R.id.to_dest)
+            private val date = itemView.findViewById<TextView>(R.id.date_txt)
+            private val time = itemView.findViewById<TextView>(R.id.time_txt)
+            private val price = itemView.findViewById<TextView>(R.id.price_txt)
+            private val bookTripButton = itemView.findViewById<Button>(R.id.editTripButton)
+            private val cv = itemView.findViewById<CardView>(R.id.card_view)
+
+            fun bind(t: Trip, sharedModel: TripListViewModel) {
+                from.text = t.from
+                to.text = t.to
+                date.text = t.departureDate
+                time.text = t.departureTime
+                price.text = t.price
+                if (t.imageUrl != "") {
+                    Picasso.get().load(t.imageUrl).into(image)
+                } else image.setImageResource(R.drawable.car_example)
+                bookTripButton.text = "Book trip"
+
+                cv.setOnClickListener {
+                    sharedModel.selectedLocal = t
+                    sharedModel.comingFromOther = true
+                    findNavController(itemView).navigate(R.id.action_othersTripList_to_tripDetail)
+                }
+
+                bookTripButton.setOnClickListener {
+                    MaterialAlertDialogBuilder(itemView.context)
+                        .setTitle("New Booking")
+                        .setMessage("Are you sure to book this trip?")
+                        .setPositiveButton("Yes",
+                            DialogInterface.OnClickListener { _, _ ->
+                                bookTheTrip(t)
+                            })
+                        .setNegativeButton("No",
+                            DialogInterface.OnClickListener { _, _ ->
+                            })
+                        .show()
+                }
+            }
+
+            fun unbind() {
+                bookTripButton.setOnClickListener {  }
+                cv.setOnClickListener {  }
+            }
+
+            private fun bookTheTrip(trip: Trip) {
+                FirestoreRepository().controlBooking(trip)
+                    .addOnSuccessListener {
+                        if (it.documents.size != 0) {
+                            Toast.makeText(itemView.context, "Trip already booked", Toast.LENGTH_SHORT)
+                                .show()
+                        } else {
+                            try {
+                                FirestoreRepository().bookingTransaction(trip)
+                                    .addOnSuccessListener {
+                                        Toast.makeText(itemView.context, "Trip booked successfully", Toast.LENGTH_SHORT).show()
+                                    }
+                                    .addOnFailureListener { mes ->
+                                        Toast.makeText(itemView.context, mes.message, Toast.LENGTH_SHORT).show()
+                                    }
+                            } catch (e: FirebaseFirestoreException) {
+                                Toast.makeText(itemView.context, e.message, Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(itemView.context, "DB access failure", Toast.LENGTH_SHORT).show()
+                    }
+            }
+        }
+
+        override fun onViewRecycled(holder: TripViewHolder) {
+            super.onViewRecycled(holder)
+            holder.unbind()
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TripViewHolder {
+            val v= LayoutInflater.from(parent.context)
+                .inflate(R.layout.recyclerview_card_trip, parent,false)
+            return TripViewHolder(v)
+        }
+
+        override fun onBindViewHolder(holder: TripViewHolder, position: Int) {
+            holder.bind(data[position], sharedModel)
+        }
+
+        override fun getItemCount(): Int {
+            return data.size
+        }
+    }
+}
+

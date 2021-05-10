@@ -49,6 +49,12 @@
         <item name="strokeWidth">1dp</item>
     </style>
 
+    <style name="MyFiltersStyle">
+        <item name="android:textColorHint">@color/white</item>
+        <item name="startIconTint">@color/white</item>
+        <item name="endIconTint">@color/white</item>
+    </style>
+
     <style name="MyTextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="android:textColorHint">@color/white</item>
         <item name="boxStrokeWidth">3dp</item>

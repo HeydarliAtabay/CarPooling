@@ -1,31 +1,25 @@
-package com.example.madproject.ui.trips
+package com.example.madproject.ui.yourtrips
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.madproject.data.FirestoreRepository
-import com.example.madproject.data.Profile
 import com.example.madproject.data.Trip
 import com.google.android.gms.tasks.Task
-import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.EventListener
-import com.google.firebase.firestore.ktx.getField
-import com.google.firebase.firestore.ktx.toObject
 
 class TripListViewModel: ViewModel() {
 
-    private var trips : MutableLiveData<List<Trip>> = MutableLiveData()
+    private var userTrips: MutableLiveData<List<Trip>> = MutableLiveData()
+    private var otherTrips: MutableLiveData<List<Trip>> = MutableLiveData()
     private var selectedDB: MutableLiveData<Trip> = MutableLiveData(Trip())
+
     var selectedLocal = Trip()
-    private var userTrips : MutableLiveData<List<Trip>> = MutableLiveData()
-    private var otherTrips : MutableLiveData<List<Trip>> = MutableLiveData()
     var currentPhotoPath = ""
     var useDBImage = false
 
     // Flags used to manage the trip booking
     var comingFromOther = false
-    private var bookTheTrip: MutableLiveData<Boolean> = MutableLiveData(false)
 
     init {
         loadUserTrips()
@@ -39,7 +33,7 @@ class TripListViewModel: ViewModel() {
                 return@EventListener
             }
 
-            val retrievedTrips : MutableList<Trip> = mutableListOf()
+            val retrievedTrips: MutableList<Trip> = mutableListOf()
             for (doc in value!!) {
                 val t = doc.toObject(Trip::class.java)
                 retrievedTrips.add(t)
@@ -51,31 +45,42 @@ class TripListViewModel: ViewModel() {
 
     private fun loadOtherTrips() {
         val users = FirestoreRepository().getUsersList()
-        val retrievedTrips : MutableList<Trip> = mutableListOf()
 
-        users.addSnapshotListener(EventListener { value, error ->
-                if (error != null) {
-                otherTrips.value = null
-                return@EventListener
-                }
-
-                for (user in value!!) {
+        users.get()
+            .addOnSuccessListener {
+                val retrievedTrips : MutableList<Trip> = mutableListOf()
+                for (user in it!!) {
                     user.reference.collection("createdTrips")
-                        ?.addSnapshotListener(EventListener { value, error ->
+                        .addSnapshotListener(EventListener { value, error ->
                             if (error != null) {
                                 otherTrips.value = null
                                 return@EventListener
                             }
+
                             for (trip in value!!) {
                                 val t = trip.toObject(Trip::class.java)
                                 if (t.id == selectedLocal.id) selectedDB.value = t
-                                retrievedTrips.add(t)
+                                val toUpdate = findUpdate(t,retrievedTrips)
+                                if (toUpdate.id != "-1")
+                                    retrievedTrips[retrievedTrips.indexOf(toUpdate)] = t
+                                else
+                                    retrievedTrips.add(t)
                             }
+                            otherTrips.value = retrievedTrips
                         })
                 }
+            }
+            .addOnFailureListener {
 
-            })
-        otherTrips.value = retrievedTrips
+            }
+
+    }
+
+    private fun findUpdate(t: Trip, trips: List<Trip>): Trip {
+        for (trip in trips) {
+            if (t.id == trip.id) return trip
+        }
+        return Trip(id = "-1")
     }
 
     fun getUserTrips(): LiveData<List<Trip>> {
@@ -91,21 +96,22 @@ class TripListViewModel: ViewModel() {
     }
 
     fun getSelectedDB(t: Trip): LiveData<Trip> {
-        if (trips.value == null) return selectedDB
-        for (trip in trips.value!!) {
+        // Check whether the selected trip is contained in the userTrips
+        if (userTrips.value == null) return selectedDB
+        for (trip in userTrips.value!!) {
             if (trip.id == t.id) {
                 selectedDB.value = trip
-                break
+                return selectedDB
+            }
+        }
+        // Check whether the selected trip is contained in the otherTrips
+        if (otherTrips.value == null) return selectedDB
+        for (trip in otherTrips.value!!) {
+            if (trip.id == t.id) {
+                selectedDB.value = trip
+                return selectedDB
             }
         }
         return selectedDB
-    }
-
-    fun getBookTheTrip(): LiveData<Boolean> {
-        return bookTheTrip
-    }
-
-    fun setBookTheTrip(f: Boolean) {
-        bookTheTrip.value = f
     }
 }

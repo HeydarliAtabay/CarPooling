@@ -3,17 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/navigation"
-    app:startDestination="@id/tripList">
-
-    <fragment
-        android:id="@+id/login"
-        android:name="com.example.madproject.ui.profile.LoginFragment"
-        android:label="Your profile"
-        tools:layout="@layout/auth_activity" >
-        <action
-            android:id="@+id/action_login_to_tripList"
-            app:destination="@id/tripList" />
-    </fragment>
+    app:startDestination="@id/othersTripList">
 
     <fragment
         android:id="@+id/showProfile"
@@ -43,7 +33,7 @@
 
     <fragment
         android:id="@+id/tripList"
-        android:name="com.example.madproject.ui.trips.TripListFragment"
+        android:name="com.example.madproject.ui.yourtrips.TripListFragment"
         android:label="Your Trips"
         tools:layout="@layout/fragment_trip_list" >
 
@@ -59,14 +49,11 @@
             app:enterAnim="@anim/slide_in"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/slide_out" />
-        <action
-            android:id="@+id/action_tripList_to_login"
-            app:destination="@id/login" />
     </fragment>
 
     <fragment
         android:id="@+id/tripDetail"
-        android:name="com.example.madproject.ui.trips.TripDetailFragment"
+        android:name="com.example.madproject.ui.yourtrips.TripDetailFragment"
         android:label="Trip details"
         tools:layout="@layout/fragment_trip_detail" >
 
@@ -79,14 +66,11 @@
         <action
             android:id="@+id/action_tripDetail_to_userList"
             app:destination="@id/userList" />
-        <action
-            android:id="@+id/action_tripDetail_to_bookingDialog"
-            app:destination="@id/bookingDialog" />
     </fragment>
 
     <fragment
         android:id="@+id/tripEdit"
-        android:name="com.example.madproject.ui.trips.TripEditFragment"
+        android:name="com.example.madproject.ui.yourtrips.TripEditFragment"
         android:label="Edit your trip..."
         tools:layout="@layout/fragment_trip_edit" >
 
@@ -99,8 +83,8 @@
     </fragment>
     <fragment
         android:id="@+id/othersTripList"
-        android:name="com.example.madproject.ui.trips.OthersTripListFragment"
-        android:label="Other trips"
+        android:name="com.example.madproject.ui.othertrips.OthersTripListFragment"
+        android:label="Available Trips"
         tools:layout="@layout/fragment_others_trip_list">
         <action
             android:id="@+id/action_othersTripList_to_tripDetail"
@@ -109,7 +93,7 @@
 
     <fragment
         android:id="@+id/userList"
-        android:name="com.example.madproject.ui.trips.interestedusers.UserListFragment"
+        android:name="com.example.madproject.ui.yourtrips.interestedusers.UserListFragment"
         android:label="Users list"
         tools:layout="@layout/fragment_user_list" >
         <action
@@ -123,10 +107,5 @@
         android:label="Profile details"
         tools:layout="@layout/fragment_show_profile" >
     </fragment>
-
-    <dialog
-        android:id="@+id/bookingDialog"
-        android:name="com.example.madproject.ui.trips.BookingAlertDialog" >
-    </dialog>
 
 </navigation>

@@ -1,4 +1,4 @@
-package com.example.madproject.ui.trips
+package com.example.madproject.ui.yourtrips
 
 import android.os.Bundle
 import android.view.*
@@ -14,12 +14,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.madproject.R
-import com.example.madproject.data.FirestoreRepository
 import com.example.madproject.data.Trip
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import com.squareup.picasso.Picasso
 
 class TripListFragment : Fragment(R.layout.fragment_trip_list) {
@@ -38,7 +34,7 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
         recyclerView.setHasFixedSize(true)
-        recyclerView.setItemViewCacheSize(2)
+        recyclerView.setItemViewCacheSize(3)
         recyclerView.layoutManager = LinearLayoutManager(this.requireActivity())
 
         tripListViewModel.getUserTrips().observe(viewLifecycleOwner, {
@@ -58,23 +54,6 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
             tripListViewModel.selectedLocal = Trip()
             tripListViewModel.useDBImage = true
             findNavController().navigate(R.id.action_tripList_to_tripEdit)
-        }
-    }
-
-    // The following two methods will go in OtherTripsFragment
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.filters_menu, menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.filtersButton -> {
-
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
         }
     }
 

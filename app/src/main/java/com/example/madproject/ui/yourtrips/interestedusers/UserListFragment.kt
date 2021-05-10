@@ -1,11 +1,10 @@
-package com.example.madproject.ui.trips.interestedusers
+package com.example.madproject.ui.yourtrips.interestedusers
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -16,9 +15,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.madproject.R
 import com.example.madproject.data.Profile
-import com.example.madproject.data.Trip
-import com.example.madproject.ui.trips.TripListFragment
-import com.example.madproject.ui.trips.TripListViewModel
 import com.squareup.picasso.Picasso
 
 

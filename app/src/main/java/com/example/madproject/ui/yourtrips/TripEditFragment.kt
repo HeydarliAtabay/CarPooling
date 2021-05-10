@@ -1,4 +1,4 @@
-package com.example.madproject.ui.trips
+package com.example.madproject.ui.yourtrips
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -9,10 +9,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
-import android.text.Editable
 import android.text.InputType
-import android.text.TextWatcher
-import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.view.inputmethod.InputMethodManager
@@ -54,8 +51,8 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     private lateinit var price : EditText
     private lateinit var additionalInfo : EditText
     private lateinit var intermediateStop : EditText
-    private var datepicker: MaterialDatePicker<Long>? = null
-    private var timepicker: MaterialTimePicker? = null
+    private var datePicker: MaterialDatePicker<Long>? = null
+    private var timePicker: MaterialTimePicker? = null
     private val sharedModel: TripListViewModel by activityViewModels()
     private val profileModel: ProfileViewModel by activityViewModels()
     private lateinit var trip: Trip
@@ -127,8 +124,8 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     override fun onPause() {
         super.onPause()
         closeKeyboard()
-        if (datepicker?.isVisible == true) datepicker?.dismiss()
-        if (timepicker?.isVisible == true) timepicker?.dismiss()
+        if (datePicker?.isVisible == true) datePicker?.dismiss()
+        if (timePicker?.isVisible == true) timePicker?.dismiss()
         updateTrip()
         sharedModel.currentPhotoPath = currentPhotoPath ?: ""
     }
@@ -361,25 +358,25 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
             val p = currentDate.parse(departureDate.text.toString())
             dPicker = dPicker.setSelection(p?.time)
         }
-        datepicker = dPicker.build()
+        datePicker = dPicker.build()
 
-        datepicker?.addOnCancelListener {
+        datePicker?.addOnCancelListener {
             departureDate.clearFocus()
         }
 
-        datepicker?.addOnNegativeButtonClickListener {
+        datePicker?.addOnNegativeButtonClickListener {
             departureDate.clearFocus()
         }
 
-        datepicker?.addOnPositiveButtonClickListener {
+        datePicker?.addOnPositiveButtonClickListener {
 
             val inputFormat = SimpleDateFormat("dd MMM yyyy")
             val outputFormat = SimpleDateFormat("MMM dd, yyyy")
-            departureDate.setText(outputFormat.format(inputFormat.parse(datepicker?.headerText!!)!!))
+            departureDate.setText(outputFormat.format(inputFormat.parse(datePicker?.headerText!!)!!))
             departureTime.requestFocus()
         }
 
-        datepicker?.show(this.requireActivity().supportFragmentManager, datepicker.toString())
+        datePicker?.show(this.requireActivity().supportFragmentManager, datePicker.toString())
     }
 
     private fun parseTime(hour: Int?, minute: Int?): String {
@@ -410,27 +407,27 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
                 m = unParseTime(s[1])
             }
         }
-        timepicker = MaterialTimePicker.Builder()
+        timePicker = MaterialTimePicker.Builder()
             .setTitleText("Select trip departure time")
             .setTimeFormat(TimeFormat.CLOCK_24H)
             .setHour(h)
             .setMinute(m)
             .build()
 
-        timepicker?.addOnCancelListener {
+        timePicker?.addOnCancelListener {
             departureTime.clearFocus()
         }
 
-        timepicker?.addOnNegativeButtonClickListener {
+        timePicker?.addOnNegativeButtonClickListener {
             departureTime.clearFocus()
         }
 
-        timepicker?.addOnPositiveButtonClickListener {
-            departureTime.setText(parseTime(timepicker?.hour, timepicker?.minute))
+        timePicker?.addOnPositiveButtonClickListener {
+            departureTime.setText(parseTime(timePicker?.hour, timePicker?.minute))
             duration.requestFocus()
         }
 
-        timepicker?.show(this.requireActivity().supportFragmentManager, timepicker.toString())
+        timePicker?.show(this.requireActivity().supportFragmentManager, timePicker.toString())
     }
 
     private fun updateTrip() {
@@ -445,7 +442,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
             availableSeat = availableSeats.text.toString(),
             additionalInfo = additionalInfo.text.toString(),
             intermediateStop = intermediateStop.text.toString(),
-            price = price.text.toString(),
+            price = parsePrice(price.text.toString()),
             ownerEmail = profile.email
         )
         trip = sharedModel.selectedLocal

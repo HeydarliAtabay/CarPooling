@@ -25,10 +25,13 @@ import com.example.madproject.ui.profile.ProfileViewModel
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
 import com.squareup.picasso.Picasso
 
 class MainActivity : AppCompatActivity() {
+
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var navView: NavigationView
@@ -39,8 +42,16 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
+
+        setNavigation()
+
+        /*
+
+        For now deactivate the the login
 
         mAuth = Firebase.auth
 
@@ -51,6 +62,7 @@ class MainActivity : AppCompatActivity() {
             FirestoreRepository.auth = mAuth.currentUser!!
             setNavigation()
         }
+        */
 
 
     }
@@ -58,14 +70,14 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
+/*
         if(resultCode == RESULT_OK){
             if(requestCode == Requests.INTENT_LOGIN.value){
                 FirestoreRepository.auth=mAuth.currentUser!!
                 setNavigation()
             }
         }
-
+*/
     }
     private fun setNavigation(){
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
@@ -76,7 +88,7 @@ class MainActivity : AppCompatActivity() {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(setOf(
-            R.id.showProfile, R.id.tripList), drawerLayout)
+            R.id.showProfile, R.id.tripList, R.id.othersTripList), drawerLayout)
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
@@ -109,5 +121,4 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.fragment)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
-
 }

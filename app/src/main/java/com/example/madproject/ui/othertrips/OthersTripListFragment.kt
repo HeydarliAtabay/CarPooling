@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
 import android.text.InputType
+import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
@@ -84,6 +85,17 @@ class OthersTripListFragment : Fragment(R.layout.fragment_others_trip_list) {
             }
         })
 
+        if (filterViewModel.changedOrientation) {
+            launchFilterDialog()
+            filterViewModel.changedOrientation = false
+        }
+
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (filterViewModel.dialogOpened)
+            filterViewModel.changedOrientation = true
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -94,8 +106,6 @@ class OthersTripListFragment : Fragment(R.layout.fragment_others_trip_list) {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.filtersButton -> {
-                filterDialogView = LayoutInflater.from(this.requireActivity())
-                    .inflate(R.layout.filters_dialog, null, false)
                 launchFilterDialog()
                 true
             }
@@ -104,6 +114,9 @@ class OthersTripListFragment : Fragment(R.layout.fragment_others_trip_list) {
     }
 
     private fun launchFilterDialog() {
+        filterViewModel.dialogOpened = true
+        filterDialogView = LayoutInflater.from(this.requireActivity())
+            .inflate(R.layout.filters_dialog, null, false)
         filterFrom = filterDialogView.findViewById(R.id.filter_departure_location)
         filterTo = filterDialogView.findViewById(R.id.filter_arrival_location)
         filterDate = filterDialogView.findViewById(R.id.filter_date)
@@ -120,7 +133,6 @@ class OthersTripListFragment : Fragment(R.layout.fragment_others_trip_list) {
 
         filterDialogBuilder.setView(filterDialogView)
             .setTitle("Filter the trip list")
-            .setMessage("Fill the fields you want to filter")
             .setPositiveButton("Apply",
                 DialogInterface.OnClickListener { _, _ ->
                     filterViewModel.setFilter(Filters(
@@ -134,6 +146,9 @@ class OthersTripListFragment : Fragment(R.layout.fragment_others_trip_list) {
             .setNegativeButton("Cancel",
                 DialogInterface.OnClickListener { _, _ ->
                 })
+            .setOnDismissListener {
+                filterViewModel.dialogOpened = false
+            }
             .show()
     }
 
@@ -430,4 +445,3 @@ class OthersTripListFragment : Fragment(R.layout.fragment_others_trip_list) {
         }
     }
 }
-

@@ -30,7 +30,7 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
     private lateinit var trip: Trip
     private lateinit var price: TextView
     private lateinit var additionalInfo: TextView
-    private lateinit var intermediateStop: TextView
+    private lateinit var intermediateStops: TextView
     private lateinit var fab: FloatingActionButton
     private val sharedModel: TripListViewModel by activityViewModels()
     private val userListModel: UserListViewModel by activityViewModels()
@@ -46,7 +46,7 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
         availableSeats = view.findViewById(R.id.seats)
         price = view.findViewById(R.id.price)
         additionalInfo = view.findViewById(R.id.info)
-        intermediateStop = view.findViewById(R.id.intermediate_stops)
+        intermediateStops = view.findViewById(R.id.intermediate_stops)
 
         // reset the flag to "false", since this fragment will set it to "true" if the required navigation is selected
         profileModel.comingFromPrivacy = false
@@ -67,6 +67,7 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
         }
 
         trip = sharedModel.selectedLocal
+
         sharedModel.getSelectedDB(trip).observe(viewLifecycleOwner, {
             if (it == null) {
                 Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_SHORT).show()
@@ -79,6 +80,17 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
         setHasOptionsMenu(true)
 
         setValuesTrip()
+
+        if (sharedModel.changedOrientation) {
+            createBookingDialog()
+            sharedModel.changedOrientation = false
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (sharedModel.dialogOpened)
+            sharedModel.changedOrientation = true
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -108,6 +120,7 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
     }
 
     private fun createBookingDialog() {
+        sharedModel.dialogOpened = true
         MaterialAlertDialogBuilder(this.requireActivity())
             .setTitle("New Booking")
             .setMessage("Are you sure to book this trip?")
@@ -118,6 +131,9 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
             .setNegativeButton("No",
                 DialogInterface.OnClickListener { _, _ ->
                 })
+            .setOnDismissListener {
+                sharedModel.dialogOpened = false
+            }
             .show()
     }
 
@@ -130,7 +146,7 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
         availableSeats.text = trip.availableSeat
         price.text = trip.price
         additionalInfo.text = trip.additionalInfo
-        intermediateStop.text = trip.intermediateStop
+        intermediateStops.text = trip.intermediateStops
         if (trip.imageUrl != "") {
             Picasso.get().load(trip.imageUrl).error(R.drawable.car_example).into(imageCar)
         } else imageCar.setImageResource(R.drawable.car_example)

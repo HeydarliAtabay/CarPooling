@@ -18,7 +18,6 @@ class ProfileViewModel: ViewModel() {
 
 
     fun getDBUser() : LiveData<Profile>{
-        Log.d("test","getDBUser")
         FirestoreRepository().getUser().addSnapshotListener(EventListener { value, e ->
             if (e != null) {
                 profile.value = null
@@ -29,7 +28,6 @@ class ProfileViewModel: ViewModel() {
         })
         return profile
     }
-
 
     fun setDBUser(p:Profile) : Task<Void> {
         return FirestoreRepository().setUser(p)

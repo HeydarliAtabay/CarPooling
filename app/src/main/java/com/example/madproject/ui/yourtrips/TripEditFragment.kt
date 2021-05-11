@@ -50,7 +50,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     private lateinit var availableSeats : EditText
     private lateinit var price : EditText
     private lateinit var additionalInfo : EditText
-    private lateinit var intermediateStop : EditText
+    private lateinit var intermediateStops : EditText
     private var datePicker: MaterialDatePicker<Long>? = null
     private var timePicker: MaterialTimePicker? = null
     private val sharedModel: TripListViewModel by activityViewModels()
@@ -69,7 +69,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         availableSeats = view.findViewById(R.id.seats)
         price = view.findViewById(R.id.price)
         additionalInfo = view.findViewById(R.id.info)
-        intermediateStop = view.findViewById(R.id.intermediate_stops)
+        intermediateStops = view.findViewById(R.id.intermediate_stops)
         storageDir = this.requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
 
         profileModel.getDBUser().observe(viewLifecycleOwner, {
@@ -310,14 +310,14 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
             }
         }
 
-        intermediateStop.setOnFocusChangeListener { _, hasFocus ->
+        intermediateStops.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {  // lost focus
-                intermediateStop.setSelection(0, 0)
-                intermediateStop.hint = ""
+                intermediateStops.setSelection(0, 0)
+                intermediateStops.hint = ""
             } else {
-                intermediateStop.hint = "Intermediate stops"
+                intermediateStops.hint = "Intermediate stops"
                 val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                imm.showSoftInput(intermediateStop, InputMethodManager.SHOW_IMPLICIT)
+                imm.showSoftInput(intermediateStops, InputMethodManager.SHOW_IMPLICIT)
             }
         }
     }
@@ -441,7 +441,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
             duration = duration.text.toString(),
             availableSeat = availableSeats.text.toString(),
             additionalInfo = additionalInfo.text.toString(),
-            intermediateStop = intermediateStop.text.toString(),
+            intermediateStops = intermediateStops.text.toString(),
             price = parsePrice(price.text.toString()),
             ownerEmail = profile.email
         )
@@ -457,7 +457,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         availableSeats.setText(trip.availableSeat)
         price.setText(trip.price)
         additionalInfo.setText(trip.additionalInfo)
-        intermediateStop.setText(trip.intermediateStop)
+        intermediateStops.setText(trip.intermediateStops)
 
         if ((trip.imageUrl == "") && (currentPhotoPath == "")) imageCar.setImageResource(R.drawable.car_example)
         else if ((trip.imageUrl == "") && (currentPhotoPath != "")) imageCar.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath))

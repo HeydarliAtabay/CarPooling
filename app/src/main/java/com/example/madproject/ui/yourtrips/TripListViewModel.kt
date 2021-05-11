@@ -1,5 +1,6 @@
 package com.example.madproject.ui.yourtrips
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -18,15 +19,14 @@ class TripListViewModel: ViewModel() {
     var currentPhotoPath = ""
     var useDBImage = false
 
+    // Flags to manage the Dialog when the orientation changes
+    var dialogOpened = false
+    var changedOrientation = false
+
     // Flags used to manage the trip booking
     var comingFromOther = false
 
-    init {
-        loadUserTrips()
-        loadOtherTrips()
-    }
-
-    private fun loadUserTrips() {
+    fun getUserTrips(): LiveData<List<Trip>> {
         FirestoreRepository().getTrips().addSnapshotListener(EventListener { value, e ->
             if (e != null) {
                 userTrips.value = null
@@ -41,12 +41,11 @@ class TripListViewModel: ViewModel() {
             }
             userTrips.value = retrievedTrips
         })
+        return userTrips
     }
 
-    private fun loadOtherTrips() {
-        val users = FirestoreRepository().getUsersList()
-
-        users.get()
+    fun getOtherTrips(): LiveData<List<Trip>> {
+        FirestoreRepository().getUsersList().get()
             .addOnSuccessListener {
                 val retrievedTrips : MutableList<Trip> = mutableListOf()
                 for (user in it!!) {
@@ -70,10 +69,7 @@ class TripListViewModel: ViewModel() {
                         })
                 }
             }
-            .addOnFailureListener {
-
-            }
-
+        return otherTrips
     }
 
     private fun findUpdate(t: Trip, trips: List<Trip>): Trip {
@@ -83,27 +79,21 @@ class TripListViewModel: ViewModel() {
         return Trip(id = "-1")
     }
 
-    fun getUserTrips(): LiveData<List<Trip>> {
-        return userTrips
-    }
-
-    fun getOtherTrips(): LiveData<List<Trip>> {
-        return otherTrips
-    }
-
     fun saveTrip(t: Trip): Task<Void> {
         return FirestoreRepository().insertTrip(t)
     }
 
     fun getSelectedDB(t: Trip): LiveData<Trip> {
         // Check whether the selected trip is contained in the userTrips
-        if (userTrips.value == null) return selectedDB
-        for (trip in userTrips.value!!) {
-            if (trip.id == t.id) {
-                selectedDB.value = trip
-                return selectedDB
+        if (userTrips.value != null) {
+            for (trip in userTrips.value!!) {
+                if (trip.id == t.id) {
+                    selectedDB.value = trip
+                    return selectedDB
+                }
             }
         }
+
         // Check whether the selected trip is contained in the otherTrips
         if (otherTrips.value == null) return selectedDB
         for (trip in otherTrips.value!!) {

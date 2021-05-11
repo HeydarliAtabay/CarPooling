@@ -4,16 +4,11 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.*
 
-//data class Mom(var email: String)
-
 class FirestoreRepository() {
     private var fireStoreDB = FirebaseFirestore.getInstance()
 
-    //private val auth = Mom("user@gmail.com")
-
-
     companion object{
-        lateinit var auth:FirebaseUser
+        lateinit var auth: FirebaseUser
     }
 
     fun insertTrip(t: Trip): Task<Void> {

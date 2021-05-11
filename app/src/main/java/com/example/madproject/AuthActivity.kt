@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import android.widget.Toast
+import androidx.appcompat.widget.Toolbar
 import androidx.navigation.fragment.findNavController
 import com.example.madproject.data.FirestoreRepository
 import com.example.madproject.lib.Requests
@@ -22,24 +24,34 @@ class AuthActivity : AppCompatActivity() {
 
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var mAuth: FirebaseAuth
+    private lateinit var toolbar: Toolbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.auth_activity)
 
         mAuth = Firebase.auth
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.default_web_client_id))
-            .requestEmail()
-            .build()
 
-        googleSignInClient = GoogleSignIn.getClient(this, gso)
+        if (mAuth.currentUser == null) {
+            setContentView(R.layout.auth_activity)
+
+            val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build()
+
+            googleSignInClient = GoogleSignIn.getClient(this, gso)
 
 
-        val signInButton= findViewById<Button>(R.id.sbtn)
-        signInButton.setOnClickListener {
-            signIn()
+            val signInButton= findViewById<Button>(R.id.sbtn)
+            signInButton.setOnClickListener {
+                signIn()
+            }
+        } else {
+            FirestoreRepository.auth = mAuth.currentUser!!
+            startActivity(Intent(this,MainActivity::class.java))
+            finish()
         }
+
 
     }
 
@@ -72,15 +84,13 @@ class AuthActivity : AppCompatActivity() {
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
-                    Log.d("test", "signInWithCredential:success")
                     //this line is just for checking if authentication works or no
-                    val user = mAuth.currentUser
-                    Log.d("test", user?.email!!)
-                    setResult(Activity.RESULT_OK,Intent())
+                    FirestoreRepository.auth = mAuth.currentUser!!
+                    startActivity(Intent(this,MainActivity::class.java))
                     finish()
                 } else {
                     // If sign in fails, display a message to the user.
-                    Log.d("test", "signInWithCredential:failure")
+                    Toast.makeText(this, "signInWithCredential:failure", Toast.LENGTH_SHORT).show()
                 }
             }
     }

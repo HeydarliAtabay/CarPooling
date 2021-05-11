@@ -26,6 +26,8 @@
         <item name="android:scrollbarThumbVertical">@color/gray</item>
         <item name="snackbarStyle">@style/Widget.App.Snackbar</item>
 
+        <item name="materialAlertDialogTheme">@style/AlertDialogTheme</item>
+
     </style>
 
     <style name="Theme.MADProject.NoActionBar">
@@ -64,6 +66,17 @@
 
     <style name="Widget.App.Snackbar" parent="Widget.MaterialComponents.Snackbar">
         <item name="android:layout_margin">20dp</item>
+    </style>
+
+    <style name="AlertDialogTheme" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="materialAlertDialogTitleTextStyle">@style/TitleTextStyle</item>
+    </style>
+
+    <style name="TitleTextStyle" parent="MaterialAlertDialog.MaterialComponents.Title.Text">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_marginBottom">8dp</item>
+        <item name="android:layout_marginTop">8dp</item>
     </style>
 
 </resources>

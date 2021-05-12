@@ -1,30 +1,28 @@
 package com.example.madproject
 
-import android.app.Activity
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.Toast
-import androidx.appcompat.widget.Toolbar
-import androidx.navigation.fragment.findNavController
+import androidx.appcompat.app.AppCompatActivity
 import com.example.madproject.data.FirestoreRepository
 import com.example.madproject.lib.Requests
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
+
 class AuthActivity : AppCompatActivity() {
 
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var mAuth: FirebaseAuth
-    private lateinit var toolbar: Toolbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,13 +37,15 @@ class AuthActivity : AppCompatActivity() {
                 .requestEmail()
                 .build()
 
-            googleSignInClient = GoogleSignIn.getClient(this, gso)
-
-
-            val signInButton= findViewById<Button>(R.id.sbtn)
-            signInButton.setOnClickListener {
-                signIn()
-            }
+            // Firstly sign out from google in order to manage to sign out of the user
+            GoogleSignIn.getClient(this, gso).signOut()
+                .addOnCompleteListener(this) {
+                    googleSignInClient = GoogleSignIn.getClient(this, gso)
+                    val signInButton = findViewById<Button>(R.id.sbtn)
+                    signInButton.setOnClickListener {
+                        signIn()
+                    }
+                }
         } else {
             FirestoreRepository.auth = mAuth.currentUser!!
             startActivity(Intent(this,MainActivity::class.java))

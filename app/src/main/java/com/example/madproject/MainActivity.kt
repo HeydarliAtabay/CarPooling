@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -36,8 +37,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navView: NavigationView
     private var profile = Profile()
     private lateinit var model: ProfileViewModel
-    private lateinit var mAuth: FirebaseAuth
     private lateinit var toolbar: Toolbar
+    private lateinit var header: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,7 +56,7 @@ class MainActivity : AppCompatActivity() {
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         navView = findViewById(R.id.nav_view)
         val navController = findNavController(R.id.fragment)
-
+        header = navView.getHeaderView(0)
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(setOf(
@@ -76,10 +77,15 @@ class MainActivity : AppCompatActivity() {
         })
         loadNavigationHeader()
 
+        val logoutButton = header.findViewById<ImageButton>(R.id.log_out_button)
+
+        logoutButton.setOnClickListener {
+            performLogOut()
+        }
+
     }
 
     private fun loadNavigationHeader() {
-        val header: View = navView.getHeaderView(0)
         val profilePictureHeader: ImageView = header.findViewById(R.id.imageUser)
         val profileNameHeader: TextView = header.findViewById(R.id.nameHeader)
         profileNameHeader.text = profile.fullName
@@ -91,5 +97,12 @@ class MainActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.fragment)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
+    }
+
+    private fun performLogOut() {
+        Firebase.auth.signOut()
+        Toast.makeText(this, "Succesfully logged out", Toast.LENGTH_SHORT).show()
+        startActivity(Intent(this,AuthActivity::class.java))
+        finish()
     }
 }

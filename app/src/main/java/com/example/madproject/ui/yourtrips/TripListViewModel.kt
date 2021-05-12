@@ -20,7 +20,7 @@ class TripListViewModel: ViewModel() {
     var useDBImage = false
 
     // Flags to manage the Dialog when the orientation changes
-    var dialogOpened = false
+    var bookingDialogOpened = false
     var changedOrientation = false
 
     // Flags used to manage the trip booking

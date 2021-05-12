@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.text.InputType
+import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.view.inputmethod.InputMethodManager
@@ -22,6 +23,7 @@ import com.example.madproject.R
 import com.example.madproject.data.Profile
 import com.example.madproject.data.Trip
 import com.example.madproject.lib.FixOrientation
+import com.example.madproject.lib.MyFunctions
 import com.example.madproject.lib.Requests
 import com.example.madproject.ui.profile.ProfileViewModel
 import com.google.android.material.datepicker.CalendarConstraints
@@ -111,7 +113,8 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
             R.id.saveButton -> {
                 updateTrip()
                 if (formCheck()) {
-                    if (currentPhotoPath == "") saveValues() else saveValuesImage()
+                    val f = currentPhotoPath != ""
+                    saveTrip(f)
                 } else {
                     Toast.makeText(context, "Insert the required fields to save the trip!", Toast.LENGTH_LONG).show()
                 }
@@ -162,7 +165,9 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         if (resultCode == AppCompatActivity.RESULT_OK) {
             when (requestCode) {
                 Requests.INTENT_CAPTURE_PHOTO.value -> {
-                    resizeSetImage()
+                    currentPhotoPath = MyFunctions.resizeSetImage(this.requireActivity(), bigPhotoPath!!, storageDir?.absolutePath)
+                    imageCar.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath!!))
+                    bigPhotoPath = ""
                 }
 
                 Requests.INTENT_PHOTO_FROM_GALLERY.value -> {
@@ -171,12 +176,17 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
                             it
                         )
                     }
-                    val outputFile = createImageFile()
+                    val outputFile = MyFunctions.createImageFile(storageDir?.absolutePath).apply {
+                        // Save a file: path for use with ACTION_VIEW intents
+                        bigPhotoPath = absolutePath
+                    }
                     val fileOutputStream = FileOutputStream(outputFile)
                     inputStream?.copyTo(fileOutputStream)
                     fileOutputStream.close()
                     inputStream?.close()
-                    resizeSetImage()
+                    currentPhotoPath = MyFunctions.resizeSetImage(this.requireActivity(), bigPhotoPath!!, storageDir?.absolutePath)
+                    imageCar.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath!!))
+                    bigPhotoPath = ""
                 }
             }
         } else {
@@ -185,31 +195,6 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
                 bigPhotoPath = ""
             }
         }
-    }
-
-    private fun resizeSetImage() {
-        currentPhotoPath = "${storageDir?.absolutePath}/profileImage.jpg"
-        val smallImageFile = File(currentPhotoPath!!)
-        val fout: OutputStream = FileOutputStream(smallImageFile)
-
-        val bigImageFile = File(bigPhotoPath!!)
-        photoURI = FileProvider.getUriForFile(
-            this.requireActivity().applicationContext,
-            "com.example.android.fileprovider",
-            bigImageFile
-        )
-        val pic = FixOrientation.handleSamplingAndRotationBitmap(
-            this.requireActivity().applicationContext,
-            photoURI
-        )
-        pic?.compress(Bitmap.CompressFormat.JPEG, 30, fout)
-        fout.flush()
-        fout.close()
-
-        imageCar.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath!!))
-
-        bigImageFile.delete()
-        bigPhotoPath = ""
     }
 
     private fun closeKeyboard() {
@@ -290,7 +275,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
             if (!hasFocus) {  // lost focus
                 price.setSelection(0, 0)
                 price.hint = ""
-                price.setText(parsePrice(price.text.toString()))
+                price.setText(MyFunctions.parsePrice(price.text.toString()))
             } else {
                 view?.findViewById<TextInputLayout>(R.id.tilPrice)?.error = null
                 price.hint = "Price"
@@ -319,24 +304,6 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
                 val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.showSoftInput(intermediateStops, InputMethodManager.SHOW_IMPLICIT)
             }
-        }
-    }
-
-    private fun parsePrice(s: String): String {
-        return if (s.contains(".")) {
-            val p = s.split(".")
-            val integer = if (p[0] == "") "0" else p[0]
-            val dec = p[1]
-            when (dec.length) {
-                0 -> "$integer.00"
-                1 -> "$integer.${dec}0"
-                else -> "$integer.${dec[0]}${dec[1]}"
-            }
-
-        } else {
-            if (s != "") {
-                "$s.00"
-            } else ""
         }
     }
 
@@ -379,23 +346,6 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         datePicker?.show(this.requireActivity().supportFragmentManager, datePicker.toString())
     }
 
-    private fun parseTime(hour: Int?, minute: Int?): String {
-        if ((hour == null) || (minute == null)) return ""
-
-        val h = if (hour < 10) "0$hour" else hour.toString()
-        val m = if (minute < 10) "0$minute" else minute.toString()
-
-        return "$h:$m"
-    }
-
-    private fun unParseTime(time: String): Int {
-        val first = time[0]
-        val second = time[1]
-        if (first.toInt() == 0) return second.toInt()
-
-        return time.toInt()
-    }
-
     private fun setTimePicker() {
         var h = 0
         var m = 0
@@ -403,8 +353,8 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         if (departureTime.text.toString() != "") {
             val s = departureTime.text.toString().split(":")
             if (s.size == 2) {
-                h = unParseTime(s[0])
-                m = unParseTime(s[1])
+                h = MyFunctions.unParseTime(s[0])
+                m = MyFunctions.unParseTime(s[1])
             }
         }
         timePicker = MaterialTimePicker.Builder()
@@ -423,7 +373,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         }
 
         timePicker?.addOnPositiveButtonClickListener {
-            departureTime.setText(parseTime(timePicker?.hour, timePicker?.minute))
+            departureTime.setText(MyFunctions.parseTime(timePicker?.hour, timePicker?.minute))
             duration.requestFocus()
         }
 
@@ -442,7 +392,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
             availableSeat = availableSeats.text.toString(),
             additionalInfo = additionalInfo.text.toString(),
             intermediateStops = intermediateStops.text.toString(),
-            price = parsePrice(price.text.toString()),
+            price = MyFunctions.parsePrice(price.text.toString()),
             ownerEmail = profile.email
         )
         trip = sharedModel.selectedLocal
@@ -468,19 +418,6 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         }
     }
 
-    @SuppressLint("SimpleDateFormat")
-    private fun createImageFile(): File {
-        // Create an image file name
-        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-
-        val filename = "${storageDir?.absolutePath}/$timeStamp.jpg"
-
-        return File(filename).apply {
-            // Save a file: path for use with ACTION_VIEW intents
-            bigPhotoPath = absolutePath
-        }
-    }
-
     private fun dispatchChoosePictureIntent() {
         val pickIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
         this.requireActivity().intent.type = "image/*"
@@ -494,7 +431,10 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
             takePictureIntent.resolveActivity(this.requireActivity().packageManager)?.also {
                 // Create the File where the photo should go
                 val photoFile: File? = try {
-                    createImageFile()
+                    MyFunctions.createImageFile(storageDir?.absolutePath).apply {
+                        // Save a file: path for use with ACTION_VIEW intents
+                        bigPhotoPath = absolutePath
+                    }
                 } catch (ex: IOException) {
                     // Error occurred while creating the File
                     null
@@ -547,12 +487,6 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     }
 
     private fun saveValues() {
-        if (trip.id == "") {
-            trip.id = FirebaseFirestore
-                .getInstance()
-                .collection("users/${profile.email}/createdTrips").document().id
-        }
-
         sharedModel.saveTrip(trip)
             .addOnCompleteListener{
                 if (it.isSuccessful) Toast.makeText(context, "Trip information saved!", Toast.LENGTH_SHORT).show()
@@ -561,40 +495,35 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
             }
     }
 
-    private fun saveValuesImage() {
+    private fun saveTrip(image: Boolean) {
         if (trip.id == "") {
             trip.id = FirebaseFirestore
                 .getInstance()
                 .collection("users/${profile.email}/createdTrips").document().id
         }
 
-        val storage = FirebaseStorage.getInstance()
-        val storageRef = storage.reference
-        val localPhoto = File(currentPhotoPath!!)
-        val file = Uri.fromFile(localPhoto)
-        val imageRef = storageRef.child("${profile.email}/${trip.id}.jpg")
-        imageRef.putFile(file)
-            .addOnCompleteListener {
-                if (it.isSuccessful) {
-                    imageRef.downloadUrl.addOnSuccessListener { uri ->
-                        trip.imageUrl = uri.toString()
-                        sharedModel.saveTrip(trip)
-                            .addOnCompleteListener{ task ->
-                                if (task.isSuccessful) Toast.makeText(context, "Trip information saved!", Toast.LENGTH_SHORT).show()
-                                else Toast.makeText(context, "Failed saving trip!", Toast.LENGTH_SHORT).show()
-                                findNavController().navigate(R.id.action_tripEdit_to_tripList)
-                            }
-                    }
-                } else {
-                    Toast.makeText(context, "Failed saving profile photo!", Toast.LENGTH_SHORT).show()
-                    sharedModel.saveTrip(trip)
-                        .addOnCompleteListener{ task ->
-                            if (!task.isSuccessful) Toast.makeText(context, "Failed saving trip!", Toast.LENGTH_SHORT).show()
-                            findNavController().navigate(R.id.action_tripEdit_to_tripList)
+        if (!image) saveValues()
+        else {
+            val storage = FirebaseStorage.getInstance()
+            val storageRef = storage.reference
+            val localPhoto = File(currentPhotoPath!!)
+            val file = Uri.fromFile(localPhoto)
+            val imageRef = storageRef.child("${profile.email}/${trip.id}.jpg")
+            imageRef.putFile(file)
+                .addOnCompleteListener {
+                    if (it.isSuccessful) {
+                        imageRef.downloadUrl.addOnSuccessListener { uri ->
+                            trip.imageUrl = uri.toString()
+                            saveValues()
                         }
+                    } else {
+                        Toast.makeText(context, "Failed saving profile photo!", Toast.LENGTH_SHORT)
+                            .show()
+                        saveValues()
+                    }
+                    currentPhotoPath = ""
+                    localPhoto.delete()
                 }
-                currentPhotoPath = ""
-                localPhoto.delete()
-            }
+        }
     }
 }

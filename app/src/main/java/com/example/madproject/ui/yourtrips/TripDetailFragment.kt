@@ -89,7 +89,7 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
 
     override fun onPause() {
         super.onPause()
-        if (sharedModel.dialogOpened)
+        if (sharedModel.bookingDialogOpened)
             sharedModel.changedOrientation = true
     }
 
@@ -120,7 +120,7 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
     }
 
     private fun createBookingDialog() {
-        sharedModel.dialogOpened = true
+        sharedModel.bookingDialogOpened = true
         MaterialAlertDialogBuilder(this.requireActivity())
             .setTitle("New Booking")
             .setMessage("Are you sure to book this trip?")
@@ -132,7 +132,7 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
                 DialogInterface.OnClickListener { _, _ ->
                 })
             .setOnDismissListener {
-                sharedModel.dialogOpened = false
+                sharedModel.bookingDialogOpened = false
             }
             .show()
     }

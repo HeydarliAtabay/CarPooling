@@ -19,6 +19,7 @@ import com.example.madproject.R
 import com.example.madproject.data.Filters
 import com.example.madproject.data.FirestoreRepository
 import com.example.madproject.data.Trip
+import com.example.madproject.lib.MyFunctions
 import com.example.madproject.ui.yourtrips.TripListViewModel
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointForward
@@ -138,7 +139,7 @@ class OthersTripListFragment : Fragment(R.layout.fragment_others_trip_list) {
                     filterViewModel.setFilter(Filters(
                         from = filterFrom.text.toString(),
                         to = filterTo.text.toString(),
-                        price = parsePrice(filterPrice.text.toString()),
+                        price = MyFunctions.parsePrice(filterPrice.text.toString()),
                         date = filterDate.text.toString(),
                         time = filterTime.text.toString()
                     ))
@@ -233,30 +234,12 @@ class OthersTripListFragment : Fragment(R.layout.fragment_others_trip_list) {
         filterPrice.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {  // lost focus
                 filterPrice.setSelection(0, 0)
-                filterPrice.setText(parsePrice(filterPrice.text.toString()))
+                filterPrice.setText(MyFunctions.parsePrice(filterPrice.text.toString()))
             } else {
                 view?.findViewById<TextInputLayout>(R.id.til_filterPrice)?.error = null
                 val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.showSoftInput(filterPrice, InputMethodManager.SHOW_IMPLICIT)
             }
-        }
-    }
-
-    private fun parsePrice(s: String): String {
-        return if (s.contains(".")) {
-            val p = s.split(".")
-            val integer = if (p[0] == "") "0" else p[0]
-            val dec = p[1]
-            when (dec.length) {
-                0 -> "$integer.00"
-                1 -> "$integer.${dec}0"
-                else -> "$integer.${dec[0]}${dec[1]}"
-            }
-
-        } else {
-            if (s != "") {
-                "$s.00"
-            } else ""
         }
     }
 
@@ -299,23 +282,6 @@ class OthersTripListFragment : Fragment(R.layout.fragment_others_trip_list) {
         datePicker?.show(this.requireActivity().supportFragmentManager, datePicker.toString())
     }
 
-    private fun parseTime(hour: Int?, minute: Int?): String {
-        if ((hour == null) || (minute == null)) return ""
-
-        val h = if (hour < 10) "0$hour" else hour.toString()
-        val m = if (minute < 10) "0$minute" else minute.toString()
-
-        return "$h:$m"
-    }
-
-    private fun unParseTime(time: String): Int {
-        val first = time[0]
-        val second = time[1]
-        if (first.toInt() == 0) return second.toInt()
-
-        return time.toInt()
-    }
-
     private fun setTimePicker() {
         var h = 0
         var m = 0
@@ -323,8 +289,8 @@ class OthersTripListFragment : Fragment(R.layout.fragment_others_trip_list) {
         if (filterTime.text.toString() != "") {
             val s = filterTime.text.toString().split(":")
             if (s.size == 2) {
-                h = unParseTime(s[0])
-                m = unParseTime(s[1])
+                h = MyFunctions.unParseTime(s[0])
+                m = MyFunctions.unParseTime(s[1])
             }
         }
         timePicker = MaterialTimePicker.Builder()
@@ -343,7 +309,7 @@ class OthersTripListFragment : Fragment(R.layout.fragment_others_trip_list) {
         }
 
         timePicker?.addOnPositiveButtonClickListener {
-            filterTime.setText(parseTime(timePicker?.hour, timePicker?.minute))
+            filterTime.setText(MyFunctions.parseTime(timePicker?.hour, timePicker?.minute))
             filterPrice.requestFocus()
         }
 

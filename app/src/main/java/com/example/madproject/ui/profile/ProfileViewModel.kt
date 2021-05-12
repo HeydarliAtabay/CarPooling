@@ -16,6 +16,10 @@ class ProfileViewModel: ViewModel() {
     var useDBImage = false
     var comingFromPrivacy = false
 
+    // This flag is used to mantain the state of the logout dialog
+    var logoutDialogOpened = false
+    var changedOrientation = false
+
 
     fun getDBUser() : LiveData<Profile>{
         FirestoreRepository().getUser().addSnapshotListener(EventListener { value, e ->

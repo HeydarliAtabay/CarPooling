@@ -3,7 +3,6 @@ package com.example.madproject.ui.profile
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap.CompressFormat
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
@@ -137,7 +136,10 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         if (resultCode == AppCompatActivity.RESULT_OK) {
             when (requestCode) {
                 Requests.INTENT_CAPTURE_PHOTO.value -> {
-                    resizeSetImage()
+
+                    currentPhotoPath = MyFunctions.resizeSetImage(this.requireActivity(), bigPhotoPath!!, storageDir?.absolutePath)
+                    image.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath!!))
+                    bigPhotoPath = ""
                 }
 
                 Requests.INTENT_PHOTO_FROM_GALLERY.value -> {
@@ -146,12 +148,17 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                             it
                         )
                     }
-                    val outputFile = createImageFile()
+                    val outputFile = MyFunctions.createImageFile(storageDir?.absolutePath).apply {
+                        // Save a file: path for use with ACTION_VIEW intents
+                        bigPhotoPath = absolutePath
+                    }
                     val fileOutputStream = FileOutputStream(outputFile)
                     inputStream?.copyTo(fileOutputStream)
                     fileOutputStream.close()
                     inputStream?.close()
-                    resizeSetImage()
+                    currentPhotoPath = MyFunctions.resizeSetImage(this.requireActivity(), bigPhotoPath!!, storageDir?.absolutePath)
+                    image.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath!!))
+                    bigPhotoPath = ""
                 }
             }
         } else {
@@ -160,31 +167,6 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                 bigPhotoPath = ""
             }
         }
-    }
-
-    private fun resizeSetImage() {
-        currentPhotoPath = "${storageDir?.absolutePath}/profileImage.jpg"
-        val smallImageFile = File(currentPhotoPath!!)
-        val fout: OutputStream = FileOutputStream(smallImageFile)
-
-        val bigImageFile = File(bigPhotoPath!!)
-        photoURI = FileProvider.getUriForFile(
-            this.requireActivity().applicationContext,
-            "com.example.android.fileprovider",
-            bigImageFile
-        )
-        val pic = FixOrientation.handleSamplingAndRotationBitmap(
-            this.requireActivity().applicationContext,
-            photoURI
-        )
-        pic?.compress(CompressFormat.JPEG, 30, fout)
-        fout.flush()
-        fout.close()
-
-        image.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath!!))
-
-        bigImageFile.delete()
-        bigPhotoPath = ""
     }
 
     private fun closeKeyboard() {
@@ -380,19 +362,6 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             }
     }
 
-    @SuppressLint("SimpleDateFormat")
-    private fun createImageFile(): File {
-        // Create an image file name
-        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-
-        val filename = "${storageDir?.absolutePath}/$timeStamp.jpg"
-
-        return File(filename).apply {
-            // Save a file: path for use with ACTION_VIEW intents
-            bigPhotoPath = absolutePath
-        }
-    }
-
     private fun dispatchChoosePictureIntent() {
         val pickIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
         this.requireActivity().intent.type = "image/*"
@@ -406,7 +375,10 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             takePictureIntent.resolveActivity(this.requireActivity().packageManager)?.also {
                 // Create the File where the photo should go
                 val photoFile: File? = try {
-                    createImageFile()
+                    MyFunctions.createImageFile(storageDir?.absolutePath).apply {
+                        // Save a file: path for use with ACTION_VIEW intents
+                        bigPhotoPath = absolutePath
+                    }
                 } catch (ex: IOException) {
                     // Error occurred while creating the File
                     null

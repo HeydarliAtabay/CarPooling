@@ -44,6 +44,7 @@ class OthersTripListFragment : Fragment(R.layout.fragment_others_trip_list) {
     private lateinit var filterDate: EditText
     private lateinit var filterTime: EditText
     private lateinit var filterPrice: EditText
+    private var tripIdInDialog = ""
     private var datePicker: MaterialDatePicker<Long>? = null
     private var timePicker: MaterialTimePicker? = null
     private val tripListViewModel: TripListViewModel by activityViewModels()
@@ -87,7 +88,9 @@ class OthersTripListFragment : Fragment(R.layout.fragment_others_trip_list) {
         })
 
         if (filterViewModel.changedOrientation) {
+            filter = filterViewModel.temporalFilters
             launchFilterDialog()
+            filterViewModel.temporalFilters = Filters()
             filterViewModel.changedOrientation = false
         }
 
@@ -95,8 +98,18 @@ class OthersTripListFragment : Fragment(R.layout.fragment_others_trip_list) {
 
     override fun onPause() {
         super.onPause()
-        if (filterViewModel.dialogOpened)
+        if (filterViewModel.dialogOpened) {
+            if (datePicker?.isVisible == true) datePicker?.dismiss()
+            if (timePicker?.isVisible == true) timePicker?.dismiss()
+            filterViewModel.temporalFilters = Filters(
+                from = filterFrom.text.toString(),
+                to = filterTo.text.toString(),
+                price = MyFunctions.parsePrice(filterPrice.text.toString()),
+                date = filterDate.text.toString(),
+                time = filterTime.text.toString()
+            )
             filterViewModel.changedOrientation = true
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -346,23 +359,36 @@ class OthersTripListFragment : Fragment(R.layout.fragment_others_trip_list) {
                 }
 
                 bookTripButton.setOnClickListener {
-                    MaterialAlertDialogBuilder(itemView.context)
-                        .setTitle("New Booking")
-                        .setMessage("Are you sure to book this trip?")
-                        .setPositiveButton("Yes",
-                            DialogInterface.OnClickListener { _, _ ->
-                                bookTheTrip(t)
-                            })
-                        .setNegativeButton("No",
-                            DialogInterface.OnClickListener { _, _ ->
-                            })
-                        .show()
+                    sharedModel.tripIdInDialog = t.id
+                    openBookingDialog(t, sharedModel)
                 }
+
+                if (sharedModel.tripIdInDialog == t.id) {
+                    openBookingDialog(t, sharedModel)
+                }
+
             }
 
             fun unbind() {
                 bookTripButton.setOnClickListener {  }
                 cv.setOnClickListener {  }
+            }
+
+            private fun openBookingDialog(t: Trip, sharedModel: TripListViewModel) {
+                MaterialAlertDialogBuilder(itemView.context)
+                    .setTitle("New Booking")
+                    .setMessage("Are you sure to book this trip?")
+                    .setPositiveButton("Yes",
+                        DialogInterface.OnClickListener { _, _ ->
+                            bookTheTrip(t)
+                        })
+                    .setNegativeButton("No",
+                        DialogInterface.OnClickListener { _, _ ->
+                        })
+                    .setOnDismissListener {
+                        sharedModel.tripIdInDialog = ""
+                    }
+                    .show()
             }
 
             private fun bookTheTrip(trip: Trip) {

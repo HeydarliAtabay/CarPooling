@@ -1,6 +1,5 @@
 package com.example.madproject.ui.yourtrips
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -25,6 +24,9 @@ class TripListViewModel: ViewModel() {
 
     // Flags used to manage the trip booking
     var comingFromOther = false
+
+    // Data used to manage the booking dialog restore state from OtherTripsFragment
+    var tripIdInDialog = ""
 
     fun getUserTrips(): LiveData<List<Trip>> {
         FirestoreRepository().getTrips().addSnapshotListener(EventListener { value, e ->

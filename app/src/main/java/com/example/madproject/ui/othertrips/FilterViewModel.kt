@@ -12,6 +12,8 @@ class FilterViewModel: ViewModel() {
     var dialogOpened = false
     var changedOrientation = false
 
+    var temporalFilters = Filters()
+
     fun getFilter(): LiveData<Filters> {
         return filter
     }

@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.text.InputType
+import android.text.TextWatcher
 import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
@@ -112,11 +113,21 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         return when (item.itemId) {
             R.id.saveButton -> {
                 updateTrip()
-                if (formCheck()) {
-                    val f = currentPhotoPath != ""
-                    saveTrip(f)
+                Log.d("test", "duration -> ${trip.duration}")
+                if ((trip.duration.isNotEmpty()) && (trip.duration.length != 5)) {
+                    view?.findViewById<TextInputLayout>(R.id.tilDuration)?.error = " "
+                    Toast.makeText(context, "Insert the duration in the required format!", Toast.LENGTH_LONG).show()
                 } else {
-                    Toast.makeText(context, "Insert the required fields to save the trip!", Toast.LENGTH_LONG).show()
+                    if (formCheck()) {
+                        val f = currentPhotoPath != ""
+                        saveTrip(f)
+                    } else {
+                        Toast.makeText(
+                            context,
+                            "Insert the required fields to save the trip!",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
                 }
                 true
             }
@@ -248,16 +259,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
             }
         }
 
-        duration.setOnFocusChangeListener { _, hasFocus ->
-            if (!hasFocus) {  // lost focus
-                duration.setSelection(0, 0)
-                duration.hint = ""
-            } else {
-                duration.hint = "Estimated duration in hours"
-                val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                imm.showSoftInput(duration, InputMethodManager.SHOW_IMPLICIT)
-            }
-        }
+        MyFunctions.durationTextListener(duration, context, view)
 
         availableSeats.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {  // lost focus
@@ -388,7 +390,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
             to = arrival.text.toString(),
             departureDate = departureDate.text.toString(),
             departureTime = departureTime.text.toString(),
-            duration = duration.text.toString(),
+            duration = MyFunctions.parseDuration(duration.text.toString()),
             availableSeat = availableSeats.text.toString(),
             additionalInfo = additionalInfo.text.toString(),
             intermediateStops = intermediateStops.text.toString(),
@@ -411,9 +413,9 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
 
         if ((trip.imageUrl == "") && (currentPhotoPath == "")) imageCar.setImageResource(R.drawable.car_example)
         else if ((trip.imageUrl == "") && (currentPhotoPath != "")) imageCar.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath))
-        else if ((trip.imageUrl != "") && (currentPhotoPath == "")) Picasso.get().load(trip.imageUrl).error(R.drawable.car_example).into(imageCar)
+        else if ((trip.imageUrl != "") && (currentPhotoPath == "")) Picasso.get().load(trip.imageUrl).placeholder(R.drawable.car_example).error(R.drawable.car_example).into(imageCar)
         else {
-            if (sharedModel.useDBImage) Picasso.get().load(trip.imageUrl).error(R.drawable.car_example).into(imageCar)
+            if (sharedModel.useDBImage) Picasso.get().load(trip.imageUrl).placeholder(R.drawable.car_example).error(R.drawable.car_example).into(imageCar)
             else imageCar.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath))
         }
     }

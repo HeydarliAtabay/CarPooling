@@ -148,7 +148,7 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
         additionalInfo.text = trip.additionalInfo
         intermediateStops.text = trip.intermediateStops
         if (trip.imageUrl != "") {
-            Picasso.get().load(trip.imageUrl).error(R.drawable.car_example).into(imageCar)
+            Picasso.get().load(trip.imageUrl).placeholder(R.drawable.car_example).error(R.drawable.car_example).into(imageCar)
         } else imageCar.setImageResource(R.drawable.car_example)
     }
 

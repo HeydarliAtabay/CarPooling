@@ -8,7 +8,7 @@
     <string name="time"> Time<sup><small>*</small></sup> </string>
     <string name="seats"> Available Seats<sup><small>*</small></sup> </string>
     <string name="price"> Price<sup><small>*</small></sup> </string>
-    <string name="duration"> Estimated Duration (hours) </string>
+    <string name="duration"> Estimated Duration (hh:mm) </string>
     <string name="info"> Additional Information </string>
     <string name="stops"> Intermediate Stops </string>
     <string name="fullName"> Full Name<sup><small>*</small></sup> </string>

@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.madproject.data.FirestoreRepository
+import com.example.madproject.data.Profile
 import com.example.madproject.data.Trip
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.EventListener
@@ -28,7 +29,12 @@ class TripListViewModel: ViewModel() {
     // Data used to manage the booking dialog restore state from OtherTripsFragment
     var tripIdInDialog = ""
 
-    fun getUserTrips(): LiveData<List<Trip>> {
+    init {
+        loadUserTrips()
+        loadOtherTrips()
+    }
+
+    private fun loadUserTrips() {
         FirestoreRepository().getTrips().addSnapshotListener(EventListener { value, e ->
             if (e != null) {
                 userTrips.value = null
@@ -43,34 +49,43 @@ class TripListViewModel: ViewModel() {
             }
             userTrips.value = retrievedTrips
         })
+    }
+
+    private fun loadOtherTrips() {
+        FirestoreRepository().getUsersList()
+            .addSnapshotListener(EventListener { value1, error1 ->
+                if (error1!= null) {
+                    return@EventListener
+                }
+                val retrievedTrips : MutableList<Trip> = mutableListOf()
+                for (user in value1!!) {
+                    user.reference.collection("createdTrips")
+                        .whereNotEqualTo("availableSeat", "0")
+                        .addSnapshotListener { value, error ->
+                            if (error != null) {
+                                otherTrips.value = null
+                            } else {
+                                for (trip in value!!) {
+                                    val t = trip.toObject(Trip::class.java)
+                                    if (t.id == selectedLocal.id) selectedDB.value = t
+                                    val toUpdate = findUpdate(t, retrievedTrips)
+                                    if (toUpdate.id != "-1")
+                                        retrievedTrips[retrievedTrips.indexOf(toUpdate)] = t
+                                    else
+                                        retrievedTrips.add(t)
+                                }
+                                otherTrips.value = retrievedTrips
+                            }
+                        }
+                }
+            })
+    }
+
+    fun getUserTrips(): LiveData<List<Trip>> {
         return userTrips
     }
 
     fun getOtherTrips(): LiveData<List<Trip>> {
-        FirestoreRepository().getUsersList().get()
-            .addOnSuccessListener {
-                val retrievedTrips : MutableList<Trip> = mutableListOf()
-                for (user in it!!) {
-                    user.reference.collection("createdTrips")
-                        .addSnapshotListener(EventListener { value, error ->
-                            if (error != null) {
-                                otherTrips.value = null
-                                return@EventListener
-                            }
-
-                            for (trip in value!!) {
-                                val t = trip.toObject(Trip::class.java)
-                                if (t.id == selectedLocal.id) selectedDB.value = t
-                                val toUpdate = findUpdate(t,retrievedTrips)
-                                if (toUpdate.id != "-1")
-                                    retrievedTrips[retrievedTrips.indexOf(toUpdate)] = t
-                                else
-                                    retrievedTrips.add(t)
-                            }
-                            otherTrips.value = retrievedTrips
-                        })
-                }
-            }
         return otherTrips
     }
 

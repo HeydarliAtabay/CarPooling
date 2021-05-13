@@ -348,7 +348,8 @@ class OthersTripListFragment : Fragment(R.layout.fragment_others_trip_list) {
                 time.text = t.departureTime
                 price.text = t.price
                 if (t.imageUrl != "") {
-                    Picasso.get().load(t.imageUrl).into(image)
+
+                    Picasso.get().load(t.imageUrl).placeholder(R.drawable.car_example).error(R.drawable.car_example).into(image)
                 } else image.setImageResource(R.drawable.car_example)
                 bookTripButton.text = "Book trip"
 

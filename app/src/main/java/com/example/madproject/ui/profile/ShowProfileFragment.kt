@@ -105,7 +105,7 @@ class ShowProfileFragment : Fragment() {
         }
 
         if (profile.imageUrl != "") {
-            Picasso.get().load(profile.imageUrl).error(R.drawable.avatar).into(image)
+            Picasso.get().load(profile.imageUrl).placeholder(R.drawable.avatar).error(R.drawable.avatar).into(image)
         } else image.setImageResource(R.drawable.avatar)
     }
 }

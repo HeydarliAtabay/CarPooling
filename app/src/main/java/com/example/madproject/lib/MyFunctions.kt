@@ -1,18 +1,19 @@
 package com.example.madproject.lib
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.provider.MediaStore
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
-import androidx.core.app.ActivityCompat.startActivityForResult
+import android.view.View
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import androidx.core.content.FileProvider
+import com.example.madproject.R
+import com.google.android.material.textfield.TextInputLayout
 import java.io.File
 import java.io.FileOutputStream
-import java.io.IOException
 import java.io.OutputStream
 import java.text.SimpleDateFormat
 import java.util.*
@@ -69,6 +70,75 @@ class MyFunctions {
                     "$s.00"
                 } else ""
             }
+        }
+
+        fun parseDuration(s: String): String {
+            if (s.isEmpty() || s.length!=5) return s
+
+            val p = s.split(":")
+            if (p[1].toInt() < 60) return s
+
+            val m = p[1].toInt() - 60
+            val h = if (p[0].toInt() == 99) p[0].toInt() else p[0].toInt() +1
+
+            val mStr = if (m > 9) m.toString() else "0$m"
+            val hStr = if (h > 9) h.toString() else "0$h"
+            return "$hStr:$mStr"
+        }
+
+        fun durationTextListener(duration: EditText, context: Context?, view: View?) {
+            duration.setOnFocusChangeListener { _, hasFocus ->
+                if (!hasFocus) {  // lost focus
+                    duration.setSelection(0, 0)
+                    duration.hint = ""
+                    duration.setText(parseDuration(duration.text.toString()))
+                } else {
+                    view?.findViewById<TextInputLayout>(R.id.tilDuration)?.error = null
+                    duration.hint = "hh:mm"
+                    val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.showSoftInput(duration, InputMethodManager.SHOW_IMPLICIT)
+                }
+            }
+
+            duration.addTextChangedListener(object: TextWatcher {
+                var edited = false
+                val dividerCharacter = ":"
+
+                override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                    if (edited) {
+                        edited = false
+                        return
+                    }
+
+                    var working = getEditText()
+
+                    working = manageDurationDivider(working, start, before)
+
+                    edited = true
+                    duration.setText(working)
+                    duration.setSelection(duration.text.length)
+                }
+
+                private fun manageDurationDivider(working: String, start: Int, before: Int) : String{
+                    if (working.length == 2) {
+                        return if (before <= 2 && start < 2)
+                            working + dividerCharacter
+                        else
+                            working.dropLast(1)
+                    }
+                    return working
+                }
+
+                private fun getEditText() : String {
+                    return if (duration.text.length >= 10)
+                        duration.text.toString().substring(0,10)
+                    else
+                        duration.text.toString()
+                }
+
+                override fun afterTextChanged(s: Editable) {}
+                override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+            })
         }
 
         fun parseTime(hour: Int?, minute: Int?): String {

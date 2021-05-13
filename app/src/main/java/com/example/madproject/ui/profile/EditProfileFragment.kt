@@ -285,9 +285,9 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
 
         if ((profile.imageUrl == "") && (currentPhotoPath == "")) image.setImageResource(R.drawable.avatar)
         else if ((profile.imageUrl == "") && (currentPhotoPath != "")) image.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath))
-        else if ((profile.imageUrl != "") && (currentPhotoPath == "")) Picasso.get().load(profile.imageUrl).error(R.drawable.avatar).into(image)
+        else if ((profile.imageUrl != "") && (currentPhotoPath == "")) Picasso.get().load(profile.imageUrl).placeholder(R.drawable.avatar).error(R.drawable.avatar).into(image)
         else {
-            if (model.useDBImage) Picasso.get().load(profile.imageUrl).error(R.drawable.avatar).into(image)
+            if (model.useDBImage) Picasso.get().load(profile.imageUrl).placeholder(R.drawable.avatar).error(R.drawable.avatar).into(image)
             else image.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath))
         }
     }

@@ -56,7 +56,7 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
 
                 fullName.text = u.fullName
                 if (u.imageUrl != "") {
-                    Picasso.get().load(u.imageUrl).error(R.drawable.avatar).into(image)
+                    Picasso.get().load(u.imageUrl).placeholder(R.drawable.avatar).error(R.drawable.avatar).into(image)
                 } else image.setImageResource(R.drawable.avatar)
 
                 cv.setOnClickListener {

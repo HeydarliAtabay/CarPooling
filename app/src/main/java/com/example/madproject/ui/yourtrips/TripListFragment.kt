@@ -76,7 +76,7 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
                 time.text = t.departureTime
                 price.text = t.price
                 if (t.imageUrl != "") {
-                    Picasso.get().load(t.imageUrl).error(R.drawable.car_example).into(image)
+                    Picasso.get().load(t.imageUrl).placeholder(R.drawable.car_example).error(R.drawable.car_example).into(image)
                 } else image.setImageResource(R.drawable.car_example)
 
                 cv.setOnClickListener {

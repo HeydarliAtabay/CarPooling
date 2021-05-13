@@ -180,7 +180,7 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/text_input_layout10"
+                android:id="@+id/tilDuration"
                 style="@style/MyTextInputLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -195,8 +195,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
                     android:ems="18"
-                    android:inputType="numberDecimal"
-                    android:maxLength="4"
+                    android:inputType="number"
+                    android:maxLength="5"
                     android:textColor="?attr/color"
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>

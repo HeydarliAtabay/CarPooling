@@ -31,7 +31,8 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
     private lateinit var price: TextView
     private lateinit var additionalInfo: TextView
     private lateinit var intermediateStops: TextView
-    private lateinit var fab: FloatingActionButton
+    private lateinit var fabBooking: FloatingActionButton
+    private lateinit var fabDelete: FloatingActionButton
     private val sharedModel: TripListViewModel by activityViewModels()
     private val userListModel: UserListViewModel by activityViewModels()
     private val profileModel: ProfileViewModel by activityViewModels()
@@ -55,13 +56,19 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
             userListModel.resetFilteredUsers()
         }
 
-        fab = view.findViewById(R.id.fabBooking)
+        fabBooking = view.findViewById(R.id.fabBooking)
+        fabDelete = view.findViewById(R.id.fabDelete)
 
         if (!sharedModel.comingFromOther) {
-            fab.hide()
+            fabBooking.hide()
+            fabDelete.show()
+            fabDelete.setOnClickListener {
+                deleteTripDialog()
+            }
         } else {
-            fab.show()
-            fab.setOnClickListener {
+            fabDelete.hide()
+            fabBooking.show()
+            fabBooking.setOnClickListener {
                 createBookingDialog()
             }
         }
@@ -70,7 +77,11 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
 
         sharedModel.getSelectedDB(trip).observe(viewLifecycleOwner, {
             if (it == null) {
-                Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_SHORT).show()
+                if (sharedModel.comingFromOther) {
+                    Toast.makeText(context, "This trip does not exist anymore!", Toast.LENGTH_SHORT).show()
+                    findNavController().navigate(R.id.action_tripDetail_to_othersTripList)
+                } else
+                    Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_SHORT).show()
             } else {
                 trip = it
                 setValuesTrip()
@@ -81,16 +92,23 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
 
         setValuesTrip()
 
-        if (sharedModel.changedOrientation) {
+        if (sharedModel.changedOrientationBooking) {
             createBookingDialog()
-            sharedModel.changedOrientation = false
+            sharedModel.changedOrientationBooking = false
+        }
+
+        if (sharedModel.changedOrientationDelete) {
+            deleteTripDialog()
+            sharedModel.changedOrientationDelete = false
         }
     }
 
     override fun onPause() {
         super.onPause()
         if (sharedModel.bookingDialogOpened)
-            sharedModel.changedOrientation = true
+            sharedModel.changedOrientationBooking = true
+        if (sharedModel.deleteDialogOpened)
+            sharedModel.changedOrientationDelete = true
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -133,6 +151,32 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
                 })
             .setOnDismissListener {
                 sharedModel.bookingDialogOpened = false
+            }
+            .show()
+    }
+
+    private fun deleteTripDialog() {
+        sharedModel.deleteDialogOpened = true
+        MaterialAlertDialogBuilder(this.requireActivity())
+            .setTitle("Delete trip")
+            .setMessage("Are you sure to delete this trip?")
+            .setPositiveButton("Yes",
+                DialogInterface.OnClickListener { _, _ ->
+                    // TODO: Transaction to remove also the bookings
+                    FirestoreRepository().deleteTrip(trip)
+                        .addOnSuccessListener {
+                            Toast.makeText(this.requireActivity(), "Trip successfully deleted!", Toast.LENGTH_SHORT).show()
+                            findNavController().navigate(R.id.action_tripDetail_to_tripList)
+                        }
+                        .addOnFailureListener {
+                            Toast.makeText(this.requireActivity(), "Failure in removing the trip!", Toast.LENGTH_SHORT).show()
+                        }
+                })
+            .setNegativeButton("No",
+                DialogInterface.OnClickListener { _, _ ->
+                })
+            .setOnDismissListener {
+                sharedModel.deleteDialogOpened = false
             }
             .show()
     }

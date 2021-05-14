@@ -69,6 +69,12 @@
             app:enterAnim="@anim/slide_in"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/slide_out" />
+        <action
+            android:id="@+id/action_tripDetail_to_othersTripList"
+            app:destination="@id/othersTripList" />
+        <action
+            android:id="@+id/action_tripDetail_to_tripList"
+            app:destination="@id/tripList" />
     </fragment>
 
     <fragment

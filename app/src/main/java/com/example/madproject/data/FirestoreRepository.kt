@@ -15,6 +15,10 @@ class FirestoreRepository() {
         return fireStoreDB.collection("users/${auth.email}/createdTrips").document(t.id).set(t)
     }
 
+    fun deleteTrip(t: Trip): Task<Void> {
+        return  fireStoreDB.collection("users/${auth.email}/createdTrips").document(t.id).delete()
+    }
+
     fun getTrips(): CollectionReference {
         return fireStoreDB.collection("users/${auth.email}/createdTrips")
     }

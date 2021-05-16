@@ -70,10 +70,11 @@ class OthersTripListFragment : Fragment(R.layout.fragment_others_trip_list) {
                 Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
             } else {
                 tripList = it
-                if (tripList.isNotEmpty()) {
+                if (tripList.isNotEmpty())
                     emptyList.visibility = View.INVISIBLE
-                    recyclerView.adapter = TripsAdapter(filteredTripList(), tripListViewModel)
-                }
+                else
+                    emptyList.visibility = View.VISIBLE
+                recyclerView.adapter = TripsAdapter(filteredTripList(), tripListViewModel)
             }
         })
 
@@ -399,6 +400,27 @@ class OthersTripListFragment : Fragment(R.layout.fragment_others_trip_list) {
                             Toast.makeText(itemView.context, "Trip already booked", Toast.LENGTH_SHORT)
                                 .show()
                         } else {
+                            FirestoreRepository().proposeBooking(trip)
+                                .addOnSuccessListener {
+                                    Toast.makeText(itemView.context, "Booking request successfully sent!", Toast.LENGTH_SHORT).show()
+                                }
+                                .addOnFailureListener {
+                                    Toast.makeText(itemView.context, "The booking request had a trouble, please retry!", Toast.LENGTH_SHORT).show()
+                                }
+                        }
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(itemView.context, "DB access failure", Toast.LENGTH_SHORT).show()
+                    }
+            }
+            /*
+            private fun bookTheTrip(trip: Trip) {
+                FirestoreRepository().controlBooking(trip)
+                    .addOnSuccessListener {
+                        if (it.documents.size != 0) {
+                            Toast.makeText(itemView.context, "Trip already booked", Toast.LENGTH_SHORT)
+                                .show()
+                        } else {
                             try {
                                 FirestoreRepository().bookingTransaction(trip)
                                     .addOnSuccessListener {
@@ -416,6 +438,8 @@ class OthersTripListFragment : Fragment(R.layout.fragment_others_trip_list) {
                         Toast.makeText(itemView.context, "DB access failure", Toast.LENGTH_SHORT).show()
                     }
             }
+
+             */
         }
 
         override fun onViewRecycled(holder: TripViewHolder) {

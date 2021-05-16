@@ -17,6 +17,7 @@ import com.example.madproject.ui.yourtrips.interestedusers.UserListViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.firestore.FirebaseFirestoreException
+import com.google.firebase.storage.FirebaseStorage
 import com.squareup.picasso.Picasso
 
 class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
@@ -142,13 +143,10 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
         MaterialAlertDialogBuilder(this.requireActivity())
             .setTitle("New Booking")
             .setMessage("Are you sure to book this trip?")
-            .setPositiveButton("Yes",
-                DialogInterface.OnClickListener { _, _ ->
-                    bookTheTrip()
-                })
-            .setNegativeButton("No",
-                DialogInterface.OnClickListener { _, _ ->
-                })
+            .setPositiveButton("Yes") { _, _ ->
+                bookTheTrip()
+            }
+            .setNegativeButton("No") { _, _ -> }
             .setOnDismissListener {
                 sharedModel.bookingDialogOpened = false
             }
@@ -160,21 +158,31 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
         MaterialAlertDialogBuilder(this.requireActivity())
             .setTitle("Delete trip")
             .setMessage("Are you sure to delete this trip?")
-            .setPositiveButton("Yes",
-                DialogInterface.OnClickListener { _, _ ->
-                    // TODO: Transaction to remove also the bookings
-                    FirestoreRepository().deleteTrip(trip)
-                        .addOnSuccessListener {
-                            Toast.makeText(this.requireActivity(), "Trip successfully deleted!", Toast.LENGTH_SHORT).show()
-                            findNavController().navigate(R.id.action_tripDetail_to_tripList)
-                        }
-                        .addOnFailureListener {
-                            Toast.makeText(this.requireActivity(), "Failure in removing the trip!", Toast.LENGTH_SHORT).show()
-                        }
-                })
-            .setNegativeButton("No",
-                DialogInterface.OnClickListener { _, _ ->
-                })
+            .setPositiveButton("Yes") { _, _ ->
+                FirestoreRepository().deleteTrip(trip)
+                    .addOnSuccessListener {
+
+                        FirebaseStorage.getInstance().reference
+                            .child("${FirestoreRepository.auth.email}/${trip.id}.jpg")
+                            .delete()
+
+                        Toast.makeText(
+                            this.requireActivity(),
+                            "Trip successfully deleted!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        findNavController().navigate(R.id.action_tripDetail_to_tripList)
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(
+                            this.requireActivity(),
+                            "Failure in removing the trip!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+            }
+            .setNegativeButton("No") { _, _ ->
+            }
             .setOnDismissListener {
                 sharedModel.deleteDialogOpened = false
             }
@@ -196,6 +204,28 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
         } else imageCar.setImageResource(R.drawable.car_example)
     }
 
+    private fun bookTheTrip() {
+        FirestoreRepository().controlBooking(trip)
+            .addOnSuccessListener {
+                if (it.documents.size != 0) {
+                    Toast.makeText(this.requireActivity(), "Trip already booked", Toast.LENGTH_SHORT)
+                        .show()
+                } else {
+                    FirestoreRepository().proposeBooking(trip)
+                        .addOnSuccessListener {
+                            Toast.makeText(this.requireActivity(), "Booking request successfully sent!", Toast.LENGTH_SHORT).show()
+                        }
+                        .addOnFailureListener {
+                            Toast.makeText(this.requireActivity(), "The booking request had a trouble, please retry!", Toast.LENGTH_SHORT).show()
+                        }
+                }
+            }
+            .addOnFailureListener {
+                Toast.makeText(this.requireActivity(), "DB access failure", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    /*
     private fun bookTheTrip() {
         FirestoreRepository().controlBooking(trip)
             .addOnSuccessListener {
@@ -227,4 +257,5 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
                     .show()
             }
     }
+     */
 }

@@ -3,14 +3,12 @@ package com.example.madproject.ui.yourtrips
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.text.InputType
-import android.text.TextWatcher
 import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
@@ -21,12 +19,10 @@ import androidx.core.content.FileProvider
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.madproject.R
-import com.example.madproject.data.Profile
+import com.example.madproject.data.FirestoreRepository
 import com.example.madproject.data.Trip
-import com.example.madproject.lib.FixOrientation
 import com.example.madproject.lib.MyFunctions
 import com.example.madproject.lib.Requests
-import com.example.madproject.ui.profile.ProfileViewModel
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -57,9 +53,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     private var datePicker: MaterialDatePicker<Long>? = null
     private var timePicker: MaterialTimePicker? = null
     private val sharedModel: TripListViewModel by activityViewModels()
-    private val profileModel: ProfileViewModel by activityViewModels()
     private lateinit var trip: Trip
-    private var profile = Profile()
     private var storageDir: File? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -74,14 +68,6 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         additionalInfo = view.findViewById(R.id.info)
         intermediateStops = view.findViewById(R.id.intermediate_stops)
         storageDir = this.requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-
-        profileModel.getDBUser().observe(viewLifecycleOwner, {
-            if (it == null) {
-                Toast.makeText(this.requireActivity(), "Firebase Failure!", Toast.LENGTH_LONG).show()
-            } else {
-                profile = it
-            }
-        })
 
         trip = sharedModel.selectedLocal
         currentPhotoPath = sharedModel.currentPhotoPath
@@ -395,7 +381,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
             additionalInfo = additionalInfo.text.toString(),
             intermediateStops = intermediateStops.text.toString(),
             price = MyFunctions.parsePrice(price.text.toString()),
-            ownerEmail = profile.email
+            ownerEmail = FirestoreRepository.auth.email!!
         )
         trip = sharedModel.selectedLocal
     }
@@ -499,9 +485,8 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
 
     private fun saveTrip(image: Boolean) {
         if (trip.id == "") {
-            trip.id = FirebaseFirestore
-                .getInstance()
-                .collection("users/${profile.email}/createdTrips").document().id
+            trip.id = FirebaseFirestore.getInstance()
+                .collection("trips").document().id
         }
 
         if (!image) saveValues()
@@ -510,7 +495,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
             val storageRef = storage.reference
             val localPhoto = File(currentPhotoPath!!)
             val file = Uri.fromFile(localPhoto)
-            val imageRef = storageRef.child("${profile.email}/${trip.id}.jpg")
+            val imageRef = storageRef.child("${FirestoreRepository.auth.email}/${trip.id}.jpg")
             imageRef.putFile(file)
                 .addOnCompleteListener {
                     if (it.isSuccessful) {

@@ -1,5 +1,6 @@
 package com.example.madproject.ui.yourtrips.interestedusers
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -14,6 +15,7 @@ class UserListViewModel: ViewModel() {
     private var allUsers = mutableListOf<Profile>()
     private var filteredUsers : MutableLiveData<List<Profile>> = MutableLiveData(listOf())
     private var selectedDBUser: MutableLiveData<Profile> = MutableLiveData(Profile())
+    private var selectedBookings: List<Booking> = listOf()
     var selectedLocalUser = Profile()
     var selectedLocalTrip = Trip()
 
@@ -38,14 +40,7 @@ class UserListViewModel: ViewModel() {
                 if (u.email == selectedLocalUser.email) selectedDBUser.value = u
 
                 // Update the list of users who booked a selected trip
-                if (filteredUsers.value != null) {
-                    for (user in filteredUsers.value!!) {
-                        if (u.email == user.email) {
-                            retrievedFilteredUsers.add(u)
-                            break
-                        }
-                    }
-                }
+                if (filteredUsers.value?.contains(u) == true) retrievedFilteredUsers.add(u)
             }
             allUsers = retrievedUsers
             filteredUsers.value = retrievedFilteredUsers
@@ -53,7 +48,7 @@ class UserListViewModel: ViewModel() {
     }
 
     fun getUsers(): LiveData<List<Profile>> {
-        FirestoreRepository().getBookings(selectedLocalTrip).addSnapshotListener(EventListener { value, e ->
+        FirestoreRepository().getProposals(selectedLocalTrip).addSnapshotListener(EventListener { value, e ->
 
             if (e != null) {
                 filteredUsers.value = null
@@ -61,13 +56,16 @@ class UserListViewModel: ViewModel() {
             }
 
             val retrievedUsers : MutableList<Profile> = mutableListOf()
+            val retrievedBookings : MutableList<Booking> = mutableListOf()
             for (doc in value!!) {
                 val booking = doc.toObject(Booking::class.java)
+                retrievedBookings.add(booking)
                 for (user in allUsers) {
                     if (booking.clientEmail == user.email) retrievedUsers.add(user)
                 }
             }
             filteredUsers.value = retrievedUsers
+            selectedBookings = retrievedBookings
         })
         return filteredUsers
     }
@@ -77,13 +75,23 @@ class UserListViewModel: ViewModel() {
     }
 
     fun getSelectedDB(): LiveData<Profile> {
-        for (user in allUsers) {
-            if (user.email == selectedLocalUser.email) {
-                selectedDBUser.value = user
-                break
-            }
-        }
+
+        if (allUsers.contains(selectedLocalUser))
+            selectedDBUser.value = allUsers[allUsers.indexOf(selectedLocalUser)]
+
         return selectedDBUser
+    }
+
+    fun getBooking(u: Profile): Booking {
+        for (b in selectedBookings)
+            if (b.clientEmail == u.email) return b
+        return Booking()
+    }
+
+    fun setBookingFlag(u: Profile) {
+        for (b in selectedBookings)
+            if (b.clientEmail == u.email)
+                FirestoreRepository().setProposalFlag(b, selectedLocalTrip, !b.confirmed)
     }
 
 }

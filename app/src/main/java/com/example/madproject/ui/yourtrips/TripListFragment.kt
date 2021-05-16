@@ -1,6 +1,7 @@
 package com.example.madproject.ui.yourtrips
 
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.widget.Button
@@ -45,8 +46,11 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
                 if (tripList.isNotEmpty()) {
                     emptyList.visibility = View.INVISIBLE
                     emptyList2.visibility = View.INVISIBLE
-                    recyclerView.adapter = TripsAdapter(tripList.toList(), tripListViewModel)
+                } else {
+                    emptyList.visibility = View.VISIBLE
+                    emptyList2.visibility = View.VISIBLE
                 }
+                recyclerView.adapter = TripsAdapter(tripList.toList(), tripListViewModel)
             }
         })
 

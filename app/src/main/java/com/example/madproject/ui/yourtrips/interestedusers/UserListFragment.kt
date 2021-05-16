@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -37,10 +38,11 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
                 Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
             } else {
                 userList = it
-                if (userList.isNotEmpty()) {
+                if (userList.isNotEmpty())
                     emptyList.visibility = View.INVISIBLE
-                    recyclerView.adapter = UsersAdapter(userList.toList(), userListViewModel)
-                }
+                else
+                    emptyList.visibility = View.VISIBLE
+                recyclerView.adapter = UsersAdapter(userList.toList(), userListViewModel)
             }
         })
     }
@@ -51,10 +53,15 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
             private val image = itemView.findViewById<ImageView>(R.id.imageUser)
             private val fullName = itemView.findViewById<TextView>(R.id.name)
             private val cv = itemView.findViewById<CardView>(R.id.card_view)
+            private val check = itemView.findViewById<ImageButton>(R.id.checkedButt)
 
             fun bind(u: Profile, sharedModel: UserListViewModel) {
 
                 fullName.text = u.fullName
+
+                if (sharedModel.getBooking(u).confirmed) check.setImageResource(R.drawable.ic_icons8_checked_32_yes)
+                else check.setImageResource(R.drawable.ic_icons8_checked_32_no)
+
                 if (u.imageUrl != "") {
                     Picasso.get().load(u.imageUrl).placeholder(R.drawable.avatar).error(R.drawable.avatar).into(image)
                 } else image.setImageResource(R.drawable.avatar)
@@ -62,6 +69,12 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
                 cv.setOnClickListener {
                     sharedModel.selectedLocalUser = u
                     Navigation.findNavController(itemView).navigate(R.id.action_userList_to_showProfilePrivacy)
+                }
+
+                check.setOnClickListener {
+                    sharedModel.setBookingFlag(u)
+                    if (sharedModel.getBooking(u).confirmed) check.setImageResource(R.drawable.ic_icons8_checked_32_yes)
+                    else check.setImageResource(R.drawable.ic_icons8_checked_32_no)
                 }
             }
 

@@ -3,6 +3,7 @@ package com.example.madproject.data
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.*
+import com.google.firebase.storage.FirebaseStorage
 
 class FirestoreRepository() {
     private var fireStoreDB = FirebaseFirestore.getInstance()
@@ -11,12 +12,27 @@ class FirestoreRepository() {
         lateinit var auth: FirebaseUser
     }
 
-    fun insertTrip(t: Trip): Task<Void> {
-        return fireStoreDB.collection("users/${auth.email}/createdTrips").document(t.id).set(t)
+    fun insertTrip(t: Trip): Task<Transaction> {
+
+        return fireStoreDB.runTransaction { transaction ->
+
+            transaction.set(
+                fireStoreDB.collection("trips").document(t.id),
+                mapOf("tripId" to t.id)
+            )
+
+            transaction.set(
+                fireStoreDB.collection("users/${auth.email}/createdTrips").document(t.id),
+                t
+            )
+        }
     }
 
-    fun deleteTrip(t: Trip): Task<Void> {
-        return  fireStoreDB.collection("users/${auth.email}/createdTrips").document(t.id).delete()
+    fun deleteTrip(t: Trip): Task<Transaction> {
+        return fireStoreDB.runTransaction { transaction ->
+            transaction.delete(fireStoreDB.collection("users/${auth.email}/createdTrips").document(t.id))
+            transaction.delete(fireStoreDB.collection("trips").document(t.id))
+        }
     }
 
     fun getTrips(): CollectionReference {
@@ -33,14 +49,20 @@ class FirestoreRepository() {
 
     fun controlBooking(t: Trip): Task<QuerySnapshot> {
         val p = auth.email
-        return fireStoreDB.collection("bookings")
-            .whereEqualTo("tripId", t.id)
+        return fireStoreDB.collection("trips/${t.id}/proposals")
             .whereEqualTo("clientEmail", p)
             .get()
     }
 
+    fun proposeBooking(t: Trip): Task<Void> {
+        val newBookingId = fireStoreDB.collection("trips/${t.id}/proposals").document().id
+        return fireStoreDB.collection("trips/${t.id}/proposals")
+            .document(newBookingId)
+            .set(Booking(id = newBookingId,clientEmail = auth.email!!))
+    }
+
     fun bookingTransaction(t: Trip): Task<Transaction> {
-        val booking = Booking(auth.email!!, t.id)
+        val booking = Booking(auth.email!!)
         val tripIWantToBook =
             fireStoreDB.collection("users/${t.ownerEmail}/createdTrips").document(t.id)
         val newBooking = fireStoreDB.collection("bookings").document()
@@ -60,8 +82,13 @@ class FirestoreRepository() {
         }
     }
 
-    fun getBookings(t: Trip): Query {
-        return fireStoreDB.collection("bookings").whereEqualTo("tripId", t.id)
+    fun getProposals(t: Trip): Query {
+        return fireStoreDB.collection("trips/${t.id}/proposals")
+    }
+
+    fun setProposalFlag(b: Booking, t: Trip, flag: Boolean): Task<Void> {
+        return fireStoreDB.collection("trips/${t.id}/proposals").document(b.id)
+            .update("confirmed", flag)
     }
 
     fun getUsersList(): Query {

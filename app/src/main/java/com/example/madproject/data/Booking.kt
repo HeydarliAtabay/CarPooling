@@ -1,6 +1,7 @@
 package com.example.madproject.data
 
 data class Booking(
+    val id: String = "",
     val clientEmail : String = "",
-    val tripId : String = ""
+    var confirmed: Boolean = false
 )

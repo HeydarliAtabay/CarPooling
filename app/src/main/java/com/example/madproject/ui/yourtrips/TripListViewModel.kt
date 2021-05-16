@@ -9,6 +9,7 @@ import com.example.madproject.data.Profile
 import com.example.madproject.data.Trip
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.EventListener
+import com.google.firebase.firestore.Transaction
 
 class TripListViewModel: ViewModel() {
 
@@ -47,10 +48,12 @@ class TripListViewModel: ViewModel() {
             val retrievedTrips: MutableList<Trip> = mutableListOf()
             for (doc in value!!) {
                 val t = doc.toObject(Trip::class.java)
+                Log.d("test", "Load trip -> $t")
                 retrievedTrips.add(t)
                 if (t.id == selectedLocal.id) selectedDB.value = t
             }
             userTrips.value = retrievedTrips
+            Log.d("test", "Loaded trips -> ${userTrips.value}")
         })
     }
 
@@ -63,7 +66,6 @@ class TripListViewModel: ViewModel() {
                 val retrievedTrips : MutableList<Trip> = mutableListOf()
                 for (user in value1!!) {
                     user.reference.collection("createdTrips")
-                        .whereNotEqualTo("availableSeat", "0")
                         .addSnapshotListener { value, error ->
                             if (error != null) {
                                 otherTrips.value = null
@@ -71,18 +73,20 @@ class TripListViewModel: ViewModel() {
                                 val updatedList: MutableList<Trip> = mutableListOf()
                                 for (trip in value!!) {
                                     val t = trip.toObject(Trip::class.java)
-                                    if (t.id == selectedLocal.id) selectedDB.value = t
-                                    val toUpdate = findUpdate(t, retrievedTrips)
-                                    if (toUpdate.id != "-1")
-                                        retrievedTrips[retrievedTrips.indexOf(toUpdate)] = t
-                                    else
-                                        retrievedTrips.add(t)
+                                    if (t.availableSeat.toInt() == 0) {
+                                        if (t == selectedDB.value) selectedDB.value = null
+                                        if (retrievedTrips.contains(t)) { retrievedTrips.remove(t) }
+                                        break
+                                    }
+                                    if (t == selectedLocal) selectedDB.value = t
+                                    if (retrievedTrips.contains(t)) retrievedTrips[retrievedTrips.indexOf(t)] = t
+                                    else retrievedTrips.add(t)
                                     updatedList.add(t)
                                 }
                                 val toRemove = findDeleted(updatedList, retrievedTrips)
                                 if (toRemove.id != "-1") {
                                     retrievedTrips.remove(toRemove)
-                                    if (selectedDB.value?.id == toRemove.id)
+                                    if (selectedDB.value == toRemove)
                                         selectedDB.value = null
                                 }
                                 otherTrips.value = retrievedTrips
@@ -100,13 +104,6 @@ class TripListViewModel: ViewModel() {
         return otherTrips
     }
 
-    private fun findUpdate(t: Trip, trips: List<Trip>): Trip {
-        for (trip in trips) {
-            if (t.id == trip.id) return trip
-        }
-        return Trip(id = "-1")
-    }
-
     private fun findDeleted(upd: List<Trip>, comp: List<Trip>): Trip {
 
         // If the size of upd and the subList of comp belonging to ownerEmail is the same it means that
@@ -116,15 +113,15 @@ class TripListViewModel: ViewModel() {
         if (upd.size == filtered.size) return Trip(id = "-1")
 
         for (t1 in filtered) {
-            // If in upd there is no id with the id in comp, it means that id was deleted
-            if (upd.none { trip -> trip.id == t1.id })
+            // If upd does not contains t1, it means that id was deleted
+            if (!upd.contains(t1))
                 return t1
         }
 
         return Trip(id = "-1")
     }
 
-    fun saveTrip(t: Trip): Task<Void> {
+    fun saveTrip(t: Trip): Task<Transaction> {
         return FirestoreRepository().insertTrip(t)
     }
 

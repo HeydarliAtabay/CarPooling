@@ -48,12 +48,10 @@ class TripListViewModel: ViewModel() {
             val retrievedTrips: MutableList<Trip> = mutableListOf()
             for (doc in value!!) {
                 val t = doc.toObject(Trip::class.java)
-                Log.d("test", "Load trip -> $t")
                 retrievedTrips.add(t)
                 if (t.id == selectedLocal.id) selectedDB.value = t
             }
             userTrips.value = retrievedTrips
-            Log.d("test", "Loaded trips -> ${userTrips.value}")
         })
     }
 

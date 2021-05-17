@@ -99,7 +99,6 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         return when (item.itemId) {
             R.id.saveButton -> {
                 updateTrip()
-                Log.d("test", "duration -> ${trip.duration}")
                 if ((trip.duration.isNotEmpty()) && (trip.duration.length != 5)) {
                     view?.findViewById<TextInputLayout>(R.id.tilDuration)?.error = " "
                     Toast.makeText(context, "Insert the duration in the required format!", Toast.LENGTH_LONG).show()

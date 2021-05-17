@@ -106,7 +106,7 @@
     <fragment
         android:id="@+id/userList"
         android:name="com.example.madproject.ui.yourtrips.interestedusers.UserListFragment"
-        android:label="Users list"
+        android:label="Bookings Management"
         tools:layout="@layout/fragment_user_list" >
         <action
             android:id="@+id/action_userList_to_showProfilePrivacy"

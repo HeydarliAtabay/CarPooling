@@ -130,6 +130,7 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
             }
             R.id.profilesButton -> {
                 userListModel.selectedLocalTrip = trip
+                userListModel.tabBookings = false
                 profileModel.comingFromPrivacy = true
                 findNavController().navigate(R.id.action_tripDetail_to_userList)
                 true

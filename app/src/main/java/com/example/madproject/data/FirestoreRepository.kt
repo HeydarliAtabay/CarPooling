@@ -86,6 +86,10 @@ class FirestoreRepository() {
         return fireStoreDB.collection("trips/${t.id}/proposals")
     }
 
+    fun getConfirmed(t: Trip): Query {
+        return fireStoreDB.collection("trips/${t.id}/confirmedBookings")
+    }
+
     fun setProposalFlag(b: Booking, t: Trip, flag: Boolean): Task<Void> {
         return fireStoreDB.collection("trips/${t.id}/proposals").document(b.id)
             .update("confirmed", flag)

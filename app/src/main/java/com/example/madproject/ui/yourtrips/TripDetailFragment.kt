@@ -1,6 +1,5 @@
 package com.example.madproject.ui.yourtrips
 
-import android.content.DialogInterface
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
@@ -16,7 +15,6 @@ import com.example.madproject.ui.profile.ProfileViewModel
 import com.example.madproject.ui.yourtrips.interestedusers.UserListViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.storage.FirebaseStorage
 import com.squareup.picasso.Picasso
 
@@ -206,18 +204,31 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
     }
 
     private fun bookTheTrip() {
-        FirestoreRepository().controlBooking(trip)
-            .addOnSuccessListener {
-                if (it.documents.size != 0) {
+        FirestoreRepository().controlBookings(trip)
+            .addOnSuccessListener { it1 ->
+                if (it1.documents.size != 0) {
                     Toast.makeText(this.requireActivity(), "Trip already booked", Toast.LENGTH_SHORT)
                         .show()
                 } else {
-                    FirestoreRepository().proposeBooking(trip)
-                        .addOnSuccessListener {
-                            Toast.makeText(this.requireActivity(), "Booking request successfully sent!", Toast.LENGTH_SHORT).show()
+
+                    FirestoreRepository().controlProposals(trip)
+                        .addOnSuccessListener { it2 ->
+                            if (it2.documents.size != 0) {
+                                Toast.makeText(this.requireActivity(), "Trip already booked", Toast.LENGTH_SHORT)
+                                    .show()
+                            } else {
+
+                                FirestoreRepository().proposeBooking(trip)
+                                    .addOnSuccessListener {
+                                        Toast.makeText(this.requireActivity(), "Booking request successfully sent!", Toast.LENGTH_SHORT).show()
+                                    }
+                                    .addOnFailureListener {
+                                        Toast.makeText(this.requireActivity(), "The booking request had a trouble, please retry!", Toast.LENGTH_SHORT).show()
+                                    }
+                            }
                         }
                         .addOnFailureListener {
-                            Toast.makeText(this.requireActivity(), "The booking request had a trouble, please retry!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this.requireActivity(), "DB access failure", Toast.LENGTH_SHORT).show()
                         }
                 }
             }

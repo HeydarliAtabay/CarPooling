@@ -28,7 +28,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
-import com.google.firebase.firestore.FirebaseFirestoreException
 import com.squareup.picasso.Picasso
 import java.text.SimpleDateFormat
 import java.util.*
@@ -44,7 +43,6 @@ class OthersTripListFragment : Fragment(R.layout.fragment_others_trip_list) {
     private lateinit var filterDate: EditText
     private lateinit var filterTime: EditText
     private lateinit var filterPrice: EditText
-    private var tripIdInDialog = ""
     private var datePicker: MaterialDatePicker<Long>? = null
     private var timePicker: MaterialTimePicker? = null
     private val tripListViewModel: TripListViewModel by activityViewModels()
@@ -148,19 +146,19 @@ class OthersTripListFragment : Fragment(R.layout.fragment_others_trip_list) {
 
         filterDialogBuilder.setView(filterDialogView)
             .setTitle("Filter the trip list")
-            .setPositiveButton("Apply",
-                DialogInterface.OnClickListener { _, _ ->
-                    filterViewModel.setFilter(Filters(
+            .setPositiveButton("Apply") { _, _ ->
+                filterViewModel.setFilter(
+                    Filters(
                         from = filterFrom.text.toString(),
                         to = filterTo.text.toString(),
                         price = MyFunctions.parsePrice(filterPrice.text.toString()),
                         date = filterDate.text.toString(),
                         time = filterTime.text.toString()
-                    ))
-                })
-            .setNegativeButton("Cancel",
-                DialogInterface.OnClickListener { _, _ ->
-                })
+                    )
+                )
+            }
+            .setNegativeButton("Cancel") { _, _ ->
+            }
             .setOnDismissListener {
                 filterViewModel.dialogOpened = false
             }
@@ -380,13 +378,11 @@ class OthersTripListFragment : Fragment(R.layout.fragment_others_trip_list) {
                 MaterialAlertDialogBuilder(itemView.context)
                     .setTitle("New Booking")
                     .setMessage("Are you sure to book this trip?")
-                    .setPositiveButton("Yes",
-                        DialogInterface.OnClickListener { _, _ ->
-                            bookTheTrip(t)
-                        })
-                    .setNegativeButton("No",
-                        DialogInterface.OnClickListener { _, _ ->
-                        })
+                    .setPositiveButton("Yes") { _, _ ->
+                        bookTheTrip(t)
+                    }
+                    .setNegativeButton("No") { _, _ ->
+                    }
                     .setOnDismissListener {
                         sharedModel.tripIdInDialog = ""
                     }
@@ -394,18 +390,29 @@ class OthersTripListFragment : Fragment(R.layout.fragment_others_trip_list) {
             }
 
             private fun bookTheTrip(trip: Trip) {
-                FirestoreRepository().controlBooking(trip)
-                    .addOnSuccessListener {
-                        if (it.documents.size != 0) {
+                FirestoreRepository().controlBookings(trip)
+                    .addOnSuccessListener { it1 ->
+                        if (it1.documents.size != 0) {
                             Toast.makeText(itemView.context, "Trip already booked", Toast.LENGTH_SHORT)
                                 .show()
                         } else {
-                            FirestoreRepository().proposeBooking(trip)
-                                .addOnSuccessListener {
-                                    Toast.makeText(itemView.context, "Booking request successfully sent!", Toast.LENGTH_SHORT).show()
+                            FirestoreRepository().controlProposals(trip)
+                                .addOnSuccessListener { it2 ->
+                                    if (it2.documents.size != 0) {
+                                        Toast.makeText(itemView.context, "Trip already booked", Toast.LENGTH_SHORT)
+                                            .show()
+                                    } else {
+                                        FirestoreRepository().proposeBooking(trip)
+                                            .addOnSuccessListener {
+                                                Toast.makeText(itemView.context, "Booking request successfully sent!", Toast.LENGTH_SHORT).show()
+                                            }
+                                            .addOnFailureListener {
+                                                Toast.makeText(itemView.context, "The booking request had a trouble, please retry!", Toast.LENGTH_SHORT).show()
+                                            }
+                                    }
                                 }
                                 .addOnFailureListener {
-                                    Toast.makeText(itemView.context, "The booking request had a trouble, please retry!", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(itemView.context, "DB access failure", Toast.LENGTH_SHORT).show()
                                 }
                         }
                     }
@@ -413,33 +420,6 @@ class OthersTripListFragment : Fragment(R.layout.fragment_others_trip_list) {
                         Toast.makeText(itemView.context, "DB access failure", Toast.LENGTH_SHORT).show()
                     }
             }
-            /*
-            private fun bookTheTrip(trip: Trip) {
-                FirestoreRepository().controlBooking(trip)
-                    .addOnSuccessListener {
-                        if (it.documents.size != 0) {
-                            Toast.makeText(itemView.context, "Trip already booked", Toast.LENGTH_SHORT)
-                                .show()
-                        } else {
-                            try {
-                                FirestoreRepository().bookingTransaction(trip)
-                                    .addOnSuccessListener {
-                                        Toast.makeText(itemView.context, "Trip booked successfully", Toast.LENGTH_SHORT).show()
-                                    }
-                                    .addOnFailureListener { mes ->
-                                        Toast.makeText(itemView.context, mes.message, Toast.LENGTH_SHORT).show()
-                                    }
-                            } catch (e: FirebaseFirestoreException) {
-                                Toast.makeText(itemView.context, e.message, Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                    }
-                    .addOnFailureListener {
-                        Toast.makeText(itemView.context, "DB access failure", Toast.LENGTH_SHORT).show()
-                    }
-            }
-
-             */
         }
 
         override fun onViewRecycled(holder: TripViewHolder) {

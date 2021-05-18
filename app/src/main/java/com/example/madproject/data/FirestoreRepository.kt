@@ -3,7 +3,6 @@ package com.example.madproject.data
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.*
-import com.google.firebase.storage.FirebaseStorage
 
 class FirestoreRepository() {
     private var fireStoreDB = FirebaseFirestore.getInstance()
@@ -39,6 +38,10 @@ class FirestoreRepository() {
         return fireStoreDB.collection("users/${auth.email}/createdTrips")
     }
 
+    fun getTrip(t: Trip): DocumentReference {
+        return fireStoreDB.collection("users/${auth.email}/createdTrips").document(t.id)
+    }
+
     fun getUser(): DocumentReference {
         return fireStoreDB.collection("users").document(auth.email!!)
     }
@@ -47,36 +50,61 @@ class FirestoreRepository() {
         return fireStoreDB.collection("users").document(auth.email!!).set(p)
     }
 
-    fun controlBooking(t: Trip): Task<QuerySnapshot> {
+    fun controlProposals(t: Trip): Task<QuerySnapshot> {
         val p = auth.email
+
         return fireStoreDB.collection("trips/${t.id}/proposals")
+            .whereEqualTo("clientEmail", p)
+            .get()
+    }
+
+    fun controlBookings(t: Trip): Task<QuerySnapshot> {
+        val p = auth.email
+
+        return fireStoreDB.collection("trips/${t.id}/confirmedBookings")
             .whereEqualTo("clientEmail", p)
             .get()
     }
 
     fun proposeBooking(t: Trip): Task<Void> {
         val newBookingId = fireStoreDB.collection("trips/${t.id}/proposals").document().id
-        return fireStoreDB.collection("trips/${t.id}/proposals")
-            .document(newBookingId)
-            .set(Booking(id = newBookingId,clientEmail = auth.email!!))
+
+        return fireStoreDB.collection("trips/${t.id}/proposals").document(newBookingId)
+                .set(Booking(id = newBookingId,clientEmail = auth.email!!))
     }
 
-    fun bookingTransaction(t: Trip): Task<Transaction> {
-        val booking = Booking(auth.email!!)
-        val tripIWantToBook =
-            fireStoreDB.collection("users/${t.ownerEmail}/createdTrips").document(t.id)
-        val newBooking = fireStoreDB.collection("bookings").document()
+    fun bookingTransaction(t: Trip, bookingsConfirmed: List<Booking>, proposals: List<Booking>): Task<Transaction> {
+
+        val tripIWantToBook = fireStoreDB.collection("users/${t.ownerEmail}/createdTrips").document(t.id)
+
         return fireStoreDB.runTransaction { transaction ->
+
             val snapshotTrip = transaction.get(tripIWantToBook)
             val availableSeats = snapshotTrip.getString("availableSeat")!!.toInt()
-            if (availableSeats > 0) {
-                val newAvailableSeats = availableSeats - 1
-                transaction.update(tripIWantToBook, "availableSeat", newAvailableSeats.toString())
-                transaction.set(newBooking, booking)
+            if (availableSeats >= bookingsConfirmed.size) {
+                val newAvailableSeats = availableSeats - bookingsConfirmed.size
+                for (b in bookingsConfirmed) {
+                    b.confirmed = true
+                    transaction.set(
+                        fireStoreDB.collection("trips/${t.id}/confirmedBookings").document(b.id),
+                        b
+                    )
+                    transaction.delete(
+                        fireStoreDB.collection("trips/${t.id}/proposals").document(b.id)
+                    )
+                }
+                if (newAvailableSeats == 0) {
+                    for (b in proposals) {
+                        transaction.delete(
+                            fireStoreDB.collection("trips/${t.id}/proposals").document(b.id)
+                        )
+                    }
+                }
 
+                transaction.update(tripIWantToBook, "availableSeat", newAvailableSeats.toString())
             } else {
                 throw RuntimeException(
-                    "No available seats"
+                    "Problem in the confirmation, only $availableSeats available seats!"
                 )
             }
         }

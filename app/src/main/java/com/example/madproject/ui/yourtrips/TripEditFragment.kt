@@ -9,7 +9,6 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.text.InputType
-import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.view.inputmethod.InputMethodManager

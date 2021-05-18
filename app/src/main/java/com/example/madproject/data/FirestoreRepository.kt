@@ -4,7 +4,7 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.*
 
-class FirestoreRepository() {
+class FirestoreRepository {
     private var fireStoreDB = FirebaseFirestore.getInstance()
 
     companion object{

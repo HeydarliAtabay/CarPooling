@@ -2,10 +2,8 @@ package com.example.madproject.ui.othertrips
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.DialogInterface
 import android.os.Bundle
 import android.text.InputType
-import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*

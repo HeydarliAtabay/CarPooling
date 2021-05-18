@@ -9,13 +9,12 @@ import android.net.Uri
 import android.os.Build
 import java.io.IOException
 import java.io.InputStream
+import kotlin.math.roundToInt
 
 class FixOrientation {
     companion object {
         @Throws(IOException::class)
         fun handleSamplingAndRotationBitmap(context: Context, selectedImage: Uri?): Bitmap? {
-            val MAX_HEIGHT = 1024
-            val MAX_WIDTH = 1024
 
             // First decode with inJustDecodeBounds=true to check dimensions
             val options = BitmapFactory.Options()
@@ -25,7 +24,7 @@ class FixOrientation {
             imageStream?.close()
 
             // Calculate inSampleSize
-            options.inSampleSize = calculateInSampleSize(options, MAX_WIDTH, MAX_HEIGHT)
+            options.inSampleSize = calculateInSampleSize(options)
 
             // Decode bitmap with inSampleSize set
             options.inJustDecodeBounds = false
@@ -35,16 +34,17 @@ class FixOrientation {
             return img
         }
 
-        private fun calculateInSampleSize(options: BitmapFactory.Options,
-                                          reqWidth: Int, reqHeight: Int): Int {
+        private fun calculateInSampleSize(options: BitmapFactory.Options): Int {
             // Raw height and width of image
+            val reqWidth = 1024
+            val reqHeight = 1024
             val height = options.outHeight
             val width = options.outWidth
             var inSampleSize = 1
             if (height > reqHeight || width > reqWidth) {
 
-                val heightRatio = Math.round(height.toFloat() / reqHeight.toFloat())
-                val widthRatio = Math.round(width.toFloat() / reqWidth.toFloat())
+                val heightRatio = (height.toFloat() / reqHeight.toFloat()).roundToInt()
+                val widthRatio = (width.toFloat() / reqWidth.toFloat()).roundToInt()
 
                 inSampleSize = if (heightRatio < widthRatio) heightRatio else widthRatio
 
@@ -61,10 +61,8 @@ class FixOrientation {
         @Throws(IOException::class)
         private fun rotateImageIfRequired(context: Context, img: Bitmap?, selectedImage: Uri): Bitmap? {
             val input = context.contentResolver.openInputStream(selectedImage)
-            val ei: ExifInterface
-            ei = if (Build.VERSION.SDK_INT > 23) ExifInterface(input!!) else ExifInterface(selectedImage.path!!)
-            val orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
-            return when (orientation) {
+            val ei: ExifInterface = if (Build.VERSION.SDK_INT > 23) ExifInterface(input!!) else ExifInterface(selectedImage.path!!)
+            return when (ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)) {
                 ExifInterface.ORIENTATION_ROTATE_90 -> rotateImage(img, 90)
                 ExifInterface.ORIENTATION_ROTATE_180 -> rotateImage(img, 180)
                 ExifInterface.ORIENTATION_ROTATE_270 -> rotateImage(img, 270)

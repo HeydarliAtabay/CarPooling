@@ -1,12 +1,7 @@
 package com.example.madproject
 
-
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
-import android.os.PersistableBundle
-import android.provider.MediaStore
-import android.util.Log
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -21,19 +16,14 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.example.madproject.data.FirestoreRepository
 import com.example.madproject.data.Profile
-import com.example.madproject.lib.Requests
 import com.example.madproject.ui.profile.ProfileViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.FirebaseStorage
 import com.squareup.picasso.Picasso
 
 class MainActivity : AppCompatActivity() {
@@ -123,32 +113,32 @@ class MainActivity : AppCompatActivity() {
         MaterialAlertDialogBuilder(this)
             .setTitle("Log out")
             .setMessage("Do you want to log out from the Car Pooling app?")
-            .setPositiveButton("Yes",
-                DialogInterface.OnClickListener { _, _ ->
+            .setPositiveButton("Yes") { _, _ ->
 
-                    val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                        .requestIdToken(getString(R.string.default_web_client_id))
-                        .requestEmail()
-                        .build()
+                val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    .requestIdToken(getString(R.string.default_web_client_id))
+                    .requestEmail()
+                    .build()
 
-                    // Sign out from Google
-                    GoogleSignIn.getClient(this, gso).signOut()
-                        .addOnCompleteListener(this) {
-                            if (it.isSuccessful) {
-                                // Sign out from Firebase
-                                Firebase.auth.signOut()
-                                Toast.makeText(this, "Succesfully logged out!", Toast.LENGTH_SHORT).show()
-                                startActivity(Intent(this,AuthActivity::class.java))
-                                finish()
-                            } else {
-                                Toast.makeText(this, "Problem in the log out!", Toast.LENGTH_SHORT).show()
-                            }
+                // Sign out from Google
+                GoogleSignIn.getClient(this, gso).signOut()
+                    .addOnCompleteListener(this) {
+                        if (it.isSuccessful) {
+                            // Sign out from Firebase
+                            Firebase.auth.signOut()
+                            Toast.makeText(this, "Succesfully logged out!", Toast.LENGTH_SHORT)
+                                .show()
+                            startActivity(Intent(this, AuthActivity::class.java))
+                            finish()
+                        } else {
+                            Toast.makeText(this, "Problem in the log out!", Toast.LENGTH_SHORT)
+                                .show()
                         }
+                    }
 
-                })
-            .setNegativeButton("No",
-                DialogInterface.OnClickListener { _, _ ->
-                })
+            }
+            .setNegativeButton("No") { _, _ ->
+            }
             .setOnDismissListener {
                 model.logoutDialogOpened = false
             }

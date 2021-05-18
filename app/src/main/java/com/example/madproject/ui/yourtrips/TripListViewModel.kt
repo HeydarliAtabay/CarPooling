@@ -1,11 +1,9 @@
 package com.example.madproject.ui.yourtrips
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.madproject.data.FirestoreRepository
-import com.example.madproject.data.Profile
 import com.example.madproject.data.Trip
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.EventListener

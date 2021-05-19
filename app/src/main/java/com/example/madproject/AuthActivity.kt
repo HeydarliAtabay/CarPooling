@@ -2,7 +2,6 @@ package com.example.madproject
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -46,23 +45,21 @@ class AuthActivity : AppCompatActivity() {
             startMainActivity()
         }
 
-
     }
 
     private fun startMainActivity() {
         FirestoreRepository.auth = mAuth.currentUser!!
-        FirestoreRepository().getUser().addSnapshotListener { value, error ->
-            if (error == null) {
+
+        FirestoreRepository().getUser().get().addOnCompleteListener {
+            if (it.isSuccessful) {
                 var flag = false
-                if (value != null && !value.exists()) {
+                if (it.result?.exists() == false){
                     flag = true
                 }
-                Log.d("test", "SetNavigation() from activity -> onCreate()")
 
-                val intent = Intent(this, MainActivity::class.java).also {
-                    it.putExtra("INTENT_NEED_REGISTRATION_EXTRA", flag)
+                val intent = Intent(this, MainActivity::class.java).also { int ->
+                    int.putExtra("INTENT_NEED_REGISTRATION_EXTRA", flag)
                 }
-
                 startActivity(intent)
                 finish()
             } else {

@@ -21,6 +21,8 @@ class ProfileViewModel: ViewModel() {
     var logoutDialogOpened = false
     var changedOrientation = false
 
+    var bigPhotoPath = ""
+
     init {
         loadProfile()
     }

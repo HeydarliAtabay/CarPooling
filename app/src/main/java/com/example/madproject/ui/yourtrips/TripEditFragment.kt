@@ -37,7 +37,6 @@ import java.util.*
 
 class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     private var currentPhotoPath: String? = ""
-    private var bigPhotoPath: String? = ""
     private lateinit var imageCar : ImageView
     private lateinit var photoURI: Uri
     private lateinit var departure : EditText
@@ -160,9 +159,9 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         if (resultCode == AppCompatActivity.RESULT_OK) {
             when (requestCode) {
                 Requests.INTENT_CAPTURE_PHOTO.value -> {
-                    currentPhotoPath = MyFunctions.resizeSetImage(this.requireActivity(), bigPhotoPath!!, storageDir?.absolutePath)
+                    currentPhotoPath = MyFunctions.resizeSetImage(this.requireActivity(), sharedModel.bigPhotoPath, storageDir?.absolutePath)
                     imageCar.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath!!))
-                    bigPhotoPath = ""
+                    sharedModel.bigPhotoPath = ""
                 }
 
                 Requests.INTENT_PHOTO_FROM_GALLERY.value -> {
@@ -173,21 +172,21 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
                     }
                     val outputFile = MyFunctions.createImageFile(storageDir?.absolutePath).apply {
                         // Save a file: path for use with ACTION_VIEW intents
-                        bigPhotoPath = absolutePath
+                        sharedModel.bigPhotoPath = absolutePath
                     }
                     val fileOutputStream = FileOutputStream(outputFile)
                     inputStream?.copyTo(fileOutputStream)
                     fileOutputStream.close()
                     inputStream?.close()
-                    currentPhotoPath = MyFunctions.resizeSetImage(this.requireActivity(), bigPhotoPath!!, storageDir?.absolutePath)
+                    currentPhotoPath = MyFunctions.resizeSetImage(this.requireActivity(), sharedModel.bigPhotoPath, storageDir?.absolutePath)
                     imageCar.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath!!))
-                    bigPhotoPath = ""
+                    sharedModel.bigPhotoPath = ""
                 }
             }
         } else {
             if (requestCode == Requests.INTENT_CAPTURE_PHOTO.value) {
-                File(bigPhotoPath!!).delete()
-                bigPhotoPath = ""
+                File(sharedModel.bigPhotoPath).delete()
+                sharedModel.bigPhotoPath = ""
             }
         }
     }
@@ -419,7 +418,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
                 val photoFile: File? = try {
                     MyFunctions.createImageFile(storageDir?.absolutePath).apply {
                         // Save a file: path for use with ACTION_VIEW intents
-                        bigPhotoPath = absolutePath
+                        sharedModel.bigPhotoPath = absolutePath
                     }
                 } catch (ex: IOException) {
                     // Error occurred while creating the File

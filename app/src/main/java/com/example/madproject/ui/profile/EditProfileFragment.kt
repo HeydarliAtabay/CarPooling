@@ -39,7 +39,6 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     private lateinit var dateOfBirth: EditText
     private lateinit var image: ImageView
     private var currentPhotoPath: String? = ""
-    private var bigPhotoPath: String? = ""
     private lateinit var photoURI: Uri
     private var profile: Profile = Profile()
     private var storageDir: File? = null
@@ -60,6 +59,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         profile = model.localProfile
         currentPhotoPath = model.currentPhotoPath
 
+
         getProfileFromShowProfile()
 
         model.useDBImage = false
@@ -78,6 +78,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         if (picker?.isVisible == true) picker?.dismiss()
         updateProfile()
         model.currentPhotoPath = currentPhotoPath ?: ""
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -136,10 +137,9 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         if (resultCode == AppCompatActivity.RESULT_OK) {
             when (requestCode) {
                 Requests.INTENT_CAPTURE_PHOTO.value -> {
-
-                    currentPhotoPath = MyFunctions.resizeSetImage(this.requireActivity(), bigPhotoPath!!, storageDir?.absolutePath)
+                    currentPhotoPath = MyFunctions.resizeSetImage(this.requireActivity(), model.bigPhotoPath, storageDir?.absolutePath)
                     image.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath!!))
-                    bigPhotoPath = ""
+                    model.bigPhotoPath = ""
                 }
 
                 Requests.INTENT_PHOTO_FROM_GALLERY.value -> {
@@ -150,21 +150,21 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                     }
                     val outputFile = MyFunctions.createImageFile(storageDir?.absolutePath).apply {
                         // Save a file: path for use with ACTION_VIEW intents
-                        bigPhotoPath = absolutePath
+                        model.bigPhotoPath = absolutePath
                     }
                     val fileOutputStream = FileOutputStream(outputFile)
                     inputStream?.copyTo(fileOutputStream)
                     fileOutputStream.close()
                     inputStream?.close()
-                    currentPhotoPath = MyFunctions.resizeSetImage(this.requireActivity(), bigPhotoPath!!, storageDir?.absolutePath)
+                    currentPhotoPath = MyFunctions.resizeSetImage(this.requireActivity(), model.bigPhotoPath, storageDir?.absolutePath)
                     image.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath!!))
-                    bigPhotoPath = ""
+                    model.bigPhotoPath = ""
                 }
             }
         } else {
             if (requestCode == Requests.INTENT_CAPTURE_PHOTO.value) {
-                File(bigPhotoPath!!).delete()
-                bigPhotoPath = ""
+                File(model.bigPhotoPath).delete()
+                model.bigPhotoPath = ""
             }
         }
     }
@@ -337,7 +337,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                 else {
                     Toast.makeText(context, "Failed saving profile!", Toast.LENGTH_SHORT).show()
                     if (!model.needRegistration)
-                    findNavController().navigate(R.id.action_editProfile_to_showProfile)
+                        findNavController().navigate(R.id.action_editProfile_to_showProfile)
                 }
             }
     }
@@ -380,7 +380,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                 val photoFile: File? = try {
                     MyFunctions.createImageFile(storageDir?.absolutePath).apply {
                         // Save a file: path for use with ACTION_VIEW intents
-                        bigPhotoPath = absolutePath
+                        model.bigPhotoPath = absolutePath
                     }
                 } catch (ex: IOException) {
                     // Error occurred while creating the File

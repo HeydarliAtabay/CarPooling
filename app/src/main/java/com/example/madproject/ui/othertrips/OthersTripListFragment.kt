@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.text.InputType
-import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
@@ -34,7 +33,7 @@ import com.squareup.picasso.Picasso
 import java.text.SimpleDateFormat
 import java.util.*
 
-class OthersTripListFragment : Fragment(R.layout.fragment_others_trip_list) {
+class OthersTripListFragment : Fragment() {
     private var tripList = listOf<Trip>()
     private var filter = Filters()
     private lateinit var emptyList: TextView
@@ -50,7 +49,6 @@ class OthersTripListFragment : Fragment(R.layout.fragment_others_trip_list) {
     private val tripListViewModel: TripListViewModel by activityViewModels()
     private val profileViewModel: ProfileViewModel by activityViewModels()
     private val filterViewModel: FilterViewModel by activityViewModels()
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -77,14 +75,9 @@ class OthersTripListFragment : Fragment(R.layout.fragment_others_trip_list) {
         return inflater.inflate(R.layout.fragment_others_trip_list, container, false)
     }
 
-    override fun onStart() {
-        super.onStart()
-        Log.d("test", "OthersTripListFragment -> onStart()")
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Log.d("test", "OthersTripListFragment -> onViewCreated()")
+
         emptyList = view.findViewById(R.id.emptyList)
         filterDialogBuilder = MaterialAlertDialogBuilder(this.requireActivity())
 

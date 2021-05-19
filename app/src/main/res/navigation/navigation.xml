@@ -126,6 +126,7 @@
         tools:layout="@layout/fragment_show_profile" >
     </fragment>
 
+
     <fragment
         android:id="@+id/registerProfile"
         android:name="com.example.madproject.ui.profile.EditProfileFragment"

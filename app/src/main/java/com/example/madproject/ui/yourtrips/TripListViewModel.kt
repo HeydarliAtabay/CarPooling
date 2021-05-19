@@ -17,6 +17,7 @@ class TripListViewModel: ViewModel() {
 
     var selectedLocal = Trip()
     var currentPhotoPath = ""
+    var bigPhotoPath = ""
     var useDBImage = false
 
     // Flags to manage the Dialog when the orientation changes

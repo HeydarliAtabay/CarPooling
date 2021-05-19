@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.text.InputType
+import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
@@ -325,9 +326,20 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     private fun saveValues() {
         model.setDBUser(profile)
             .addOnCompleteListener{
-                if (it.isSuccessful) Toast.makeText(context, "Profile information saved!", Toast.LENGTH_SHORT).show()
-                else Toast.makeText(context, "Failed saving profile!", Toast.LENGTH_SHORT).show()
-                findNavController().navigate(R.id.action_editProfile_to_showProfile)
+                if (it.isSuccessful)  {
+                    Toast.makeText(context, "Profile information saved!", Toast.LENGTH_SHORT).show()
+                    if (model.needRegistration.value == true) {
+                        model.needRegistration.value = false
+                        findNavController().navigate(R.id.action_registerProfile_to_othersTripList)
+                    } else {
+                        findNavController().navigate(R.id.action_editProfile_to_showProfile)
+                    }
+                }
+                else {
+                    Toast.makeText(context, "Failed saving profile!", Toast.LENGTH_SHORT).show()
+                    if (model.needRegistration.value == false)
+                    findNavController().navigate(R.id.action_editProfile_to_showProfile)
+                }
             }
     }
 
@@ -342,20 +354,18 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                 if (it.isSuccessful) {
                     imageRef.downloadUrl.addOnSuccessListener { uri ->
                         profile.imageUrl = uri.toString()
-                        model.setDBUser(profile)
+                        saveValues()
+                        /*model.setDBUser(profile)
                             .addOnCompleteListener{ task ->
                                 if (task.isSuccessful) Toast.makeText(context, "Profile information saved!", Toast.LENGTH_SHORT).show()
                                 else Toast.makeText(context, "Failed saving profile!", Toast.LENGTH_SHORT).show()
                                 findNavController().navigate(R.id.action_editProfile_to_showProfile)
-                            }
+                            }*/
                     }
                 } else {
-                    Toast.makeText(context, "Failed saving profile photo!", Toast.LENGTH_SHORT).show()
-                    model.setDBUser(profile)
-                        .addOnCompleteListener { task ->
-                            if(!task.isSuccessful) Toast.makeText(context, "Failed saving profile!", Toast.LENGTH_SHORT).show()
-                            findNavController().navigate(R.id.action_editProfile_to_showProfile)
-                        }
+                    Toast.makeText(context, "Failed saving profile photo!", Toast.LENGTH_SHORT)
+                        .show()
+                    saveValues()
                 }
                 currentPhotoPath = ""
                 localPhoto.delete()

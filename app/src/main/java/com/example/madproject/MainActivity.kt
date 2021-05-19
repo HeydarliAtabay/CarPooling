@@ -2,20 +2,24 @@ package com.example.madproject
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.example.madproject.data.FirestoreRepository
 import com.example.madproject.data.Profile
 import com.example.madproject.ui.profile.ProfileViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -31,7 +35,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var navView: NavigationView
     private var profile = Profile()
-    private lateinit var model: ProfileViewModel
+    //private lateinit var model: ProfileViewModel
+    private val model: ProfileViewModel by viewModels()
     private lateinit var toolbar: Toolbar
     private lateinit var header: View
 
@@ -41,6 +46,12 @@ class MainActivity : AppCompatActivity() {
 
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
+
+        /*FirestoreRepository().getUser().get().addOnSuccessListener { result  ->
+            model.needRegistration = !(result.exists())
+        }*/
+
+        Log.d("test", "needRegistration e' settata a "+model.needRegistration.value.toString()+" in mainActivity")
 
         setNavigation()
     }
@@ -77,13 +88,16 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
-        model = ViewModelProviders.of(this)
-            .get(ProfileViewModel::class.java)
+        /*model = ViewModelProviders.of(this)
+            .get(ProfileViewModel::class.java)*/
 
         model.getDBUser().observe(this, {
-            if (it == null) {
-                Toast.makeText(this, "Firebase Failure!", Toast.LENGTH_LONG).show()
-            } else {
+            if (it == null && model.needRegistration.value == true) {
+                Toast.makeText(this, "Register your profile", Toast.LENGTH_LONG).show()
+                loadNavigationHeader()
+            } else if (it == null) {
+                Toast.makeText(this, "Firebase failure!", Toast.LENGTH_LONG).show()
+            } else if (it != null) {
                 profile = it
                 loadNavigationHeader()
             }

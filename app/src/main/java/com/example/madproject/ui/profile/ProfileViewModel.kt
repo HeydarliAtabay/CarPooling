@@ -1,5 +1,6 @@
 package com.example.madproject.ui.profile
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -15,6 +16,7 @@ class ProfileViewModel: ViewModel() {
     var currentPhotoPath = ""
     var useDBImage = false
     var comingFromPrivacy = false
+    var needRegistration :MutableLiveData<Boolean> = MutableLiveData(false)
 
     // This flag is used to maintain the state of the logout dialog
     var logoutDialogOpened = false
@@ -25,13 +27,28 @@ class ProfileViewModel: ViewModel() {
     }
 
     private fun loadProfile() {
+        Log.d("test", "sono di nuovo qui")
         FirestoreRepository().getUser().addSnapshotListener(EventListener { value, e ->
             if (e != null) {
                 profile.value = null
                 return@EventListener
             }
+            if (value != null && value.exists()) {
+                Log.d("test", "value non è nullo ed esiste")
+            }
+
+
+            if (value != null && !value.exists()) {
+                Log.d("test", "value non è nullo e non esiste")
+                needRegistration.value = true
+            }
+
+            if (value == null) {
+                Log.d("test", "value è nullo")
+            }
 
             profile.value = value?.toObject(Profile::class.java)
+            Log.d("test", "needRegistration e' settata a "+needRegistration.value.toString()+" in loadProfile")
         })
     }
 
@@ -42,5 +59,4 @@ class ProfileViewModel: ViewModel() {
     fun setDBUser(p:Profile) : Task<Void> {
         return FirestoreRepository().setUser(p)
     }
-
 }

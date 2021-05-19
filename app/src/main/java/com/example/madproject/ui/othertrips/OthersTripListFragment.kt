@@ -4,13 +4,16 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.text.InputType
+import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.Navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.madproject.R
@@ -18,6 +21,7 @@ import com.example.madproject.data.Filters
 import com.example.madproject.data.FirestoreRepository
 import com.example.madproject.data.Trip
 import com.example.madproject.lib.MyFunctions
+import com.example.madproject.ui.profile.ProfileViewModel
 import com.example.madproject.ui.yourtrips.TripListViewModel
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointForward
@@ -30,7 +34,7 @@ import com.squareup.picasso.Picasso
 import java.text.SimpleDateFormat
 import java.util.*
 
-class OthersTripListFragment : Fragment(R.layout.fragment_others_trip_list) {
+class OthersTripListFragment : Fragment() {
     private var tripList = listOf<Trip>()
     private var filter = Filters()
     private lateinit var emptyList: TextView
@@ -44,7 +48,27 @@ class OthersTripListFragment : Fragment(R.layout.fragment_others_trip_list) {
     private var datePicker: MaterialDatePicker<Long>? = null
     private var timePicker: MaterialTimePicker? = null
     private val tripListViewModel: TripListViewModel by activityViewModels()
+    private val profileViewModel: ProfileViewModel by activityViewModels()
+    //private lateinit var profileViewModel : ProfileViewModel
     private val filterViewModel: FilterViewModel by activityViewModels()
+
+
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+
+        profileViewModel.needRegistration.observe(viewLifecycleOwner, {
+            if (it) {
+                findNavController().navigate(R.id.action_othersTripList_to_registerProfile)
+            }
+        })
+        Log.d("test", "needRegistration e'"+profileViewModel.needRegistration.value.toString()+" in OtherTrip")
+        return inflater.inflate(R.layout.fragment_others_trip_list, container, false)
+    }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

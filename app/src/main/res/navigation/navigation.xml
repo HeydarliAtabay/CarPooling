@@ -101,6 +101,9 @@
             app:enterAnim="@anim/slide_in"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/slide_out" />
+        <action
+            android:id="@+id/action_othersTripList_to_registerProfile"
+            app:destination="@id/registerProfile" />
     </fragment>
 
     <fragment
@@ -121,6 +124,16 @@
         android:name="com.example.madproject.ui.profile.ShowProfileFragment"
         android:label="Profile details"
         tools:layout="@layout/fragment_show_profile" >
+    </fragment>
+
+    <fragment
+        android:id="@+id/registerProfile"
+        android:name="com.example.madproject.ui.profile.EditProfileFragment"
+        android:label="Register your data..."
+        tools:layout="@layout/fragment_edit_profile" >
+        <action
+            android:id="@+id/action_registerProfile_to_othersTripList"
+            app:destination="@id/othersTripList" />
     </fragment>
 
 </navigation>

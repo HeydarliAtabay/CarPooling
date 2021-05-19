@@ -62,7 +62,9 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
                 Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
             } else {
                 confirmed = it
-                if (userListViewModel.tabBookings) setConfirmedList()
+                if (userListViewModel.tabBookings)
+                    setConfirmedList()
+
             }
         })
 
@@ -74,10 +76,7 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
                 if (selectedTrip.availableSeat == "0") {
                     val tab = tabLayout.getTabAt(1)
                     tab?.select()
-                    userListViewModel.tabBookings = true
                 }
-                if (!userListViewModel.tabBookings) setProposalsList()
-                else setConfirmedList()
             }
         })
 
@@ -87,13 +86,9 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 // Handle tab select
                 when (tab?.contentDescription) {
-                    "tabProp" -> {
-                        setProposalsList()
-                    }
+                    "tabProp" -> setProposalsList()
 
-                    "tabBook" -> {
-                        setConfirmedList()
-                    }
+                    "tabBook" -> setConfirmedList()
                 }
             }
 
@@ -125,7 +120,9 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
     }
 
     private fun setProposalsList() {
-        userListViewModel.tabBookings = false
+        if (userListViewModel.tabBookings)
+            userListViewModel.tabBookings = false
+
         if (proposals.isNotEmpty()) {
             emptyList.visibility = View.INVISIBLE
             bookButton.visibility = View.VISIBLE
@@ -148,7 +145,9 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
         bookButton.visibility = View.INVISIBLE
         tvSeats.visibility = View.INVISIBLE
         bookButton.setOnClickListener { }
-        userListViewModel.tabBookings = true
+        if (!userListViewModel.tabBookings)
+            userListViewModel.tabBookings = true
+
         if (confirmed.isNotEmpty())
             emptyList.visibility = View.INVISIBLE
         else {

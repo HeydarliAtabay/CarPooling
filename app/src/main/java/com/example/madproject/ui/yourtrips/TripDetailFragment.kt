@@ -50,6 +50,8 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
 
         // reset the flag to "false", since this fragment will set it to "true" if the required navigation is selected
         profileModel.comingFromPrivacy = false
+        // reset the flag to "false", because the userListFragment can go back to this fragment with the flag == true
+        // userListModel.tabBookings = false
 
         if (!sharedModel.comingFromOther) {
             userListModel.resetFilteredUsers()

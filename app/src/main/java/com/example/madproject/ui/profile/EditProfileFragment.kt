@@ -9,7 +9,6 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.text.InputType
-import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
@@ -355,12 +354,6 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                     imageRef.downloadUrl.addOnSuccessListener { uri ->
                         profile.imageUrl = uri.toString()
                         saveValues()
-                        /*model.setDBUser(profile)
-                            .addOnCompleteListener{ task ->
-                                if (task.isSuccessful) Toast.makeText(context, "Profile information saved!", Toast.LENGTH_SHORT).show()
-                                else Toast.makeText(context, "Failed saving profile!", Toast.LENGTH_SHORT).show()
-                                findNavController().navigate(R.id.action_editProfile_to_showProfile)
-                            }*/
                     }
                 } else {
                     Toast.makeText(context, "Failed saving profile photo!", Toast.LENGTH_SHORT)

@@ -27,28 +27,18 @@ class ProfileViewModel: ViewModel() {
     }
 
     private fun loadProfile() {
-        Log.d("test", "sono di nuovo qui")
         FirestoreRepository().getUser().addSnapshotListener(EventListener { value, e ->
             if (e != null) {
                 profile.value = null
                 return@EventListener
             }
-            if (value != null && value.exists()) {
-                Log.d("test", "value non è nullo ed esiste")
-            }
-
 
             if (value != null && !value.exists()) {
-                Log.d("test", "value non è nullo e non esiste")
+                //needRegistration.value = true
                 needRegistration.value = true
             }
 
-            if (value == null) {
-                Log.d("test", "value è nullo")
-            }
-
             profile.value = value?.toObject(Profile::class.java)
-            Log.d("test", "needRegistration e' settata a "+needRegistration.value.toString()+" in loadProfile")
         })
     }
 

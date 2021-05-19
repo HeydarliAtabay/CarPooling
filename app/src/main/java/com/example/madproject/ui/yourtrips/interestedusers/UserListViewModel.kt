@@ -134,6 +134,7 @@ class UserListViewModel: ViewModel() {
     }
 
     fun getDBTrip(): LiveData<Trip> {
+        selectedTrip.value = selectedLocalTrip
         FirestoreRepository().getTrip(selectedLocalTrip).addSnapshotListener(EventListener { value, e ->
 
             if (e != null) {

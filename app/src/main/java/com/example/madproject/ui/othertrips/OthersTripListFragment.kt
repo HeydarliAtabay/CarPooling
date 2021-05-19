@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.madproject.R
 import com.example.madproject.data.Filters
 import com.example.madproject.data.FirestoreRepository
+import com.example.madproject.data.Profile
 import com.example.madproject.data.Trip
 import com.example.madproject.lib.MyFunctions
 import com.example.madproject.ui.profile.ProfileViewModel
@@ -34,7 +35,7 @@ import com.squareup.picasso.Picasso
 import java.text.SimpleDateFormat
 import java.util.*
 
-class OthersTripListFragment : Fragment() {
+class OthersTripListFragment : Fragment(R.layout.fragment_others_trip_list) {
     private var tripList = listOf<Trip>()
     private var filter = Filters()
     private lateinit var emptyList: TextView
@@ -49,9 +50,7 @@ class OthersTripListFragment : Fragment() {
     private var timePicker: MaterialTimePicker? = null
     private val tripListViewModel: TripListViewModel by activityViewModels()
     private val profileViewModel: ProfileViewModel by activityViewModels()
-    //private lateinit var profileViewModel : ProfileViewModel
     private val filterViewModel: FilterViewModel by activityViewModels()
-
 
 
     override fun onCreateView(
@@ -62,13 +61,18 @@ class OthersTripListFragment : Fragment() {
 
         profileViewModel.needRegistration.observe(viewLifecycleOwner, {
             if (it) {
+                profileViewModel.localProfile = Profile(
+                    email = FirestoreRepository.auth.email!!,
+                    fullName = FirestoreRepository.auth.displayName!!,
+                    phoneNumber = FirestoreRepository.auth.phoneNumber!!,
+                    imageUrl = FirestoreRepository.auth.photoUrl!!.toString()
+                )
                 findNavController().navigate(R.id.action_othersTripList_to_registerProfile)
             }
         })
-        Log.d("test", "needRegistration e'"+profileViewModel.needRegistration.value.toString()+" in OtherTrip")
+
         return inflater.inflate(R.layout.fragment_others_trip_list, container, false)
     }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

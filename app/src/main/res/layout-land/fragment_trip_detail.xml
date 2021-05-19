@@ -275,7 +275,7 @@
         android:background="?attr/colorError"
         android:backgroundTint="?attr/colorError"
         android:contentDescription="Delete a trip"
-        android:src="@drawable/round_delete_forever_black_48"
+        android:src="@drawable/outline_delete_white_48"
         app:layout_constraintHorizontal_bias="0.954"
         app:layout_constraintVertical_bias="0.944"
         app:layout_constraintBottom_toBottomOf="parent"

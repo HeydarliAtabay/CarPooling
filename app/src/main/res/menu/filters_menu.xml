@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/filtersButton"
-        android:icon="@drawable/round_filter_list_black_36"
+        android:icon="@drawable/outline_filter_list_white_36"
         android:title="filtersButton"
         app:showAsAction="always" />
 </menu>

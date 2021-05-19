@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/saveButton"
-        android:icon="@drawable/round_done_black_36"
+        android:icon="@drawable/outline_done_white_36"
         android:title="saveButton"
         app:showAsAction="always" />
 </menu>

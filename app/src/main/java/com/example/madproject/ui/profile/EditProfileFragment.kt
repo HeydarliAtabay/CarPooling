@@ -327,8 +327,8 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             .addOnCompleteListener{
                 if (it.isSuccessful)  {
                     Toast.makeText(context, "Profile information saved!", Toast.LENGTH_SHORT).show()
-                    if (model.needRegistration.value == true) {
-                        model.needRegistration.value = false
+                    if (model.needRegistration) {
+                        model.needRegistration = false
                         findNavController().navigate(R.id.action_registerProfile_to_othersTripList)
                     } else {
                         findNavController().navigate(R.id.action_editProfile_to_showProfile)
@@ -336,7 +336,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                 }
                 else {
                     Toast.makeText(context, "Failed saving profile!", Toast.LENGTH_SHORT).show()
-                    if (model.needRegistration.value == false)
+                    if (!model.needRegistration)
                     findNavController().navigate(R.id.action_editProfile_to_showProfile)
                 }
             }

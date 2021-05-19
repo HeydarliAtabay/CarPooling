@@ -11,7 +11,6 @@ import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.Navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -59,23 +58,33 @@ class OthersTripListFragment : Fragment(R.layout.fragment_others_trip_list) {
         savedInstanceState: Bundle?
     ): View? {
 
-        profileViewModel.needRegistration.observe(viewLifecycleOwner, {
-            if (it) {
-                profileViewModel.localProfile = Profile(
-                    email = FirestoreRepository.auth.email!!,
-                    fullName = FirestoreRepository.auth.displayName!!,
-                    phoneNumber = FirestoreRepository.auth.phoneNumber!!,
-                    imageUrl = FirestoreRepository.auth.photoUrl!!.toString()
-                )
-                findNavController().navigate(R.id.action_othersTripList_to_registerProfile)
-            }
-        })
+        if (profileViewModel.needRegistration) {
+            val email = FirestoreRepository.auth.email ?: ""
+            val name = FirestoreRepository.auth.displayName ?: ""
+            val phone = FirestoreRepository.auth.phoneNumber ?: ""
+            val image = if (FirestoreRepository.auth.photoUrl != null) FirestoreRepository.auth.photoUrl.toString()
+            else ""
+
+            profileViewModel.localProfile = Profile(
+                email = email,
+                fullName = name,
+                phoneNumber = phone,
+                imageUrl = image
+            )
+            findNavController().navigate(R.id.action_othersTripList_to_registerProfile)
+        }
 
         return inflater.inflate(R.layout.fragment_others_trip_list, container, false)
     }
 
+    override fun onStart() {
+        super.onStart()
+        Log.d("test", "OthersTripListFragment -> onStart()")
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Log.d("test", "OthersTripListFragment -> onViewCreated()")
         emptyList = view.findViewById(R.id.emptyList)
         filterDialogBuilder = MaterialAlertDialogBuilder(this.requireActivity())
 

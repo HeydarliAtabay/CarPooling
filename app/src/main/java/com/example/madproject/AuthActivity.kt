@@ -2,6 +2,7 @@ package com.example.madproject
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -42,12 +43,32 @@ class AuthActivity : AppCompatActivity() {
             }
 
         } else {
-            FirestoreRepository.auth = mAuth.currentUser!!
-            startActivity(Intent(this, MainActivity::class.java))
-            finish()
+            startMainActivity()
         }
 
 
+    }
+
+    private fun startMainActivity() {
+        FirestoreRepository.auth = mAuth.currentUser!!
+        FirestoreRepository().getUser().addSnapshotListener { value, error ->
+            if (error == null) {
+                var flag = false
+                if (value != null && !value.exists()) {
+                    flag = true
+                }
+                Log.d("test", "SetNavigation() from activity -> onCreate()")
+
+                val intent = Intent(this, MainActivity::class.java).also {
+                    it.putExtra("INTENT_NEED_REGISTRATION_EXTRA", flag)
+                }
+
+                startActivity(intent)
+                finish()
+            } else {
+                Toast.makeText(this, "Firebase failure!", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun signIn() {
@@ -79,9 +100,7 @@ class AuthActivity : AppCompatActivity() {
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
                     //this line is just for checking if authentication works or no
-                    FirestoreRepository.auth = mAuth.currentUser!!
-                    startActivity(Intent(this, MainActivity::class.java))
-                    finish()
+                    startMainActivity()
                 } else {
                     // If sign in fails, display a message to the user.
                     Toast.makeText(this, "signInWithCredential:failure", Toast.LENGTH_SHORT).show()

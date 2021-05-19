@@ -1,6 +1,5 @@
 package com.example.madproject.ui.profile
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -16,7 +15,7 @@ class ProfileViewModel: ViewModel() {
     var currentPhotoPath = ""
     var useDBImage = false
     var comingFromPrivacy = false
-    var needRegistration :MutableLiveData<Boolean> = MutableLiveData(false)
+    var needRegistration = false
 
     // This flag is used to maintain the state of the logout dialog
     var logoutDialogOpened = false
@@ -31,11 +30,6 @@ class ProfileViewModel: ViewModel() {
             if (e != null) {
                 profile.value = null
                 return@EventListener
-            }
-
-            if (value != null && !value.exists()) {
-                //needRegistration.value = true
-                needRegistration.value = true
             }
 
             profile.value = value?.toObject(Profile::class.java)

@@ -2,6 +2,7 @@ package com.example.madproject
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -42,7 +43,10 @@ class MainActivity : AppCompatActivity() {
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
+        model.needRegistration = intent.getBooleanExtra("INTENT_NEED_REGISTRATION_EXTRA", false)
+
         setNavigation()
+        Log.d("test", "onCreate() finished")
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
@@ -79,8 +83,7 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
 
         model.getDBUser().observe(this, {
-            if (it == null && model.needRegistration.value == true) {
-                Toast.makeText(this, "Register your profile", Toast.LENGTH_LONG).show()
+            if (it == null && model.needRegistration) {
                 loadNavigationHeader()
             } else if (it == null) {
                 Toast.makeText(this, "Firebase failure!", Toast.LENGTH_LONG).show()

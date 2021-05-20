@@ -23,6 +23,9 @@ class ProfileViewModel: ViewModel() {
 
     var bigPhotoPath = ""
 
+    // Variable to manage the orientation of the screen in the async tasks
+    var orientation = -1
+
     init {
         loadProfile()
     }

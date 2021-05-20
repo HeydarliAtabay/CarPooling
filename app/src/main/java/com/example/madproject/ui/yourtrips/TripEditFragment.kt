@@ -3,6 +3,7 @@ package com.example.madproject.ui.yourtrips
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
@@ -70,6 +71,8 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         trip = sharedModel.selectedLocal
         currentPhotoPath = sharedModel.currentPhotoPath
 
+        sharedModel.orientation = this.requireActivity().requestedOrientation
+
         setValues()
 
         fixEditText()
@@ -102,6 +105,8 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
                     Toast.makeText(context, "Insert the duration in the required format!", Toast.LENGTH_LONG).show()
                 } else {
                     if (formCheck()) {
+                        // Disable the orientation because the saving part is an Async task
+                        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LOCKED
                         val f = currentPhotoPath != ""
                         saveTrip(f)
                     } else {
@@ -477,6 +482,8 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
                 if (it.isSuccessful) Toast.makeText(context, "Trip information saved!", Toast.LENGTH_SHORT).show()
                 else Toast.makeText(context, "Failed saving trip!", Toast.LENGTH_SHORT).show()
                 findNavController().navigate(R.id.action_tripEdit_to_tripList)
+                // Restore the old orientation (disabled because of the Async task)
+                requireActivity().requestedOrientation = sharedModel.orientation
             }
     }
 

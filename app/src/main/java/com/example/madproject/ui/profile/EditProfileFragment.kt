@@ -3,6 +3,7 @@ package com.example.madproject.ui.profile
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
@@ -17,13 +18,18 @@ import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import com.example.madproject.AuthActivity
 import com.example.madproject.R
 import com.example.madproject.data.Profile
 import com.example.madproject.lib.*
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointBackward
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.textfield.TextInputLayout
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.squareup.picasso.Picasso
 import java.io.*
@@ -45,7 +51,6 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     private var picker: MaterialDatePicker<Long>? = null
     private val model: ProfileViewModel by activityViewModels()
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
         fullName = view.findViewById(R.id.fullName)
@@ -59,6 +64,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         profile = model.localProfile
         currentPhotoPath = model.currentPhotoPath
 
+        model.orientation = this.requireActivity().requestedOrientation
 
         getProfileFromShowProfile()
 
@@ -70,6 +76,8 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
 
         val editPhoto = view.findViewById<ImageButton>(R.id.imageButton)
         registerForContextMenu(editPhoto)
+
+
     }
 
     override fun onPause() {
@@ -91,6 +99,8 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             R.id.saveButton -> {
                 updateProfile()
                 if (formCheck()) {
+                    // Disable the orientation because the saving part is an Async task
+                    requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LOCKED
                     if (currentPhotoPath == "") saveValues() else saveValuesImage()
                 } else {
                     Toast.makeText(
@@ -101,7 +111,13 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                 }
                 true
             }
-            else -> super.onOptionsItemSelected(item)
+            else -> {
+                if ((item.itemId == Requests.BACK_ARROW_ID.value) && model.needRegistration) {
+                    performLogout()
+                    return true
+                }
+                super.onOptionsItemSelected(item)
+            }
         }
     }
 
@@ -167,6 +183,26 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                 model.bigPhotoPath = ""
             }
         }
+    }
+
+    private fun performLogout() {
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(getString(R.string.default_web_client_id))
+            .requestEmail()
+            .build()
+
+        // Sign out from Google
+        GoogleSignIn.getClient(this.requireActivity(), gso).signOut()
+            .addOnCompleteListener(this.requireActivity()) {
+                if (it.isSuccessful) {
+                    // Sign out from Firebase
+                    Firebase.auth.signOut()
+                    Toast.makeText(this.requireContext(), "Successfully logged out!", Toast.LENGTH_SHORT)
+                        .show()
+                    startActivity(Intent(this.requireActivity(), AuthActivity::class.java))
+                    this.requireActivity().finish()
+                }
+            }
     }
 
     private fun closeKeyboard() {
@@ -339,6 +375,8 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                     if (!model.needRegistration)
                         findNavController().navigate(R.id.action_editProfile_to_showProfile)
                 }
+                // Restore the old orientation (disabled because of the Async task)
+                requireActivity().requestedOrientation = model.orientation
             }
     }
 

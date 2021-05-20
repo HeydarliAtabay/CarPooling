@@ -2,6 +2,7 @@ package com.example.madproject.ui.othertrips
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.text.InputType
 import android.view.*
@@ -87,6 +88,8 @@ class OthersTripListFragment : Fragment() {
         recyclerView.setHasFixedSize(true)
         recyclerView.setItemViewCacheSize(3)
         recyclerView.layoutManager = LinearLayoutManager(this.requireActivity())
+
+        tripListViewModel.orientation = this.requireActivity().requestedOrientation
 
         setHasOptionsMenu(true)
 

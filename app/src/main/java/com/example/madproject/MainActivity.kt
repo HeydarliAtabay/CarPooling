@@ -128,7 +128,7 @@ class MainActivity : AppCompatActivity() {
                         if (it.isSuccessful) {
                             // Sign out from Firebase
                             Firebase.auth.signOut()
-                            Toast.makeText(this, "Succesfully logged out!", Toast.LENGTH_SHORT)
+                            Toast.makeText(this, "Successfully logged out!", Toast.LENGTH_SHORT)
                                 .show()
                             startActivity(Intent(this, AuthActivity::class.java))
                             finish()

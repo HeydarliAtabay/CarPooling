@@ -10,7 +10,9 @@ import com.google.firebase.firestore.EventListener
 
 class ProfileViewModel: ViewModel() {
 
-    private var profile: MutableLiveData<Profile> = MutableLiveData(Profile())
+    private val profile: MutableLiveData<Profile>
+        by lazy { MutableLiveData(Profile()).also { loadProfile() } }
+
     var localProfile = Profile()
     var currentPhotoPath = ""
     var useDBImage = false
@@ -25,10 +27,6 @@ class ProfileViewModel: ViewModel() {
 
     // Variable to manage the orientation of the screen in the async tasks
     var orientation = -1
-
-    init {
-        loadProfile()
-    }
 
     private fun loadProfile() {
         FirestoreRepository().getUser().addSnapshotListener(EventListener { value, e ->

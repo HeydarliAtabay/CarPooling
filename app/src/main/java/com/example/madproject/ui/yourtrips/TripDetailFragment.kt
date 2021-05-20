@@ -238,38 +238,4 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
                 Toast.makeText(this.requireActivity(), "DB access failure", Toast.LENGTH_SHORT).show()
             }
     }
-
-    /*
-    private fun bookTheTrip() {
-        FirestoreRepository().controlBooking(trip)
-            .addOnSuccessListener {
-                if (it.documents.size != 0) {
-                    Toast.makeText(this.requireActivity(), "Trip already booked", Toast.LENGTH_SHORT)
-                        .show()
-                } else {
-                    try {
-                        FirestoreRepository().bookingTransaction(trip)
-                            .addOnSuccessListener {
-                                Toast.makeText(
-                                    this.requireActivity(),
-                                    "Trip booked successfully",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                            .addOnFailureListener { mes ->
-                                Toast.makeText(
-                                    this.requireActivity(), mes.message, Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                    } catch (e: FirebaseFirestoreException) {
-                        Toast.makeText(this.requireActivity(), e.message, Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
-            .addOnFailureListener {
-                Toast.makeText(this.requireActivity(), "DB access failure", Toast.LENGTH_SHORT)
-                    .show()
-            }
-    }
-     */
 }

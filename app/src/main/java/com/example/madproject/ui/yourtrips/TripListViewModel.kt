@@ -11,8 +11,13 @@ import com.google.firebase.firestore.Transaction
 
 class TripListViewModel: ViewModel() {
 
-    private var userTrips: MutableLiveData<List<Trip>> = MutableLiveData()
-    private var otherTrips: MutableLiveData<List<Trip>> = MutableLiveData()
+
+    private val userTrips: MutableLiveData<List<Trip>>
+        by lazy { MutableLiveData<List<Trip>>().also { loadUserTrips() } }
+
+    private val otherTrips: MutableLiveData<List<Trip>>
+        by lazy { MutableLiveData<List<Trip>>().also { loadOtherTrips() } }
+
     private var selectedDB: MutableLiveData<Trip> = MutableLiveData()
 
     var selectedLocal = Trip()
@@ -35,10 +40,10 @@ class TripListViewModel: ViewModel() {
     // Variable to manage the orientation of the screen in the async tasks
     var orientation = -1
 
-    init {
+    /*init {
         loadUserTrips()
         loadOtherTrips()
-    }
+    }*/
 
     private fun loadUserTrips() {
         FirestoreRepository().getTrips().addSnapshotListener(EventListener { value, e ->

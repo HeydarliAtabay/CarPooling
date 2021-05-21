@@ -250,7 +250,7 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
                 } else image.setImageResource(R.drawable.avatar)
 
                 cv.setOnClickListener {
-                    sharedModel.selectedLocalUser = u
+                    sharedModel.selectedLocalUserEmail = u.email
                     Navigation.findNavController(itemView)
                         .navigate(R.id.action_userList_to_showProfilePrivacy)
                 }

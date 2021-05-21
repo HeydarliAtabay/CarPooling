@@ -75,6 +75,12 @@
         <action
             android:id="@+id/action_tripDetail_to_tripList"
             app:destination="@id/tripList" />
+        <action
+            android:id="@+id/action_tripDetail_to_showProfilePrivacy"
+            app:destination="@id/showProfilePrivacy"
+            app:enterAnim="@anim/slide_in"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out" />
     </fragment>
 
     <fragment

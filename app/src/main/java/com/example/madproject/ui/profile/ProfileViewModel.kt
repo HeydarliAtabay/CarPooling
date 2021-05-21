@@ -10,10 +10,12 @@ import com.google.firebase.firestore.EventListener
 
 class ProfileViewModel: ViewModel() {
 
-    private val profile: MutableLiveData<Profile>
+    private val yourProfile: MutableLiveData<Profile>
         by lazy { MutableLiveData(Profile()).also { loadProfile() } }
 
     var localProfile = Profile()
+
+
     var currentPhotoPath = ""
     var useDBImage = false
     var comingFromPrivacy = false
@@ -31,16 +33,16 @@ class ProfileViewModel: ViewModel() {
     private fun loadProfile() {
         FirestoreRepository().getUser().addSnapshotListener(EventListener { value, e ->
             if (e != null) {
-                profile.value = null
+                yourProfile.value = null
                 return@EventListener
             }
 
-            profile.value = value?.toObject(Profile::class.java)
+            yourProfile.value = value?.toObject(Profile::class.java)
         })
     }
 
     fun getDBUser() : LiveData<Profile>{
-        return profile
+        return yourProfile
     }
 
     fun setDBUser(p:Profile) : Task<Void> {

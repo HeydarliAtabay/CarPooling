@@ -114,10 +114,9 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
-        if (!sharedModel.comingFromOther) {
-            inflater.inflate(R.menu.show_profiles, menu)
+        inflater.inflate(R.menu.show_profiles, menu)
+        if (!sharedModel.comingFromOther)
             inflater.inflate(R.menu.edit_menu, menu)
-        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -129,10 +128,16 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
                 true
             }
             R.id.profilesButton -> {
-                userListModel.selectedLocalTrip = trip
-                userListModel.tabBookings = false
-                profileModel.comingFromPrivacy = true
-                findNavController().navigate(R.id.action_tripDetail_to_userList)
+                if (sharedModel.comingFromOther) {
+                    userListModel.selectedLocalUserEmail = trip.ownerEmail
+                    profileModel.comingFromPrivacy = true
+                    findNavController().navigate(R.id.action_tripDetail_to_showProfilePrivacy)
+                } else {
+                    userListModel.selectedLocalTrip = trip
+                    userListModel.tabBookings = false
+                    profileModel.comingFromPrivacy = true
+                    findNavController().navigate(R.id.action_tripDetail_to_userList)
+                }
                 true
             }
             else -> super.onOptionsItemSelected(item)

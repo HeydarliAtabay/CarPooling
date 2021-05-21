@@ -17,7 +17,7 @@ class UserListViewModel: ViewModel() {
     private var confirmedBook : MutableLiveData<List<Profile>> = MutableLiveData(listOf())
     private var selectedDBUser: MutableLiveData<Profile> = MutableLiveData(Profile())
     private var selectedBookings: List<Booking> = listOf()
-    var selectedLocalUser = Profile()
+    var selectedLocalUserEmail = ""
 
     // Manage the selected Trip update
     var selectedLocalTrip = Trip()
@@ -49,7 +49,7 @@ class UserListViewModel: ViewModel() {
                 retrievedUsers.add(u)
 
                 // Update the selected user in Show Profile
-                if (u.email == selectedLocalUser.email) selectedDBUser.value = u
+                if (u.email == selectedLocalUserEmail) selectedDBUser.value = u
 
                 // Update the list of users who booked a selected trip
                 for (p in proposals.value!!)
@@ -116,8 +116,10 @@ class UserListViewModel: ViewModel() {
 
     fun getSelectedDB(): LiveData<Profile> {
 
-        if (allUsers.contains(selectedLocalUser))
-            selectedDBUser.value = allUsers[allUsers.indexOf(selectedLocalUser)]
+        for (u in allUsers) {
+            if (u.email == selectedLocalUserEmail)
+                selectedDBUser.value = u
+        }
 
         return selectedDBUser
     }

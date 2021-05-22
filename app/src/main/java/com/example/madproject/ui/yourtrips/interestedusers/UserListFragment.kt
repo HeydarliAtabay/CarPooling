@@ -36,6 +36,8 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
         tabLayout = view.findViewById(R.id.tab)
         tvSeats = view.findViewById(R.id.tvSeats)
 
+        // If the fragment was destroyed (i.e., for orientation change) with the booking tab opened,
+        // select the confirmed bookings tab
         if (userListViewModel.tabBookings) {
             val tab = tabLayout.getTabAt(1)
             tab?.select()
@@ -46,6 +48,7 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
         recyclerView.setItemViewCacheSize(2)
         recyclerView.layoutManager = LinearLayoutManager(this.requireActivity())
 
+        // Get the list of users who made a proposal to the selected trip
         userListViewModel.getProposals().observe(viewLifecycleOwner, {
             if (it == null) {
                 Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
@@ -57,6 +60,7 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
             }
         })
 
+        // Get the list of users who have a confirmed booking on the selected trip
         userListViewModel.getConfirmed().observe(viewLifecycleOwner, {
             if (it == null) {
                 Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
@@ -68,11 +72,13 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
             }
         })
 
+        // Get the selected trip updated from the DB. It is needed to observe the available seats
         userListViewModel.getDBTrip().observe(viewLifecycleOwner, {
             if (it == null) {
                 Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
             } else {
                 selectedTrip = it
+                // If there are no more available seats it is selected the bookings tab
                 if (selectedTrip.availableSeat == "0") {
                     val tab = tabLayout.getTabAt(1)
                     tab?.select()
@@ -97,6 +103,7 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
             override fun onTabUnselected(tab: TabLayout.Tab?) {}
         })
 
+        // If the orientation was changed with the dialog opened -> reopen the dialog
         if (userListViewModel.changedOrientationBooking) {
             createBookingDialog()
             userListViewModel.changedOrientationBooking = false
@@ -109,6 +116,10 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
             userListViewModel.changedOrientationBooking = true
     }
 
+    /*
+    Function to check if the old list of users and the new list of users (got from the DB) are the same
+    If yes the current list is not updated, in this way the recycler view is not re-rendered
+     */
     private fun sameLists(old: List<Profile>, new: List<Profile>): Boolean {
         if (old.size != new.size) return false
         if (new.isEmpty()) return false
@@ -119,6 +130,9 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
         return true
     }
 
+    /*
+    Load the recycler view with the list of users who made a proposal to the trip
+     */
     private fun setProposalsList() {
         if (userListViewModel.tabBookings)
             userListViewModel.tabBookings = false
@@ -141,6 +155,9 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
         recyclerView.adapter = UsersAdapter(proposals.toList(), userListViewModel, true)
     }
 
+    /*
+    Load the recycler view with the list of users who have a confirmed booking on the trip
+     */
     private fun setConfirmedList() {
         bookButton.visibility = View.INVISIBLE
         tvSeats.visibility = View.INVISIBLE
@@ -163,6 +180,9 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
         }
     }
 
+    /*
+    Function to create the dialog to confirm the selected proposals and to send the request to the DB
+     */
     private fun createBookingDialog() {
         userListViewModel.bookingDialogOpened = true
         MaterialAlertDialogBuilder(this.requireContext())
@@ -225,6 +245,9 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
             private val cv = itemView.findViewById<CardView>(R.id.card_view)
             private val check = itemView.findViewById<ImageButton>(R.id.checkedButt)
 
+            /*
+            Populate the card view of each user
+             */
             fun bind(u: Profile, sharedModel: UserListViewModel, locationProp: Boolean) {
 
                 fullName.text = u.fullName

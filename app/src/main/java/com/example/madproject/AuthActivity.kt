@@ -27,7 +27,9 @@ class AuthActivity : AppCompatActivity() {
 
         mAuth = Firebase.auth
 
+        // Check if the user is already authenticated
         if (mAuth.currentUser == null) {
+            // If not, build the authentication activity with the button to authenticate with Google
             setContentView(R.layout.auth_activity)
 
             val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -42,14 +44,22 @@ class AuthActivity : AppCompatActivity() {
             }
 
         } else {
+            // Else start the main activity
             startMainActivity()
         }
 
     }
 
+    /*
+    Function to start the MainActivity
+     */
     private fun startMainActivity() {
+
+        // Set the current user inside the companion object of the "FirestoreRepository" class
         FirestoreRepository.auth = mAuth.currentUser!!
 
+        // Check if the current user already registered his account (second or following login)
+        // or not (first login) by setting the flag
         FirestoreRepository().getUser().get().addOnCompleteListener {
             if (it.isSuccessful) {
                 var flag = false
@@ -57,6 +67,9 @@ class AuthActivity : AppCompatActivity() {
                     flag = true
                 }
 
+                // Start the "MainActivity" with an extra flag:
+                // true     -> it is needed the first registration (first login)
+                // false    -> it is not needed the first registration, the user is already in the DB
                 val intent = Intent(this, MainActivity::class.java).also { int ->
                     int.putExtra("INTENT_NEED_REGISTRATION_EXTRA", flag)
                 }
@@ -68,6 +81,9 @@ class AuthActivity : AppCompatActivity() {
         }
     }
 
+    /*
+    Function to start the Google Sign In
+     */
     private fun signIn() {
         val signInIntent = googleSignInClient.signInIntent
         startActivityForResult(signInIntent, Requests.RC_SIGN_IN.value)
@@ -95,8 +111,7 @@ class AuthActivity : AppCompatActivity() {
         mAuth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
-                    //this line is just for checking if authentication works or no
+                    // Sign in success, start the MainActivity
                     startMainActivity()
                 } else {
                     // If sign in fails, display a message to the user.

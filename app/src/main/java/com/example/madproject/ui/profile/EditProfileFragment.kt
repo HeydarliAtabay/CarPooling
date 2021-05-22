@@ -112,6 +112,8 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                 true
             }
             else -> {
+                // If the user clicks the back arrow in the registration fragment the user will be
+                // logged out
                 if ((item.itemId == Requests.BACK_ARROW_ID.value) && model.needRegistration) {
                     performLogout()
                     return true
@@ -165,7 +167,6 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                         )
                     }
                     val outputFile = MyFunctions.createImageFile(storageDir?.absolutePath).apply {
-                        // Save a file: path for use with ACTION_VIEW intents
                         model.bigPhotoPath = absolutePath
                     }
                     val fileOutputStream = FileOutputStream(outputFile)
@@ -185,6 +186,9 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         }
     }
 
+    /*
+    Function to perform the logout
+     */
     private fun performLogout() {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.default_web_client_id))
@@ -214,6 +218,9 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         }
     }
 
+    /*
+    Function to manage the listeners on the edit texts
+     */
     private fun fixEditText() {
         fullName.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {  // lost focus
@@ -341,6 +348,9 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         profile = model.localProfile
     }
 
+    /*
+    Check if the required fields are provided when the user clicks the save button
+     */
     private fun formCheck(): Boolean {
         var flag = true
         if (profile.fullName == "") {
@@ -358,6 +368,9 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         return flag
     }
 
+    /*
+    Save the new values inside Firebase
+     */
     private fun saveValues() {
         model.setDBUser(profile)
             .addOnCompleteListener{
@@ -380,6 +393,9 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             }
     }
 
+    /*
+    If there is a new image, save the image inside Firebase storage and then the new profile information
+     */
     private fun saveValuesImage() {
         val storage = FirebaseStorage.getInstance()
         val storageRef = storage.reference
@@ -403,12 +419,18 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             }
     }
 
+    /*
+    Start the intent to choose a new picture from the gallery
+     */
     private fun dispatchChoosePictureIntent() {
         val pickIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
         this.requireActivity().intent.type = "image/*"
         startActivityForResult(pickIntent, Requests.INTENT_PHOTO_FROM_GALLERY.value)
     }
 
+    /*
+    Start the intent to capture a new picture from the default camera app
+     */
     @SuppressLint("QueryPermissionsNeeded")
     private fun dispatchTakePictureIntent() {
         Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->

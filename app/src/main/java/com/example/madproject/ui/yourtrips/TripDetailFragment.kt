@@ -50,8 +50,6 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
 
         // reset the flag to "false", since this fragment will set it to "true" if the required navigation is selected
         profileModel.comingFromPrivacy = false
-        // reset the flag to "false", because the userListFragment can go back to this fragment with the flag == true
-        // userListModel.tabBookings = false
 
         if (!sharedModel.comingFromOther) {
             userListModel.resetFilteredUsers()
@@ -128,6 +126,8 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
                 true
             }
             R.id.profilesButton -> {
+                // If the user is inside others trip list he will navigate to the profile of the driver
+                // Else he will navigate to his booking manager
                 if (sharedModel.comingFromOther) {
                     userListModel.selectedLocalUserEmail = trip.ownerEmail
                     profileModel.comingFromPrivacy = true

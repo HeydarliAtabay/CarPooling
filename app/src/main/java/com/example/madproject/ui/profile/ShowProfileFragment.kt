@@ -30,11 +30,14 @@ class ShowProfileFragment : Fragment() {
                               container: ViewGroup?,
                               savedInstanceState: Bundle?):View?{
 
-        if (model.comingFromPrivacy) {
-            return inflater.inflate(R.layout.privacy_show_profile, container, false)
-        }
+        // If the flag "comingFromPrivacy" is true it is inflated the layout to show only limited
+        // user information. If the flag is false it is loaded the full layout to show the information
+        // of the current user
 
-        return inflater.inflate(R.layout.fragment_show_profile, container, false)
+        return if (model.comingFromPrivacy)
+            inflater.inflate(R.layout.privacy_show_profile, container, false)
+        else
+            inflater.inflate(R.layout.fragment_show_profile, container, false)
     }
 
 
@@ -45,12 +48,14 @@ class ShowProfileFragment : Fragment() {
         email = view.findViewById(R.id.email)
         image = view.findViewById(R.id.imageView3)
 
+        // Load these information only if it is shown the current user profile
         if (!model.comingFromPrivacy) {
             dateOfBirth = view.findViewById(R.id.dateOfBirth)
             phoneNumber = view.findViewById(R.id.phoneNumber)
             location = view.findViewById(R.id.location)
         }
 
+        // Depending on the user to load, get the data from the right viewModel
         if (model.comingFromPrivacy) {
             listModel.getSelectedDB().observe(viewLifecycleOwner, {
                 if (it == null) {

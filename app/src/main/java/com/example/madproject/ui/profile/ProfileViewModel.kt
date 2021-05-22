@@ -15,17 +15,18 @@ class ProfileViewModel: ViewModel() {
 
     var localProfile = Profile()
 
-
+    // Variables to manage the photo inside trip edit
     var currentPhotoPath = ""
+    var bigPhotoPath = ""
     var useDBImage = false
+
+    // Flags to know from which path the various fragments are called
     var comingFromPrivacy = false
     var needRegistration = false
 
     // This flag is used to maintain the state of the logout dialog
     var logoutDialogOpened = false
     var changedOrientation = false
-
-    var bigPhotoPath = ""
 
     // Variable to manage the orientation of the screen in the async tasks
     var orientation = -1

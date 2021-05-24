@@ -49,6 +49,9 @@
             app:enterAnim="@anim/slide_in"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/slide_out" />
+        <action
+            android:id="@+id/action_tripList_to_userRate"
+            app:destination="@id/userRate" />
     </fragment>
 
     <fragment
@@ -81,6 +84,9 @@
             app:enterAnim="@anim/slide_in"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/slide_out" />
+        <action
+            android:id="@+id/action_tripDetail_to_userRate"
+            app:destination="@id/userRate" />
     </fragment>
 
     <fragment
@@ -132,7 +138,6 @@
         tools:layout="@layout/fragment_show_profile" >
     </fragment>
 
-
     <fragment
         android:id="@+id/registerProfile"
         android:name="com.example.madproject.ui.profile.EditProfileFragment"
@@ -141,6 +146,13 @@
         <action
             android:id="@+id/action_registerProfile_to_othersTripList"
             app:destination="@id/othersTripList" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/userRate"
+        android:name="com.example.madproject.ui.yourtrips.interestedusers.UserListFragment"
+        android:label="Rate passengers"
+        tools:layout="@layout/fragment_user_list" >
     </fragment>
 
 </navigation>

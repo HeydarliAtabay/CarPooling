@@ -34,6 +34,9 @@ class TripListViewModel: ViewModel() {
     // Flags used to manage the trip booking
     var comingFromOther = false
 
+    // Flag to manage the landscape selection of the tab
+    var tabCompletedTrips = false
+
     // Data used to manage the booking dialog restore state from OtherTripsFragment
     var tripIdInDialog = ""
 

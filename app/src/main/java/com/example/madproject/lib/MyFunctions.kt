@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
@@ -15,10 +16,31 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
 import java.text.SimpleDateFormat
+import java.time.LocalDateTime
 import java.util.*
 
 class MyFunctions {
     companion object {
+
+        @SuppressLint("SimpleDateFormat")
+        fun isFuture(date: String, time: String, duration: String): Boolean {
+            // Depending on the date and time, determine if the trip was terminated or not
+            val current = Date()
+            val inputFormat = SimpleDateFormat("MMM dd, yyyy HH:mm")
+            inputFormat.timeZone = TimeZone.getTimeZone("UTC")
+
+            var tripDateTime = inputFormat.parse("$date $time") ?: return false
+
+            if (duration != "") {
+                val inputDurationFormat = SimpleDateFormat("HH:mm")
+                inputDurationFormat.timeZone = TimeZone.getTimeZone("UTC")
+                val tripDuration = inputDurationFormat.parse(duration) ?: return false
+                val newTime = tripDateTime.time + tripDuration.time
+                tripDateTime = Date(newTime)
+            }
+
+            return tripDateTime.after(current)
+        }
 
         @SuppressLint("SimpleDateFormat")
         fun createImageFile(storagePath: String?): File {

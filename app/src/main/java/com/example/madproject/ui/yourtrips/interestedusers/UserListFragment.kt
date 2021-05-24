@@ -14,6 +14,7 @@ import com.example.madproject.data.Booking
 import com.example.madproject.data.FirestoreRepository
 import com.example.madproject.data.Profile
 import com.example.madproject.data.Trip
+import com.example.madproject.ui.yourtrips.TripListViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.tabs.TabLayout
 import com.squareup.picasso.Picasso
@@ -28,6 +29,7 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
     private lateinit var bookButton: Button
     private lateinit var tvSeats: TextView
     private val userListViewModel: UserListViewModel by activityViewModels()
+    private val tripListViewModel: TripListViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

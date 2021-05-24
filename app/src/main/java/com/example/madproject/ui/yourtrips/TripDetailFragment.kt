@@ -32,6 +32,7 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
     private lateinit var intermediateStops: TextView
     private lateinit var fabBooking: FloatingActionButton
     private lateinit var fabDelete: FloatingActionButton
+    private lateinit var fabRate: FloatingActionButton
     private val sharedModel: TripListViewModel by activityViewModels()
     private val userListModel: UserListViewModel by activityViewModels()
     private val profileModel: ProfileViewModel by activityViewModels()
@@ -50,8 +51,6 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
 
         // reset the flag to "false", since this fragment will set it to "true" if the required navigation is selected
         profileModel.comingFromPrivacy = false
-        // reset the flag to "false", because the userListFragment can go back to this fragment with the flag == true
-        // userListModel.tabBookings = false
 
         if (!sharedModel.comingFromOther) {
             userListModel.resetFilteredUsers()
@@ -59,22 +58,35 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
 
         fabBooking = view.findViewById(R.id.fabBooking)
         fabDelete = view.findViewById(R.id.fabDelete)
+        fabRate = view.findViewById(R.id.fabRate)
 
-        if (!sharedModel.comingFromOther) {
-            fabBooking.hide()
-            fabDelete.show()
-            fabDelete.setOnClickListener {
-                deleteTripDialog()
-            }
-        } else {
+        trip = sharedModel.selectedLocal
+
+        if (sharedModel.comingFromOther) {
+            fabRate.hide()
             fabDelete.hide()
             fabBooking.show()
             fabBooking.setOnClickListener {
                 createBookingDialog()
             }
+        } else {
+            fabBooking.hide()
+            if (sharedModel.tabCompletedTrips) {
+                fabDelete.hide()
+                fabRate.show()
+                fabRate.setOnClickListener {
+                    userListModel.selectedLocalTrip = trip
+                    profileModel.comingFromPrivacy = true
+                    findNavController().navigate(R.id.action_tripDetail_to_userRate)
+                }
+            } else {
+                fabRate.hide()
+                fabDelete.show()
+                fabDelete.setOnClickListener {
+                    deleteTripDialog()
+                }
+            }
         }
-
-        trip = sharedModel.selectedLocal
 
         sharedModel.getSelectedDB(trip).observe(viewLifecycleOwner, {
             if (it == null) {
@@ -114,9 +126,11 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.show_profiles, menu)
-        if (!sharedModel.comingFromOther)
-            inflater.inflate(R.menu.edit_menu, menu)
+        if (!sharedModel.tabCompletedTrips) {
+            inflater.inflate(R.menu.show_profiles, menu)
+            if (!sharedModel.comingFromOther)
+                inflater.inflate(R.menu.edit_menu, menu)
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

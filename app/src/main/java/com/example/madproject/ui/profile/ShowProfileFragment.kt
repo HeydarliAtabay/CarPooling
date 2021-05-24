@@ -10,6 +10,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.madproject.R
 import com.example.madproject.data.Profile
+import com.example.madproject.ui.yourtrips.TripListViewModel
 import com.example.madproject.ui.yourtrips.interestedusers.UserListViewModel
 import com.squareup.picasso.Picasso
 
@@ -25,6 +26,7 @@ class ShowProfileFragment : Fragment() {
     private var profile: Profile = Profile()
     private val model: ProfileViewModel by activityViewModels()
     private val listModel: UserListViewModel by activityViewModels()
+    private val tripListViewModel: TripListViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?,
@@ -39,6 +41,9 @@ class ShowProfileFragment : Fragment() {
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+        // Reset the flag that manages the tab selection in "your trips"
+        tripListViewModel.tabCompletedTrips = false
 
         fullName = view.findViewById(R.id.fullName)
         nickName = view.findViewById(R.id.nickName)

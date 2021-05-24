@@ -84,6 +84,9 @@ class OthersTripListFragment : Fragment() {
 
         if (tripListViewModel.comingFromOther) tripListViewModel.comingFromOther = false
 
+        // Reset the flag that manages the tab selection in "your trips"
+        tripListViewModel.tabCompletedTrips = false
+
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
         recyclerView.setHasFixedSize(true)
         recyclerView.setItemViewCacheSize(3)
@@ -200,6 +203,10 @@ class OthersTripListFragment : Fragment() {
     private fun filteredTripList(): List<Trip> {
 
         var list = tripList
+            .asSequence()
+            .filter {
+                MyFunctions.isFuture(it.departureDate, it.departureTime, "")
+            }
             .filter {
                 // Filter the Departure Location
                 it.from.toLowerCase(Locale.ROOT).contains(filter.from.toLowerCase(Locale.ROOT))
@@ -217,6 +224,7 @@ class OthersTripListFragment : Fragment() {
                 else
                     it.departureDate == filter.date
             }
+            .toList()
 
         if (filter.time != "") {
             list = list.filter {

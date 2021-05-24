@@ -1,4 +1,5 @@
 package com.example.madproject.data
+import android.os.Build
 
 data class Trip(var id: String = "") {
     var imageUrl: String = ""
@@ -26,6 +27,7 @@ data class Trip(var id: String = "") {
         intermediateStops: String = "",
         price: String = "",
         ownerEmail: String = ""
+
     ) : this(id) {
         this.imageUrl = imageUrl
         this.from = from

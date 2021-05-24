@@ -21,6 +21,8 @@ class TripListViewModel: ViewModel() {
     private var selectedDB: MutableLiveData<Trip> = MutableLiveData()
 
     var selectedLocal = Trip()
+
+    // Vars to manage the photos
     var currentPhotoPath = ""
     var bigPhotoPath = ""
     var useDBImage = false
@@ -43,11 +45,6 @@ class TripListViewModel: ViewModel() {
     // Variable to manage the orientation of the screen in the async tasks
     var orientation = -1
 
-    /*init {
-        loadUserTrips()
-        loadOtherTrips()
-    }*/
-
     private fun loadUserTrips() {
         FirestoreRepository().getTrips().addSnapshotListener(EventListener { value, e ->
             if (e != null) {
@@ -66,6 +63,7 @@ class TripListViewModel: ViewModel() {
     }
 
     private fun loadOtherTrips() {
+        // Get the list of other users
         FirestoreRepository().getUsersList()
             .addSnapshotListener(EventListener { value1, error1 ->
                 if (error1!= null) {
@@ -73,6 +71,7 @@ class TripListViewModel: ViewModel() {
                 }
                 val retrievedTrips : MutableList<Trip> = mutableListOf()
                 for (user in value1!!) {
+                    // For each user get the created trips
                     user.reference.collection("createdTrips")
                         .addSnapshotListener { value, error ->
                             if (error != null) {
@@ -87,10 +86,12 @@ class TripListViewModel: ViewModel() {
                                         break
                                     }
                                     if (t == selectedLocal) selectedDB.value = t
+                                    // Check if this trip must be updated instead of added
                                     if (retrievedTrips.contains(t)) retrievedTrips[retrievedTrips.indexOf(t)] = t
                                     else retrievedTrips.add(t)
                                     updatedList.add(t)
                                 }
+                                // Check if the current listener has been triggered by the delete of a trip
                                 val toRemove = findDeleted(updatedList, retrievedTrips)
                                 if (toRemove.id != "-1") {
                                     retrievedTrips.remove(toRemove)

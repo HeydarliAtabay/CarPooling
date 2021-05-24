@@ -57,6 +57,9 @@ class OthersTripListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
+        /*
+        If the "needRegistration" flag is true the navigation is redirected to the registration fragment
+         */
         if (profileViewModel.needRegistration) {
             val email = FirestoreRepository.auth.email ?: ""
             val name = FirestoreRepository.auth.displayName ?: ""
@@ -120,6 +123,7 @@ class OthersTripListFragment : Fragment() {
             }
         })
 
+        // If the orientation changed with the dialog opened -> reopen the dialog
         if (filterViewModel.changedOrientation) {
             filter = filterViewModel.temporalFilters
             launchFilterDialog()
@@ -131,6 +135,8 @@ class OthersTripListFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
+        // If the fragment is paused with the dialog opened save the filters and dismiss the datePicker
+        // and the timePicker
         if (filterViewModel.dialogOpened) {
             if (datePicker?.isVisible == true) datePicker?.dismiss()
             if (timePicker?.isVisible == true) timePicker?.dismiss()
@@ -160,6 +166,9 @@ class OthersTripListFragment : Fragment() {
         }
     }
 
+    /*
+    Create the filter dialog with the custom layout
+     */
     private fun launchFilterDialog() {
         filterViewModel.dialogOpened = true
         filterDialogView = LayoutInflater.from(this.requireActivity())
@@ -199,6 +208,9 @@ class OthersTripListFragment : Fragment() {
             .show()
     }
 
+    /*
+    Filter the list of trips with the selected filters
+     */
     @SuppressLint("SimpleDateFormat")
     private fun filteredTripList(): List<Trip> {
 
@@ -243,6 +255,9 @@ class OthersTripListFragment : Fragment() {
         return list
     }
 
+    /*
+    Manage the actions on the edit texts of this fragment
+     */
     private fun fixEditText() {
         filterFrom.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {  // lost focus
@@ -294,6 +309,9 @@ class OthersTripListFragment : Fragment() {
         }
     }
 
+    /*
+    Set the date picker
+     */
     @SuppressLint("SimpleDateFormat")
     private fun setDatePicker() {
         val constraintsBuilder = CalendarConstraints.Builder().setValidator(
@@ -333,6 +351,9 @@ class OthersTripListFragment : Fragment() {
         datePicker?.show(this.requireActivity().supportFragmentManager, datePicker.toString())
     }
 
+    /*
+    Set the time picker
+     */
     private fun setTimePicker() {
         var h = 0
         var m = 0
@@ -379,6 +400,9 @@ class OthersTripListFragment : Fragment() {
             private val bookTripButton = itemView.findViewById<Button>(R.id.editTripButton)
             private val cv = itemView.findViewById<CardView>(R.id.card_view)
 
+            /*
+            Populate the card view of each trip
+             */
             fun bind(t: Trip, sharedModel: TripListViewModel) {
                 from.text = t.from
                 to.text = t.to

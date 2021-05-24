@@ -22,6 +22,9 @@ import java.util.*
 class MyFunctions {
     companion object {
 
+        /*
+        Function to create a new image file inside "storagePath"
+         */
         @SuppressLint("SimpleDateFormat")
         fun isFuture(date: String, time: String, duration: String): Boolean {
             // Depending on the date and time, determine if the trip was terminated or not
@@ -52,6 +55,9 @@ class MyFunctions {
             return File(filename)
         }
 
+        /*
+        Function to resize the image in "bigPhotoPath", and save it in "currentPhotoPath"
+         */
         fun resizeSetImage(context: Context, bigPhotoPath: String, storagePath: String?): String {
             val currentPhotoPath = "$storagePath/profileImage.jpg"
             val smallImageFile = File(currentPhotoPath)
@@ -75,6 +81,9 @@ class MyFunctions {
             return currentPhotoPath
         }
 
+        /*
+        Function to parse the price string in edit text
+         */
         fun parsePrice(s: String): String {
             return if (s.contains(".")) {
                 val p = s.split(".")
@@ -93,6 +102,9 @@ class MyFunctions {
             }
         }
 
+        /*
+        Function to parse the duration string in edit text
+         */
         fun parseDuration(s: String): String {
             if (s.isEmpty() || s.length!=5) return s
 
@@ -107,6 +119,9 @@ class MyFunctions {
             return "$hStr:$mStr"
         }
 
+        /*
+        Function to manage the "duration" text listener
+         */
         fun durationTextListener(duration: EditText, context: Context?, view: View?) {
             duration.setOnFocusChangeListener { _, hasFocus ->
                 if (!hasFocus) {  // lost focus
@@ -162,6 +177,9 @@ class MyFunctions {
             })
         }
 
+        /*
+        Function to parse the time string in edit text
+         */
         fun parseTime(hour: Int?, minute: Int?): String {
             if ((hour == null) || (minute == null)) return ""
 
@@ -171,6 +189,9 @@ class MyFunctions {
             return "$h:$m"
         }
 
+        /*
+        Function to unParse the time string in edit text
+         */
         fun unParseTime(time: String): Int {
             val first = time[0]
             val second = time[1]

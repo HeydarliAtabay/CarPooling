@@ -51,6 +51,7 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
         recyclerView.setItemViewCacheSize(3)
         recyclerView.layoutManager = LinearLayoutManager(this.requireActivity())
 
+        // Load the list of trips created by the current user from the DB
         tripListViewModel.getUserTrips().observe(viewLifecycleOwner, {
             if (it == null) {
                 Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
@@ -126,6 +127,9 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
             private val editTripButton = itemView.findViewById<Button>(R.id.editTripButton)
             private val cv = itemView.findViewById<CardView>(R.id.card_view)
 
+            /*
+            Populate the card view of each trip
+             */
             fun bind(t: Trip, tlViewModel: TripListViewModel, ulViewModel: UserListViewModel, profileViewModel: ProfileViewModel) {
                 from.text = t.from
                 to.text = t.to

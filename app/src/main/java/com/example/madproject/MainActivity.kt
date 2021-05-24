@@ -39,9 +39,11 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Setup the Material Toolbar
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
+        // Get the flag from the intent extra in order to know if the first registration is needed
         model.needRegistration = intent.getBooleanExtra("INTENT_NEED_REGISTRATION_EXTRA", false)
 
         setNavigation()
@@ -51,6 +53,7 @@ class MainActivity : AppCompatActivity() {
         super.onRestoreInstanceState(savedInstanceState)
         if (model.changedOrientation) {
             model.changedOrientation = false
+            // if the orientation is changed with the logout dialog opened, reopen it
             performLogOut()
         }
     }
@@ -109,6 +112,9 @@ class MainActivity : AppCompatActivity() {
         } else profilePictureHeader.setImageResource(R.drawable.avatar)
     }
 
+    /*
+    Function to perform the logout and to return to the Auth Activity
+     */
     private fun performLogOut() {
         model.logoutDialogOpened = true
 

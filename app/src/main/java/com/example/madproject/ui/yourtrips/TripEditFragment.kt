@@ -176,7 +176,6 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
                         )
                     }
                     val outputFile = MyFunctions.createImageFile(storageDir?.absolutePath).apply {
-                        // Save a file: path for use with ACTION_VIEW intents
                         sharedModel.bigPhotoPath = absolutePath
                     }
                     val fileOutputStream = FileOutputStream(outputFile)
@@ -204,6 +203,9 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         }
     }
 
+    /*
+    Function to manage the listeners on the edit texts
+     */
     private fun fixEditText() {
         departure.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {  // lost focus
@@ -408,12 +410,18 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         }
     }
 
+    /*
+    Start the intent to choose a new picture from the gallery
+     */
     private fun dispatchChoosePictureIntent() {
         val pickIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
         this.requireActivity().intent.type = "image/*"
         startActivityForResult(pickIntent, Requests.INTENT_PHOTO_FROM_GALLERY.value)
     }
 
+    /*
+    Start the intent to capture a new picture from the default camera app
+     */
     @SuppressLint("QueryPermissionsNeeded")
     private fun dispatchTakePictureIntent() {
         Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
@@ -446,6 +454,9 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         }
     }
 
+    /*
+    Check if the required fields are provided when the user clicks the save button
+     */
     private fun formCheck(): Boolean {
         var flag = true
         if (trip.from == "") {
@@ -476,6 +487,9 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         return flag
     }
 
+    /*
+    Save the new values inside Firebase
+     */
     private fun saveValues() {
         sharedModel.saveTrip(trip)
             .addOnCompleteListener{
@@ -487,6 +501,9 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
             }
     }
 
+    /*
+    If there is a new image, save the image inside Firebase storage and then the new profile information
+     */
     private fun saveTrip(image: Boolean) {
         if (trip.id == "") {
             trip.id = FirebaseFirestore.getInstance()

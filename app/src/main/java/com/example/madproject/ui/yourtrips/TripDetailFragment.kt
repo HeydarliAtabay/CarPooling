@@ -142,6 +142,8 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
                 true
             }
             R.id.profilesButton -> {
+                // If the user is inside others trip list he will navigate to the profile of the driver
+                // Else he will navigate to his booking manager
                 if (sharedModel.comingFromOther) {
                     userListModel.selectedLocalUserEmail = trip.ownerEmail
                     profileModel.comingFromPrivacy = true

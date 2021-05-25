@@ -14,10 +14,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.madproject.R
-import com.example.madproject.data.Booking
-import com.example.madproject.data.FirestoreRepository
-import com.example.madproject.data.Profile
-import com.example.madproject.data.Trip
+import com.example.madproject.data.*
 import com.example.madproject.ui.yourtrips.TripListViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.tabs.TabLayout
@@ -255,7 +252,6 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
                         Toast.LENGTH_SHORT
                     ).show()
                 }
-
             }
             .setNegativeButton("No") { _, _ ->
             }
@@ -343,13 +339,12 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
                 val ratingBar = ratingDialogView.findViewById<RatingBar>(R.id.ratingStars)
                 val comment = ratingDialogView.findViewById<EditText>(R.id.ratingComment)
 
-
                 ratingBar.rating = sharedModel.rating
                 comment.setText(sharedModel.comment)
 
                 sharedModel.userEmailInDialog = u.email
 
-                // Listeners to update properly the viewModel
+                // Listeners to update properly the viewModel (useful for layout orientation change)
                 ratingBar.setOnRatingBarChangeListener { _, rating, _ ->
                     sharedModel.rating = rating
                 }
@@ -364,7 +359,21 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
                 ratingDialogBuilder.setView(ratingDialogView)
                     .setTitle("Insert a new rating")
                     .setPositiveButton("Yes") { _, _ ->
-                        Toast.makeText(itemView.context, "Rating added", Toast.LENGTH_SHORT).show()
+                        FirestoreRepository().insertRating(
+                            r = Rating(
+                                tripId = sharedModel.selectedLocalTrip.id,
+                                rating = ratingBar.rating,
+                                comment = comment.text.toString()
+                                ),
+                            user = u,
+                            passenger = true,
+                            b = sharedModel.getBooking(u)
+                        ).addOnSuccessListener {
+                            Toast.makeText(itemView.context, "New rating added. Thank you for your feedback!", Toast.LENGTH_SHORT).show()
+                        }.addOnFailureListener {
+                            Toast.makeText(itemView.context, "Problems in adding the rating!", Toast.LENGTH_SHORT).show()
+                            Log.d("test", it.message ?: "no Exc")
+                        }
                     }
                     .setNegativeButton("No") { _, _ ->
                     }

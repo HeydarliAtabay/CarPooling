@@ -1,5 +1,6 @@
 package com.example.madproject.data
 
+import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.*
@@ -169,4 +170,34 @@ class FirestoreRepository {
         return fireStoreDB.collection("users")
             .whereNotEqualTo("email", auth.email!!)
     }
+
+    /*
+    Function to start the transaction which inserts a new rating, and deletes the relative booking.
+    This transaction will:
+        - insert the new rating inside the proper collection (looking for the current user's nickName)
+        - delete the booking, so it is not anymore shown (It is ok because the trip is completed)
+    */
+    fun insertRating(r: Rating, user: Profile, passenger: Boolean, b: Booking): Task<Transaction> {
+        val collection = if (passenger) "passengerRatings" else "driverRatings"
+        val ratingCollectionRef = fireStoreDB.collection("users/${user.email}/$collection")
+
+        return fireStoreDB.runTransaction { transaction ->
+            r.nickName = transaction.get(fireStoreDB.collection("users").document(auth.email!!)).getString("nickName") ?: ""
+            val newId = ratingCollectionRef.document().id
+
+            Log.d("test", "nickName -> ${r.nickName}")
+
+            // set the new rating
+            transaction.set(
+                ratingCollectionRef.document(newId),
+                r
+            )
+            Log.d("test", "set done")
+            // delete the corresponding booking
+            transaction.delete(
+                fireStoreDB.collection("trips/${r.tripId}/confirmedBookings").document(b.id)
+            )
+        }
+    }
+
 }

@@ -22,71 +22,16 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_weight="1">
 
-        <ImageView
-            android:id="@+id/imageView4"
-            android:layout_width="17dp"
-            android:layout_height="15dp"
-            android:layout_alignStart="@+id/imageView3"
-            android:layout_alignTop="@+id/imageView3"
-            android:layout_alignEnd="@+id/imageView3"
-            android:layout_alignBottom="@+id/imageView3"
-            android:layout_marginStart="298dp"
-            android:layout_marginTop="12dp"
-            android:layout_marginEnd="4dp"
-            android:layout_marginBottom="154dp"
-            android:src="@drawable/ic_star" />
-
-        <ImageView
-            android:id="@+id/imageView5"
-            android:layout_width="16dp"
-            android:layout_height="18dp"
-            android:layout_alignStart="@+id/imageView3"
-            android:layout_alignTop="@+id/imageView3"
-            android:layout_alignEnd="@+id/imageView3"
-            android:layout_alignBottom="@+id/imageView3"
-            android:layout_marginStart="298dp"
-            android:layout_marginTop="43dp"
-            android:layout_marginEnd="5dp"
-            android:layout_marginBottom="120dp"
-            android:src="@drawable/ic_star" />
-
-        <TextView
-            android:id="@+id/passengerRating"
-            android:layout_width="28dp"
-            android:layout_height="20dp"
-            android:layout_alignStart="@+id/imageView3"
-            android:layout_alignTop="@+id/imageView3"
-            android:layout_alignEnd="@+id/imageView3"
-            android:layout_alignBottom="@+id/imageView3"
-            android:layout_marginStart="268dp"
-            android:layout_marginTop="41dp"
-            android:layout_marginEnd="23dp"
-            android:layout_marginBottom="120dp"
-            android:text="4.5"
-            android:textAlignment="center" />
-
-        <TextView
-            android:id="@+id/driverRating"
-            android:layout_width="24dp"
-            android:layout_height="19dp"
-            android:layout_alignStart="@+id/imageView3"
-            android:layout_alignTop="@+id/imageView3"
-            android:layout_alignEnd="@+id/imageView3"
-            android:layout_alignBottom="@+id/imageView3"
-            android:layout_marginStart="268dp"
-            android:layout_marginTop="9dp"
-            android:layout_marginEnd="23dp"
-            android:layout_marginBottom="153dp"
-            android:text="5.0"
-            android:textAlignment="center" />
-
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/imageView3"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="30dp"
             style="@style/ImageViewBorder"
-            android:layout_centerInParent="true" />
+            android:layout_width="216dp"
+            android:layout_height="189dp"
+            android:layout_centerInParent="true"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginEnd="30dp"
+            android:layout_marginBottom="30dp" />
     </RelativeLayout>
 
     <ScrollView
@@ -244,6 +189,48 @@
                 app:drawableTint="?attr/color"
                 android:ems="15"
                 android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textSize="12sp"
+                android:layout_marginBottom="4dp"
+                android:text="Driver Rating:" />
+
+            <TextView
+                android:id="@+id/driverRating"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="20dp"
+                android:drawablePadding="8dp"
+                android:ems="15"
+                android:textSize="16sp"
+                app:drawableStartCompat="@drawable/ic_star" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textSize="12sp"
+                android:layout_marginBottom="4dp"
+                android:text="Passenger Rating:" />
+
+            <TextView
+                android:id="@+id/passengerRating"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="20dp"
+                android:drawablePadding="8dp"
+                android:ems="15"
+                android:textSize="16sp"
+                app:drawableStartCompat="@drawable/ic_star" />
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

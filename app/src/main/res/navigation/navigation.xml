@@ -16,7 +16,16 @@
             app:enterAnim="@anim/slide_in"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/slide_out" />
+        <action
+            android:id="@+id/action_showProfile_to_comments"
+            app:destination="@id/comments" />
     </fragment>
+
+    <fragment
+        android:id="@+id/comments"
+        android:name="com.example.madproject.ui.comments.CommentsFragment"
+        android:label="Your comments"
+        tools:layout="@layout/fragment_comments" />
 
     <fragment
         android:id="@+id/editProfile"

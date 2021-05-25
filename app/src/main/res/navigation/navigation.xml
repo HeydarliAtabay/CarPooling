@@ -153,6 +153,9 @@
         android:name="com.example.madproject.ui.yourtrips.interestedusers.UserListFragment"
         android:label="Rate passengers"
         tools:layout="@layout/fragment_user_list" >
+        <action
+            android:id="@+id/action_userRate_to_showProfilePrivacy"
+            app:destination="@id/showProfilePrivacy" />
     </fragment>
 
 </navigation>

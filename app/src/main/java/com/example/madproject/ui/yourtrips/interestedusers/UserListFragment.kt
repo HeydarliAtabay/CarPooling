@@ -1,12 +1,16 @@
 package com.example.madproject.ui.yourtrips.interestedusers
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.widget.*
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.Navigation
+import androidx.navigation.Navigation.findNavController
+import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.madproject.R
@@ -38,84 +42,107 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
         tabLayout = view.findViewById(R.id.tab)
         tvSeats = view.findViewById(R.id.tvSeats)
 
-        // If the fragment was destroyed (i.e., for orientation change) with the booking tab opened,
-        // select the confirmed bookings tab
-        if (userListViewModel.tabBookings) {
-            val tab = tabLayout.getTabAt(1)
-            tab?.select()
-        }
-
         recyclerView = view.findViewById(R.id.recyclerView3)
         recyclerView.setHasFixedSize(true)
+        recyclerView.itemAnimator = DefaultItemAnimator()
         recyclerView.setItemViewCacheSize(2)
         recyclerView.layoutManager = LinearLayoutManager(this.requireActivity())
 
-        // Get the list of users who made a proposal to the selected trip
-        userListViewModel.getProposals().observe(viewLifecycleOwner, {
-            if (it == null) {
-                Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
-            } else {
-                if (!sameLists(proposals, it)) {
-                    proposals = it
-                    if (!userListViewModel.tabBookings) setProposalsList()
-                }
-            }
-        })
+        confirmed = userListViewModel.getConfirmed().value ?: listOf()
+        proposals = userListViewModel.getProposals().value ?: listOf()
 
-        // Get the list of users who have a confirmed booking on the selected trip
-        userListViewModel.getConfirmed().observe(viewLifecycleOwner, {
-            if (it == null) {
-                Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
-            } else {
-                confirmed = it
-                if (userListViewModel.tabBookings)
+        // If the user list refers to a "Completed trip", load the proper view
+        if (tripListViewModel.tabCompletedTrips) {
+
+            tabLayout.visibility = View.INVISIBLE
+
+            // Get the list of users who have a confirmed booking on the selected trip
+            userListViewModel.getConfirmed().observe(viewLifecycleOwner, {
+                if (it == null) {
+                    Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
+                } else {
+                    confirmed = it
                     setConfirmedList()
-
-            }
-        })
-
-        // Get the selected trip updated from the DB. It is needed to observe the available seats
-        userListViewModel.getDBTrip().observe(viewLifecycleOwner, {
-            if (it == null) {
-                Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
-            } else {
-                selectedTrip = it
-                // If there are no more available seats it is selected the bookings tab
-                if (selectedTrip.availableSeat == "0") {
-                    val tab = tabLayout.getTabAt(1)
-                    tab?.select()
                 }
-            }
-        })
+            })
+        } else {
 
-        // Setting the listeners on the tab
-        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            // If the fragment was destroyed (i.e., for orientation change) with the booking tab opened,
+            // select the confirmed bookings tab
+            if (userListViewModel.tabBookings) {
+                val tab = tabLayout.getTabAt(1)
+                tab?.select()
+                setConfirmedList()
+            } else
+                setProposalsList()
 
-            override fun onTabSelected(tab: TabLayout.Tab?) {
-                // Handle tab select
-                when (tab?.contentDescription) {
-                    "tabProp" -> setProposalsList()
-
-                    "tabBook" -> setConfirmedList()
+            // Get the list of users who made a proposal to the selected trip
+            userListViewModel.getProposals().observe(viewLifecycleOwner, {
+                if (it == null) {
+                    Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
+                } else {
+                    if (!sameLists(proposals, it)) {
+                        proposals = it
+                        if (!userListViewModel.tabBookings) setProposalsList()
+                    }
                 }
+            })
+
+            // Get the list of users who have a confirmed booking on the selected trip
+            userListViewModel.getConfirmed().observe(viewLifecycleOwner, {
+                if (it == null) {
+                    Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
+                } else {
+                    confirmed = it
+                    if (userListViewModel.tabBookings)
+                        setConfirmedList()
+
+                }
+            })
+
+            // Get the selected trip updated from the DB. It is needed to observe the available seats
+            userListViewModel.getDBTrip().observe(viewLifecycleOwner, {
+                if (it == null) {
+                    Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
+                } else {
+                    selectedTrip = it
+                    // If there are no more available seats it is selected the bookings tab
+                    if (selectedTrip.availableSeat == "0") {
+                        val tab = tabLayout.getTabAt(1)
+                        tab?.select()
+                    }
+                }
+            })
+
+            // Setting the listeners on the tab
+            tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+
+                override fun onTabSelected(tab: TabLayout.Tab?) {
+                    // Handle tab select
+                    when (tab?.contentDescription) {
+                        "tabProp" -> setProposalsList()
+
+                        "tabBook" -> setConfirmedList()
+                    }
+                }
+
+                override fun onTabReselected(tab: TabLayout.Tab?) {}
+
+                override fun onTabUnselected(tab: TabLayout.Tab?) {}
+            })
+
+            // If the orientation was changed with the dialog opened -> reopen the dialog
+            if (userListViewModel.changedOrientation) {
+                createConfirmBookingDialog()
+                userListViewModel.changedOrientation = false
             }
-
-            override fun onTabReselected(tab: TabLayout.Tab?) {}
-
-            override fun onTabUnselected(tab: TabLayout.Tab?) {}
-        })
-
-        // If the orientation was changed with the dialog opened -> reopen the dialog
-        if (userListViewModel.changedOrientationBooking) {
-            createBookingDialog()
-            userListViewModel.changedOrientationBooking = false
         }
     }
 
     override fun onPause() {
         super.onPause()
-        if (userListViewModel.bookingDialogOpened)
-            userListViewModel.changedOrientationBooking = true
+        if (userListViewModel.confirmBookingDialogOpened)
+            userListViewModel.changedOrientation = true
     }
 
     /*
@@ -154,7 +181,9 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
             tvSeats.visibility = View.INVISIBLE
         }
 
-        recyclerView.adapter = UsersAdapter(proposals.toList(), userListViewModel, true)
+        recyclerView.adapter = UsersAdapter(proposals.toList(), userListViewModel,
+            true, tripListViewModel)
+
     }
 
     /*
@@ -173,20 +202,21 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
             emptyList.text = "No confirmed bookings"
             emptyList.visibility = View.VISIBLE
         }
-        recyclerView.adapter = UsersAdapter(confirmed.toList(), userListViewModel, false)
+        recyclerView.adapter = UsersAdapter(confirmed.toList(), userListViewModel,
+            false, tripListViewModel)
     }
 
     private fun bookButtonListen() {
         bookButton.setOnClickListener {
-            createBookingDialog()
+            createConfirmBookingDialog()
         }
     }
 
     /*
     Function to create the dialog to confirm the selected proposals and to send the request to the DB
      */
-    private fun createBookingDialog() {
-        userListViewModel.bookingDialogOpened = true
+    private fun createConfirmBookingDialog() {
+        userListViewModel.confirmBookingDialogOpened = true
         MaterialAlertDialogBuilder(this.requireContext())
             .setTitle("Confirm Bookings")
             .setMessage("Are you sure to confirm the selected bookings?")
@@ -230,7 +260,7 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
             .setNegativeButton("No") { _, _ ->
             }
             .setOnDismissListener {
-                userListViewModel.bookingDialogOpened = false
+                userListViewModel.confirmBookingDialogOpened = false
             }
             .show()
     }
@@ -238,7 +268,8 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
     class UsersAdapter(
         val data: List<Profile>,
         private val sharedModel: UserListViewModel,
-        private val locationProp: Boolean
+        private val locationProp: Boolean,
+        private val tripListModel: TripListViewModel,
     ) : RecyclerView.Adapter<UsersAdapter.UserViewHolder>() {
 
         class UserViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -250,24 +281,34 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
             /*
             Populate the card view of each user
              */
-            fun bind(u: Profile, sharedModel: UserListViewModel, locationProp: Boolean) {
+            fun bind(u: Profile, sharedModel: UserListViewModel, locationProp: Boolean, tripListModel: TripListViewModel) {
 
                 fullName.text = u.fullName
 
-                if (locationProp) {
-                    val booking = sharedModel.getBooking(u)
-                    if (booking.confirmed) check.setImageResource(R.drawable.ic_icons8_checked_32_yes)
-                    else check.setImageResource(R.drawable.ic_icons8_checked_32_no)
-
+                // If the user comes to this list to rate the passengers load the proper view
+                if (tripListModel.tabCompletedTrips) {
+                    check.setBackgroundResource(R.drawable.button_state_selector)
+                    check.setImageResource(R.drawable.ic_star)
                     check.setOnClickListener {
-                        sharedModel.setBookingFlag(u)
-                        booking.confirmed = !booking.confirmed
+                        sharedModel.comment = ""
+                        sharedModel.rating = 0.0F
+                        openRatingDialog(u, sharedModel)
+                    }
+                } else {
+                    if (locationProp) {
+                        val booking = sharedModel.getBooking(u)
                         if (booking.confirmed) check.setImageResource(R.drawable.ic_icons8_checked_32_yes)
                         else check.setImageResource(R.drawable.ic_icons8_checked_32_no)
-                    }
 
-                } else check.setImageResource(R.drawable.ic_icons8_checked_32_yes)
+                        check.setOnClickListener {
+                            sharedModel.setBookingFlag(u)
+                            booking.confirmed = !booking.confirmed
+                            if (booking.confirmed) check.setImageResource(R.drawable.ic_icons8_checked_32_yes)
+                            else check.setImageResource(R.drawable.ic_icons8_checked_32_no)
+                        }
 
+                    } else check.setImageResource(R.drawable.ic_icons8_checked_32_yes)
+                }
 
                 if (u.imageUrl != "") {
                     Picasso.get().load(u.imageUrl).placeholder(R.drawable.avatar)
@@ -276,20 +317,69 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
 
                 cv.setOnClickListener {
                     sharedModel.selectedLocalUserEmail = u.email
-                    Navigation.findNavController(itemView)
-                        .navigate(R.id.action_userList_to_showProfilePrivacy)
+                    if (tripListModel.tabCompletedTrips) {
+                        findNavController(itemView)
+                            .navigate(R.id.action_userRate_to_showProfilePrivacy)
+                    }
+                    else
+                        findNavController(itemView)
+                            .navigate(R.id.action_userList_to_showProfilePrivacy)
+                }
+
+                if (sharedModel.userEmailInDialog == u.email) {
+                    openRatingDialog(u, sharedModel)
                 }
             }
 
-            fun unbind(locationProp: Boolean) {
+            fun unbind() {
                 cv.setOnClickListener { }
-                if (locationProp) check.setOnClickListener { }
+                check.setOnClickListener { }
+            }
+
+            private fun openRatingDialog(u: Profile, sharedModel: UserListViewModel) {
+                val ratingDialogBuilder = MaterialAlertDialogBuilder(itemView.context)
+                val ratingDialogView: View = LayoutInflater.from(itemView.context)
+                    .inflate(R.layout.rating_dialog, null, false)
+                val ratingBar = ratingDialogView.findViewById<RatingBar>(R.id.ratingStars)
+                val comment = ratingDialogView.findViewById<EditText>(R.id.ratingComment)
+
+
+                ratingBar.rating = sharedModel.rating
+                comment.setText(sharedModel.comment)
+
+                sharedModel.userEmailInDialog = u.email
+
+                // Listeners to update properly the viewModel
+                ratingBar.setOnRatingBarChangeListener { _, rating, _ ->
+                    sharedModel.rating = rating
+                }
+                comment.addTextChangedListener(object: TextWatcher {
+                    override fun afterTextChanged(s: Editable?) {
+                        sharedModel.comment = s.toString()
+                    }
+                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+                })
+
+                ratingDialogBuilder.setView(ratingDialogView)
+                    .setTitle("Insert a new rating")
+                    .setPositiveButton("Yes") { _, _ ->
+                        Toast.makeText(itemView.context, "Rating added", Toast.LENGTH_SHORT).show()
+                    }
+                    .setNegativeButton("No") { _, _ ->
+                    }
+                    .setOnDismissListener {
+                        sharedModel.userEmailInDialog = ""
+                        sharedModel.comment = ""
+                        sharedModel.rating = 0.0F
+                    }
+                    .show()
             }
         }
 
         override fun onViewRecycled(holder: UserViewHolder) {
             super.onViewRecycled(holder)
-            holder.unbind(locationProp)
+            holder.unbind()
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
@@ -299,7 +389,7 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
         }
 
         override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
-            holder.bind(data[position], sharedModel, locationProp)
+            holder.bind(data[position], sharedModel, locationProp, tripListModel)
         }
 
         override fun getItemCount(): Int {

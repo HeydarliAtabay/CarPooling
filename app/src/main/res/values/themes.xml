@@ -24,7 +24,6 @@
         <!-- Customize your theme here. -->
         <item name="android:windowBackground">#EBFFFFFF</item>
         <item name="android:scrollbarThumbVertical">@color/gray</item>
-        <item name="snackbarStyle">@style/Widget.App.Snackbar</item>
 
         <item name="materialAlertDialogTheme">@style/AlertDialogTheme</item>
 
@@ -62,10 +61,6 @@
         <item name="boxStrokeWidth">3dp</item>
         <item name="startIconTint">@color/black</item>
         <item name="endIconTint">@color/black</item>
-    </style>
-
-    <style name="Widget.App.Snackbar" parent="Widget.MaterialComponents.Snackbar">
-        <item name="android:layout_margin">20dp</item>
     </style>
 
     <style name="AlertDialogTheme" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">

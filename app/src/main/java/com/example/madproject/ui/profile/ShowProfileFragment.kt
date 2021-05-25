@@ -1,6 +1,7 @@
 package com.example.madproject.ui.profile
 
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.widget.ImageView
@@ -45,9 +46,6 @@ class ShowProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
-        // Reset the flag that manages the tab selection in "your trips"
-        tripListViewModel.tabCompletedTrips = false
-
         fullName = view.findViewById(R.id.fullName)
         nickName = view.findViewById(R.id.nickName)
         email = view.findViewById(R.id.email)
@@ -55,6 +53,8 @@ class ShowProfileFragment : Fragment() {
 
         // Load these information only if it is shown the current user profile
         if (!model.comingFromPrivacy) {
+            // Reset the flag that manages the tab selection in "your trips", after going to this page from navigation drawer
+            tripListViewModel.tabCompletedTrips = false
             dateOfBirth = view.findViewById(R.id.dateOfBirth)
             phoneNumber = view.findViewById(R.id.phoneNumber)
             location = view.findViewById(R.id.location)

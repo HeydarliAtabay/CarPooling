@@ -5,7 +5,7 @@
         <item name="colorPrimary">#90CAF9</item>
         <item name="colorOnPrimary">#000000</item>
         <item name="colorPrimaryVariant">#C3FDFF</item>
-        <item name="colorPrimaryDark">#000000</item>
+        <item name="colorPrimaryDark">#0F164E</item>
         <item name="android:textColorPrimary">#FFFFFF</item>
         <item name="android:textColor">@color/white</item>
 
@@ -25,8 +25,7 @@
 
         <!-- Customize your theme here. -->
         <item name="android:windowBackground">#BEFFFFFF</item>
-        <item name="android:scrollbarThumbVertical">?attr/colorPrimaryDark</item>
-        <item name="snackbarStyle">@style/Widget.App.Snackbar</item>
+        <item name="android:scrollbarThumbVertical">@color/black</item>
         <item name="materialAlertDialogTheme">@style/AlertDialogTheme</item>
 
     </style>
@@ -61,10 +60,6 @@
         <item name="boxStrokeWidth">3dp</item>
         <item name="startIconTint">@color/white</item>
         <item name="endIconTint">@color/white</item>
-    </style>
-
-    <style name="Widget.App.Snackbar" parent="Widget.MaterialComponents.Snackbar">
-        <item name="android:layout_margin">20dp</item>
     </style>
 
     <style name="AlertDialogTheme" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">

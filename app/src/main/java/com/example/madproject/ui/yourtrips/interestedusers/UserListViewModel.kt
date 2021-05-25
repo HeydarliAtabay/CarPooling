@@ -1,5 +1,6 @@
 package com.example.madproject.ui.yourtrips.interestedusers
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -26,9 +27,14 @@ class UserListViewModel: ViewModel() {
     // Flag to manage the landscape selection of the tab
     var tabBookings = false
 
-    // Flag to manage the booking dialog
-    var bookingDialogOpened = false
-    var changedOrientationBooking = false
+    // Flag to manage the booking confirmation dialog
+    var confirmBookingDialogOpened = false
+    var changedOrientation = false
+
+    // Data used to manage the rating dialog restore state from OtherTripsFragment
+    var userEmailInDialog = ""
+    var rating = 0.0F
+    var comment = ""
 
     init {
         loadOtherUsers()
@@ -120,7 +126,6 @@ class UserListViewModel: ViewModel() {
             if (u.email == selectedLocalUserEmail)
                 selectedDBUser.value = u
         }
-
         return selectedDBUser
     }
 

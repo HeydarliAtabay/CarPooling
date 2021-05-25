@@ -1,6 +1,7 @@
 package com.example.madproject.ui.yourtrips
 
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.widget.Button
@@ -38,6 +39,9 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
         emptyList = view.findViewById(R.id.emptyList)
         emptyList2 = view.findViewById(R.id.emptyList2)
         tabLayout = view.findViewById(R.id.tabUserTrips)
+
+        // reset the flag to "false", since this fragment will set it to "true" if the required navigation is selected
+        profileModel.comingFromPrivacy = false
 
         if (tripListViewModel.tabCompletedTrips) {
             val tab = tabLayout.getTabAt(1)
@@ -124,7 +128,7 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
             private val date = itemView.findViewById<TextView>(R.id.date_txt)
             private val time = itemView.findViewById<TextView>(R.id.time_txt)
             private val price = itemView.findViewById<TextView>(R.id.price_txt)
-            private val editTripButton = itemView.findViewById<Button>(R.id.editTripButton)
+            private val cardButton = itemView.findViewById<Button>(R.id.editTripButton)
             private val cv = itemView.findViewById<CardView>(R.id.card_view)
 
             /*
@@ -145,10 +149,10 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
                     findNavController(itemView).navigate(R.id.action_tripList_to_tripDetail)
                 }
 
-                editTripButton.text =
+                cardButton.text =
                     if (tlViewModel.tabCompletedTrips) "Rate Passengers" else "Edit"
 
-                editTripButton.setOnClickListener {
+                cardButton.setOnClickListener {
                     tlViewModel.selectedLocal = t
                     if (tlViewModel.tabCompletedTrips) {
                         ulViewModel.selectedLocalTrip = t
@@ -162,7 +166,7 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
             }
 
             fun unbind() {
-                editTripButton.setOnClickListener {  }
+                cardButton.setOnClickListener {  }
                 cv.setOnClickListener {  }
             }
         }

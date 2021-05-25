@@ -1,5 +1,6 @@
 package com.example.madproject.ui.yourtrips
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -83,13 +84,15 @@ class TripListViewModel: ViewModel() {
                                     if (t.availableSeat.toInt() == 0) {
                                         if (t == selectedDB.value) selectedDB.value = null
                                         if (retrievedTrips.contains(t)) { retrievedTrips.remove(t) }
-                                        break
+                                    } else {
+                                        if (t == selectedLocal) selectedDB.value = t
+                                        // Check if this trip must be updated instead of added
+                                        if (retrievedTrips.contains(t)) retrievedTrips[retrievedTrips.indexOf(
+                                            t
+                                        )] = t
+                                        else retrievedTrips.add(t)
+                                        updatedList.add(t)
                                     }
-                                    if (t == selectedLocal) selectedDB.value = t
-                                    // Check if this trip must be updated instead of added
-                                    if (retrievedTrips.contains(t)) retrievedTrips[retrievedTrips.indexOf(t)] = t
-                                    else retrievedTrips.add(t)
-                                    updatedList.add(t)
                                 }
                                 // Check if the current listener has been triggered by the delete of a trip
                                 val toRemove = findDeleted(updatedList, retrievedTrips)
@@ -98,6 +101,7 @@ class TripListViewModel: ViewModel() {
                                     if (selectedDB.value == toRemove)
                                         selectedDB.value = null
                                 }
+
                                 otherTrips.value = retrievedTrips
                             }
                         }

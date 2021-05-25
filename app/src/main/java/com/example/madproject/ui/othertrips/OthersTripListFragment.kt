@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.text.InputType
+import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
@@ -87,7 +88,7 @@ class OthersTripListFragment : Fragment() {
 
         if (tripListViewModel.comingFromOther) tripListViewModel.comingFromOther = false
 
-        // Reset the flag that manages the tab selection in "your trips"
+        // Reset the flag that manages the tab selection in "your trips", after going to this page from navigation drawer
         tripListViewModel.tabCompletedTrips = false
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)

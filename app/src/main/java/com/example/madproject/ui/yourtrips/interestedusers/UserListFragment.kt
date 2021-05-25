@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.Navigation.findNavController
@@ -178,8 +179,10 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
             tvSeats.visibility = View.INVISIBLE
         }
 
-        recyclerView.adapter = UsersAdapter(proposals.toList(), userListViewModel,
-            true, tripListViewModel)
+        recyclerView.adapter = UsersAdapter(
+            proposals.toList(), userListViewModel,
+            true, tripListViewModel
+        )
 
     }
 
@@ -196,11 +199,16 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
         if (confirmed.isNotEmpty())
             emptyList.visibility = View.INVISIBLE
         else {
-            emptyList.text = "No confirmed bookings"
+            if (userListViewModel.tabBookings)
+                emptyList.text = "Ratings completed"
+            else
+                emptyList.text = "No confirmed bookings"
             emptyList.visibility = View.VISIBLE
         }
-        recyclerView.adapter = UsersAdapter(confirmed.toList(), userListViewModel,
-            false, tripListViewModel)
+        recyclerView.adapter = UsersAdapter(
+            confirmed.toList(), userListViewModel,
+            false, tripListViewModel
+        )
     }
 
     private fun bookButtonListen() {
@@ -273,11 +281,17 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
             private val fullName = itemView.findViewById<TextView>(R.id.name)
             private val cv = itemView.findViewById<CardView>(R.id.card_view)
             private val check = itemView.findViewById<ImageButton>(R.id.checkedButt)
+            private var dialog: AlertDialog? = null
 
             /*
             Populate the card view of each user
              */
-            fun bind(u: Profile, sharedModel: UserListViewModel, locationProp: Boolean, tripListModel: TripListViewModel) {
+            fun bind(
+                u: Profile,
+                sharedModel: UserListViewModel,
+                locationProp: Boolean,
+                tripListModel: TripListViewModel
+            ) {
 
                 fullName.text = u.fullName
 
@@ -316,8 +330,7 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
                     if (tripListModel.tabCompletedTrips) {
                         findNavController(itemView)
                             .navigate(R.id.action_userRate_to_showProfilePrivacy)
-                    }
-                    else
+                    } else
                         findNavController(itemView)
                             .navigate(R.id.action_userList_to_showProfilePrivacy)
                 }
@@ -330,6 +343,7 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
             fun unbind() {
                 cv.setOnClickListener { }
                 check.setOnClickListener { }
+                dialog?.dismiss()
             }
 
             private fun openRatingDialog(u: Profile, sharedModel: UserListViewModel) {
@@ -348,15 +362,18 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
                 ratingBar.setOnRatingBarChangeListener { _, rating, _ ->
                     sharedModel.rating = rating
                 }
-                comment.addTextChangedListener(object: TextWatcher {
+                comment.addTextChangedListener(object : TextWatcher {
                     override fun afterTextChanged(s: Editable?) {
                         sharedModel.comment = s.toString()
                     }
+
                     override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
                     override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
                 })
 
-                ratingDialogBuilder.setView(ratingDialogView)
+                dialog?.dismiss()
+                dialog = ratingDialogBuilder.setView(ratingDialogView)
                     .setTitle("Insert a new rating")
                     .setPositiveButton("Yes") { _, _ ->
                         FirestoreRepository().insertRating(
@@ -364,14 +381,22 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
                                 tripId = sharedModel.selectedLocalTrip.id,
                                 rating = ratingBar.rating,
                                 comment = comment.text.toString()
-                                ),
+                            ),
                             user = u,
                             passenger = true,
                             b = sharedModel.getBooking(u)
                         ).addOnSuccessListener {
-                            Toast.makeText(itemView.context, "New rating added. Thank you for your feedback!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                itemView.context,
+                                "New rating added. Thank you for your feedback!",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }.addOnFailureListener {
-                            Toast.makeText(itemView.context, "Problems in adding the rating!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                itemView.context,
+                                "Problems in adding the rating!",
+                                Toast.LENGTH_SHORT
+                            ).show()
                             Log.d("test", it.message ?: "no Exc")
                         }
                     }
@@ -381,8 +406,8 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
                         sharedModel.userEmailInDialog = ""
                         sharedModel.comment = ""
                         sharedModel.rating = 0.0F
-                    }
-                    .show()
+                    }.show()
+
             }
         }
 

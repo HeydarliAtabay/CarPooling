@@ -192,7 +192,7 @@ class FirestoreRepository {
                 ratingCollectionRef.document(newId),
                 r
             )
-            Log.d("test", "set done")
+
             // delete the corresponding booking
             transaction.delete(
                 fireStoreDB.collection("trips/${r.tripId}/confirmedBookings").document(b.id)

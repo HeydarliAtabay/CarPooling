@@ -1,6 +1,5 @@
 package com.example.madproject.ui.yourtrips.interestedusers
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -17,7 +16,8 @@ class UserListViewModel: ViewModel() {
     private var proposals: MutableLiveData<List<Profile>> = MutableLiveData(listOf())
     private var confirmedBook : MutableLiveData<List<Profile>> = MutableLiveData(listOf())
     private var selectedDBUser: MutableLiveData<Profile> = MutableLiveData(Profile())
-    private var selectedBookings: List<Booking> = listOf()
+    private var selectedBookingsProposals: List<Booking> = listOf()
+    private var selectedConfirmedBookings: List<Booking> = listOf()
     var selectedLocalUserEmail = ""
 
     // Manage the selected Trip update
@@ -91,7 +91,7 @@ class UserListViewModel: ViewModel() {
                 retrievedMap[u] = booking
             }
             proposals.value = retrievedUsers
-            selectedBookings = retrievedBookings
+            selectedBookingsProposals = retrievedBookings
         })
         return proposals
     }
@@ -105,13 +105,16 @@ class UserListViewModel: ViewModel() {
             }
 
             val retrievedUsers : MutableList<Profile> = mutableListOf()
+            val retrievedBookings : MutableList<Booking> = mutableListOf()
             for (doc in value!!) {
                 val booking = doc.toObject(Booking::class.java)
+                retrievedBookings.add(booking)
                 for (user in allUsers) {
                     if (booking.clientEmail == user.email) retrievedUsers.add(user)
                 }
             }
             confirmedBook.value = retrievedUsers
+            selectedConfirmedBookings = retrievedBookings
         })
         return confirmedBook
     }
@@ -130,7 +133,9 @@ class UserListViewModel: ViewModel() {
     }
 
     fun getBooking(u: Profile): Booking {
-        for (b in selectedBookings)
+        for (b in selectedBookingsProposals)
+            if (b.clientEmail == u.email) return b
+        for (b in selectedConfirmedBookings)
             if (b.clientEmail == u.email) return b
         return Booking()
     }

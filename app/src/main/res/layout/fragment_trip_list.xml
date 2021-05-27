@@ -10,7 +10,7 @@
         android:id="@+id/emptyList"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="No trips available"
+        android:text="@string/no_trips_message1"
         android:textAppearance="@style/TextAppearance.AppCompat.Display1"
         app:layout_constraintBottom_toTopOf="@+id/emptyList2"
         app:layout_constraintEnd_toEndOf="parent"
@@ -23,7 +23,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text='Press the "+" button to add a new trip'
+        android:text="@string/no_trips_message2"
         android:textAppearance="@style/TextAppearance.AppCompat.Small"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/emptyList"
@@ -50,15 +50,15 @@
                 android:id="@+id/tabUpcoming"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:contentDescription="tabUpcoming"
-                android:text="Upcoming Trips" />
+                android:contentDescription="@string/upcoming_tab_id"
+                android:text="@string/upcoming_tab_text" />
 
             <com.google.android.material.tabs.TabItem
                 android:id="@+id/tabCompleted"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:contentDescription="tabCompleted"
-                android:text="Completed Trips" />
+                android:contentDescription="@string/completed_tab_id"
+                android:text="@string/completed_tab_text" />
 
         </com.google.android.material.tabs.TabLayout>
 
@@ -76,7 +76,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
         android:layout_margin="20dp"
-        android:contentDescription="Create a new Trip"
+        android:contentDescription="@string/new_trip_button"
         android:src="@drawable/plus"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

@@ -1,6 +1,5 @@
 package com.example.madproject.ui.yourtrips
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -105,7 +104,6 @@ class TripListViewModel: ViewModel() {
                     // For each trip query Firebase in order to get the related Bookings
                     FirestoreRepository().getProposals(trip)
                         .addSnapshotListener(EventListener { prop, error1 ->
-                            Log.d("test", "Listener Proposals")
                             if (error1 != null) {
                                 otherTrips.value = null
                                 confirmedTrips.value = null
@@ -154,7 +152,7 @@ class TripListViewModel: ViewModel() {
                                             }
 
                                             retrievedConfTrips.add(trip)
-                                            //Log.d("test", "Confirmed Trips triggered -> $retrievedConfTrips")
+
                                             confirmedTrips.value = retrievedConfTrips
                                         }
                                     })

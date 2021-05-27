@@ -10,7 +10,6 @@
         android:id="@+id/emptyList"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="No bookings found"
         android:textAppearance="@style/TextAppearance.AppCompat.Display1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -39,15 +38,15 @@
                 android:id="@+id/tabProp"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:contentDescription="tabProp"
-                android:text="Proposals" />
+                android:contentDescription="@string/proposals_tab_id"
+                android:text="@string/proposals_tab_text" />
 
             <com.google.android.material.tabs.TabItem
                 android:id="@+id/tabBook"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:contentDescription="tabBook"
-                android:text="Confirmed Bookings" />
+                android:contentDescription="@string/bookings_tab_id"
+                android:text="@string/bookings_tab_text" />
 
         </com.google.android.material.tabs.TabLayout>
 
@@ -71,7 +70,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="4dp"
-                android:text="Confirm the bookings"
+                android:text="@string/confirm_bookings_button"
                 app:layout_constraintBottom_toTopOf="@+id/tvSeats"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -85,7 +84,6 @@
                 android:layout_marginTop="8dp"
                 android:drawablePadding="8dp"
                 android:gravity="center"
-                android:text="Available Seats: 9"
                 android:textSize="18sp"
                 app:drawableStartCompat="@drawable/outline_chair_36"
                 app:layout_constraintBottom_toBottomOf="parent"

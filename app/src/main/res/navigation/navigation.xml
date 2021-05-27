@@ -111,6 +111,7 @@
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/slide_in" />
     </fragment>
+
     <fragment
         android:id="@+id/othersTripList"
         android:name="com.example.madproject.ui.othertrips.OthersTripListFragment"
@@ -145,6 +146,9 @@
         android:name="com.example.madproject.ui.profile.ShowProfileFragment"
         android:label="Profile details"
         tools:layout="@layout/fragment_show_profile" >
+        <action
+            android:id="@+id/action_showProfilePrivacy_to_comments"
+            app:destination="@id/comments" />
     </fragment>
 
     <fragment

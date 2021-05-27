@@ -5,7 +5,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
@@ -16,7 +15,6 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
 import java.text.SimpleDateFormat
-import java.time.LocalDateTime
 import java.util.*
 
 class MyFunctions {

@@ -61,9 +61,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginLeft="16dp"
                 android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"
                 android:layout_marginBottom="4dp"
                 android:layout_weight="1"
                 android:orientation="horizontal"
@@ -78,15 +76,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
                     android:text="From:"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/from_dest"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:text="Rome" />
+                    android:layout_height="match_parent" />
 
             </LinearLayout>
 
@@ -95,10 +91,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginLeft="8dp"
                 android:layout_marginTop="4dp"
                 android:layout_marginEnd="16dp"
-                android:layout_marginRight="16dp"
                 android:layout_marginBottom="4dp"
                 android:layout_weight="1"
                 android:orientation="horizontal"
@@ -113,15 +107,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
                     android:text="To:"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/to_dest"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:text="Catania" />
+                    android:layout_height="match_parent" />
             </LinearLayout>
 
             <LinearLayout
@@ -129,9 +121,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginLeft="16dp"
                 android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"
                 android:layout_weight="1"
                 android:orientation="horizontal"
                 app:layout_constraintBottom_toTopOf="@+id/editTripButton"
@@ -145,15 +135,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
                     android:text="Date:"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/date_txt"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:text="28/04/2021" />
+                    android:layout_height="match_parent" />
 
             </LinearLayout>
 
@@ -162,9 +150,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginLeft="8dp"
                 android:layout_marginEnd="16dp"
-                android:layout_marginRight="16dp"
                 android:layout_weight="1"
                 android:orientation="horizontal"
                 app:layout_constraintBottom_toBottomOf="@+id/linearLayout3"
@@ -178,15 +164,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
                     android:text="Time:"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/time_txt"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:text="16:00" />
+                    android:layout_height="match_parent" />
             </LinearLayout>
 
             <Button
@@ -195,7 +179,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:layout_marginBottom="16dp"
-                android:text="Edit"
+                android:text="@string/edit_button"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"

@@ -205,7 +205,8 @@ class OthersTripListFragment : Fragment() {
 
         fixEditText()
 
-        filterDialogBuilder.setView(filterDialogView)
+        filterDialogBuilder
+            .setView(filterDialogView)
             .setTitle("Filter the trip list")
             .setPositiveButton("Apply") { _, _ ->
                 filterViewModel.setFilter(
@@ -431,7 +432,7 @@ class OthersTripListFragment : Fragment() {
 
                     Picasso.get().load(t.imageUrl).placeholder(R.drawable.car_example).error(R.drawable.car_example).into(image)
                 } else image.setImageResource(R.drawable.car_example)
-                bookTripButton.text = "Book trip"
+                bookTripButton.text = itemView.context.getString(R.string.book_button)
 
                 cv.setOnClickListener {
                     sharedModel.selectedLocal = t

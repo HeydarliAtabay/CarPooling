@@ -2,10 +2,8 @@ package com.example.madproject.ui.profile
 
 import android.os.Bundle
 import android.view.*
+import android.widget.*
 import androidx.fragment.app.Fragment
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.madproject.R
@@ -27,6 +25,8 @@ class ShowProfileFragment : Fragment() {
     private lateinit var image : ImageView
     private lateinit var passengerRatingView: TextView
     private lateinit var driverRatingView: TextView
+    private lateinit var driverRatingsButton: ImageButton
+    private lateinit var passengerRatingsButton: ImageButton
     private var profile: Profile = Profile()
     private var passengerRatings: List<Rating> = listOf()
     private var driverRatings: List<Rating> = listOf()
@@ -57,6 +57,8 @@ class ShowProfileFragment : Fragment() {
         image = view.findViewById(R.id.imageView3)
         passengerRatingView = view.findViewById(R.id.passengerRating)
         driverRatingView = view.findViewById(R.id.driverRating)
+        driverRatingsButton = view.findViewById(R.id.driverComments)
+        passengerRatingsButton = view.findViewById(R.id.passengerComments)
 
         // Load these information only if it is shown the current user profile
         if (!profileModel.comingFromPrivacy) {
@@ -69,6 +71,18 @@ class ShowProfileFragment : Fragment() {
 
         // Depending on the user to load, get the data from the right viewModel
         if (profileModel.comingFromPrivacy) {
+
+            // Navigate to the comments page when click on the arrow, selecting which ratings to load
+            driverRatingsButton.setOnClickListener {
+                ratingsModel.showDriverRatings = true
+                findNavController().navigate(R.id.action_showProfilePrivacy_to_comments)
+            }
+
+            passengerRatingsButton.setOnClickListener {
+                ratingsModel.showDriverRatings = false
+                findNavController().navigate(R.id.action_showProfilePrivacy_to_comments)
+            }
+
             // Set the new user in ratings view model in order to load his ratings
             ratingsModel.selectUser(userListModel.selectedLocalUserEmail)
             userListModel.getSelectedDB().observe(viewLifecycleOwner, {
@@ -80,6 +94,18 @@ class ShowProfileFragment : Fragment() {
                 }
             })
         } else {
+
+            // Navigate to the comments page when click on the arrow, selecting which ratings to load
+            driverRatingsButton.setOnClickListener {
+                ratingsModel.showDriverRatings = true
+                findNavController().navigate(R.id.action_showProfile_to_comments)
+            }
+
+            passengerRatingsButton.setOnClickListener {
+                ratingsModel.showDriverRatings = false
+                findNavController().navigate(R.id.action_showProfile_to_comments)
+            }
+
             // Set the new user in ratings view model in order to load his ratings
             ratingsModel.selectUser(profileModel.getDBUser().value?.email ?: "")
             profileModel.getDBUser().observe(viewLifecycleOwner, {
@@ -150,8 +176,14 @@ class ShowProfileFragment : Fragment() {
 
         // Load ratings grade
         driverRatingView.text =
-            getString(R.string.show_ratings, String.format(" % .1f", driverRatings.map { it.rating }.average()))
+            if (driverRatings.isEmpty())
+                getString(R.string.no_ratings)
+            else
+                getString(R.string.show_ratings, String.format(" % .1f", driverRatings.map { it.rating }.average()))
         passengerRatingView.text =
-            getString(R.string.show_ratings, String.format(" % .1f", passengerRatings.map { it.rating }.average()))
+            if (passengerRatings.isEmpty())
+                getString(R.string.no_ratings)
+            else
+                getString(R.string.show_ratings, String.format(" % .1f", passengerRatings.map { it.rating }.average()))
     }
 }

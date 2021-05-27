@@ -8,6 +8,8 @@ import com.example.madproject.data.Filters
 class FilterViewModel: ViewModel() {
 
     private var filter = MutableLiveData(Filters())
+
+    // Data to manage the screen orientation changes
     var dialogOpened = false
     var changedOrientation = false
     var temporalFilters = Filters()

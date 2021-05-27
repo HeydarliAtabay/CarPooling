@@ -4,6 +4,6 @@
     <item
         android:id="@+id/profilesButton"
         android:icon="@drawable/outline_account_circle_white_36"
-        android:title="Show the profiles"
+        android:title="@string/show_profiles_message"
         app:showAsAction="always" />
 </menu>

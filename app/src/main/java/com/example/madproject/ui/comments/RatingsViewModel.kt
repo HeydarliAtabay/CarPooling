@@ -21,6 +21,9 @@ class RatingsViewModel: ViewModel() {
     // Selected user used to load the ratings of this user
     private var selectedUserEmail: String = ""
 
+    // Flag to determine if the user clicks on driverRatings button (true) or passengerRatings button (false)
+    var showDriverRatings = false
+
     /*
     Function called when it is needed to load the ratings of a different user:
         - Remove (if present) the old listeners

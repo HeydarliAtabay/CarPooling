@@ -2,7 +2,6 @@ package com.example.madproject.ui.othertrips
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.text.InputType
 import android.util.Log
@@ -62,10 +61,10 @@ class OthersTripListFragment : Fragment() {
         If the "needRegistration" flag is true the navigation is redirected to the registration fragment
          */
         if (profileViewModel.needRegistration) {
-            val email = FirestoreRepository.auth.email ?: ""
-            val name = FirestoreRepository.auth.displayName ?: ""
-            val phone = FirestoreRepository.auth.phoneNumber ?: ""
-            val image = if (FirestoreRepository.auth.photoUrl != null) FirestoreRepository.auth.photoUrl.toString()
+            val email = FirestoreRepository.currentUser.email ?: ""
+            val name = FirestoreRepository.currentUser.displayName ?: ""
+            val phone = FirestoreRepository.currentUser.phoneNumber ?: ""
+            val image = if (FirestoreRepository.currentUser.photoUrl != null) FirestoreRepository.currentUser.photoUrl.toString()
             else ""
 
             profileViewModel.localProfile = Profile(
@@ -105,13 +104,26 @@ class OthersTripListFragment : Fragment() {
             if (it == null) {
                 Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
             } else {
-                tripList = it
+                tripList = filteredTripList(it)
+                Log.d("test", "Other Trips -> $it")
                 if (tripList.isNotEmpty())
                     emptyList.visibility = View.INVISIBLE
                 else
                     emptyList.visibility = View.VISIBLE
-                recyclerView.adapter = TripsAdapter(filteredTripList(), tripListViewModel)
+                recyclerView.adapter = TripsAdapter(tripList, tripListViewModel)
             }
+        })
+
+        tripListViewModel.getConfirmedTrips().observe(viewLifecycleOwner, {
+            if (it != null) {
+                Log.d("test", "Confirmed Trips -> $it")
+            } else Log.d("test", "Confirmed Trips -> problem")
+        })
+
+        tripListViewModel.getInterestedTrips().observe(viewLifecycleOwner, {
+            if (it != null) {
+                Log.d("test", "Interested Trips -> $it")
+            } else Log.d("test", "Interested Trips -> problem")
         })
 
         // Observe the dynamic filters
@@ -120,7 +132,12 @@ class OthersTripListFragment : Fragment() {
                 Toast.makeText(context, "Problem in setting the filters!", Toast.LENGTH_LONG).show()
             } else {
                 filter = it
-                recyclerView.adapter = TripsAdapter(filteredTripList(), tripListViewModel)
+                val nl = filteredTripList(tripList)
+                if (nl.isNotEmpty())
+                    emptyList.visibility = View.INVISIBLE
+                else
+                    emptyList.visibility = View.VISIBLE
+                recyclerView.adapter = TripsAdapter(nl, tripListViewModel)
             }
         })
 
@@ -213,13 +230,13 @@ class OthersTripListFragment : Fragment() {
     Filter the list of trips with the selected filters
      */
     @SuppressLint("SimpleDateFormat")
-    private fun filteredTripList(): List<Trip> {
+    private fun filteredTripList(longList: List<Trip>): List<Trip> {
 
-        var list = tripList
+        var list = longList
             .asSequence()
-            /*.filter {
+            .filter {
                 MyFunctions.isFuture(it.departureDate, it.departureTime, "")
-            }*/
+            }
             .filter {
                 // Filter the Departure Location
                 it.from.toLowerCase(Locale.ROOT).contains(filter.from.toLowerCase(Locale.ROOT))

@@ -10,7 +10,6 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.text.InputType
-import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.view.inputmethod.InputMethodManager
@@ -386,7 +385,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
             additionalInfo = additionalInfo.text.toString(),
             intermediateStops = intermediateStops.text.toString(),
             price = MyFunctions.parsePrice(price.text.toString()),
-            ownerEmail = FirestoreRepository.auth.email!!
+            ownerEmail = FirestoreRepository.currentUser.email!!
         )
         trip = sharedModel.selectedLocal
     }
@@ -517,7 +516,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
             val storageRef = storage.reference
             val localPhoto = File(currentPhotoPath!!)
             val file = Uri.fromFile(localPhoto)
-            val imageRef = storageRef.child("${FirestoreRepository.auth.email}/${trip.id}.jpg")
+            val imageRef = storageRef.child("${FirestoreRepository.currentUser.email}/${trip.id}.jpg")
             imageRef.putFile(file)
                 .addOnCompleteListener {
                     if (it.isSuccessful) {

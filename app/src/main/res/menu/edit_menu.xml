@@ -4,6 +4,6 @@
     <item
         android:id="@+id/editButton"
         android:icon="@drawable/outline_mode_edit_36"
-        android:title="editButton"
+        android:title="Click to edit"
         app:showAsAction="always" />
 </menu>

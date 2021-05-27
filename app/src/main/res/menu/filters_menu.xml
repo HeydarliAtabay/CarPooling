@@ -4,6 +4,6 @@
     <item
         android:id="@+id/filtersButton"
         android:icon="@drawable/outline_filter_list_white_36"
-        android:title="filtersButton"
+        android:title="Open to filter the trips"
         app:showAsAction="always" />
 </menu>

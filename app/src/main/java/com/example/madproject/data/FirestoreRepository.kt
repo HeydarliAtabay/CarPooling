@@ -10,64 +10,57 @@ class FirestoreRepository {
 
     companion object{
         // Current Authenticated user
-        lateinit var auth: FirebaseUser
+        lateinit var currentUser: FirebaseUser
     }
 
     /*
     Function to insert the trip "t" inside Firebase
      */
-    fun insertTrip(t: Trip): Task<Transaction> {
+    fun insertTrip(t: Trip): Task<Void> {
 
-        return fireStoreDB.runTransaction { transaction ->
-
-            transaction.set(
-                fireStoreDB.collection("trips").document(t.id),
-                mapOf("tripId" to t.id)
-            )
-
-            transaction.set(
-                fireStoreDB.collection("users/${auth.email}/createdTrips").document(t.id),
-                t
-            )
-        }
+        return fireStoreDB.collection("trips").document(t.id).set(t)
     }
 
     /*
     Function to delete the trip "t" from Firebase
      */
-    fun deleteTrip(t: Trip): Task<Transaction> {
-        return fireStoreDB.runTransaction { transaction ->
-            transaction.delete(fireStoreDB.collection("users/${auth.email}/createdTrips").document(t.id))
-            transaction.delete(fireStoreDB.collection("trips").document(t.id))
-        }
+    fun deleteTrip(t: Trip): Task<Void> {
+        return fireStoreDB.collection("trips").document(t.id).delete()
     }
 
     /*
     Function to get the collection of trips created by the current user
      */
-    fun getTrips(): CollectionReference {
-        return fireStoreDB.collection("users/${auth.email}/createdTrips")
+    fun getUserTrips(): Query {
+        return fireStoreDB.collection("trips").whereEqualTo("ownerEmail", currentUser.email)
     }
 
     /*
     Function to get the document of the trip "t"
      */
     fun getTrip(t: Trip): DocumentReference {
-        return fireStoreDB.collection("users/${auth.email}/createdTrips").document(t.id)
+        return fireStoreDB.collection("trips").document(t.id)
+    }
+
+    /*
+    Function to get every trips from the "trips" collection
+     */
+    fun getAllTrips(): Query {
+        return fireStoreDB.collection("trips").whereNotEqualTo("ownerEmail", currentUser.email)
     }
 
     /*
     Function to get the document of the current user
      */
     fun getUser(): DocumentReference {
-        return fireStoreDB.collection("users").document(auth.email!!)
+        return fireStoreDB.collection("users").document(currentUser.email!!)
     }
 
     /*
     Function to modify the document of the current user
      */
     fun setUser(p: Profile): Task<Void> {
-        return fireStoreDB.collection("users").document(auth.email!!).set(p)
+        return fireStoreDB.collection("users").document(currentUser.email!!).set(p)
     }
 
     /*
@@ -75,7 +68,7 @@ class FirestoreRepository {
      */
     fun controlProposals(t: Trip): Task<QuerySnapshot> {
         return fireStoreDB.collection("trips/${t.id}/proposals")
-            .whereEqualTo("clientEmail", auth.email)
+            .whereEqualTo("clientEmail", currentUser.email)
             .get()
     }
 
@@ -84,7 +77,7 @@ class FirestoreRepository {
      */
     fun controlBookings(t: Trip): Task<QuerySnapshot> {
         return fireStoreDB.collection("trips/${t.id}/confirmedBookings")
-            .whereEqualTo("clientEmail", auth.email)
+            .whereEqualTo("clientEmail", currentUser.email)
             .get()
     }
 
@@ -95,7 +88,7 @@ class FirestoreRepository {
         val newBookingId = fireStoreDB.collection("trips/${t.id}/proposals").document().id
 
         return fireStoreDB.collection("trips/${t.id}/proposals").document(newBookingId)
-                .set(Booking(id = newBookingId,clientEmail = auth.email!!))
+                .set(Booking(id = newBookingId, tripId = t.id,clientEmail = currentUser.email!!))
     }
 
     /*
@@ -106,7 +99,7 @@ class FirestoreRepository {
      */
     fun bookingTransaction(t: Trip, bookingsConfirmed: List<Booking>, proposals: List<Booking>): Task<Transaction> {
 
-        val tripIWantToBook = fireStoreDB.collection("users/${t.ownerEmail}/createdTrips").document(t.id)
+        val tripIWantToBook = fireStoreDB.collection("trips").document(t.id)
 
         return fireStoreDB.runTransaction { transaction ->
 
@@ -144,14 +137,14 @@ class FirestoreRepository {
     /*
     Function to get the list of booking proposals of the trip "t"
      */
-    fun getProposals(t: Trip): Query {
+    fun getProposals(t: Trip): CollectionReference {
         return fireStoreDB.collection("trips/${t.id}/proposals")
     }
 
     /*
     Function to get the list of confirmed bookings of the trip "t"
      */
-    fun getConfirmed(t: Trip): Query {
+    fun getConfirmed(t: Trip): CollectionReference {
         return fireStoreDB.collection("trips/${t.id}/confirmedBookings")
     }
 
@@ -168,7 +161,7 @@ class FirestoreRepository {
      */
     fun getUsersList(): Query {
         return fireStoreDB.collection("users")
-            .whereNotEqualTo("email", auth.email!!)
+            .whereNotEqualTo("email", currentUser.email!!)
     }
 
     /*
@@ -177,15 +170,16 @@ class FirestoreRepository {
         - insert the new rating inside the proper collection (looking for the current user's nickName)
         - delete the booking, so it is not anymore shown (It is ok because the trip is completed)
     */
-    fun insertRating(r: Rating, user: Profile, passenger: Boolean, b: Booking): Task<Transaction> {
+    fun insertRating(r: Rating, userEmail: String, passenger: Boolean, b: Booking): Task<Transaction> {
         val collection = if (passenger) "passengerRatings" else "driverRatings"
-        val ratingCollectionRef = fireStoreDB.collection("users/${user.email}/$collection")
+        val ratingCollectionRef = fireStoreDB.collection("users/$userEmail/$collection")
 
         return fireStoreDB.runTransaction { transaction ->
-            r.nickName = transaction.get(fireStoreDB.collection("users").document(auth.email!!)).getString("nickName") ?: ""
-            val newId = ratingCollectionRef.document().id
+            r.nickName = transaction.get(fireStoreDB.collection("users")
+                .document(currentUser.email!!))
+                .getString("nickName") ?: ""
 
-            Log.d("test", "nickName -> ${r.nickName}")
+            val newId = ratingCollectionRef.document().id
 
             // set the new rating
             transaction.set(
@@ -198,6 +192,20 @@ class FirestoreRepository {
                 fireStoreDB.collection("trips/${r.tripId}/confirmedBookings").document(b.id)
             )
         }
+    }
+
+    /*
+    Function to get the collection of driver ratings of the selected user having "userEmail" as email
+     */
+    fun getDriverRating(userEmail: String): CollectionReference {
+        return fireStoreDB.collection("users/$userEmail/driverRatings")
+    }
+
+    /*
+    Function to get the collection of passenger ratings of the selected user having "userEmail" as email
+     */
+    fun getPassengerRating(userEmail: String): CollectionReference {
+        return fireStoreDB.collection("users/$userEmail/passengerRatings")
     }
 
 }

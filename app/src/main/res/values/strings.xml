@@ -111,6 +111,11 @@
         "For example, position the FAB to one side of stream of a cards so the FAB won’t interfere "
         "when a user tries to pick up one of cards.\n\n"
     </string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="open_comments">Click to see the comments</string>
+    <string name="show_ratings">%s / 5</string>
+    <string name="remaining_seats">Available Seats: %s</string>
+    <string name="no_seats_message">No available seats</string>
+    <string name="no_proposals_message">No proposals found</string>
+    <string name="ratings_completed">Ratings completed</string>
+    <string name="no_bookings_message">No confirmed bookings</string>
 </resources>

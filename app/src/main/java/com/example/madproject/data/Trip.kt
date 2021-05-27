@@ -1,5 +1,4 @@
 package com.example.madproject.data
-import android.os.Build
 
 data class Trip(var id: String = "") {
     var imageUrl: String = ""

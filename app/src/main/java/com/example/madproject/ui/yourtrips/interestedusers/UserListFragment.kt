@@ -167,12 +167,12 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
         if (proposals.isNotEmpty()) {
             emptyList.visibility = View.INVISIBLE
             bookButton.visibility = View.VISIBLE
-            tvSeats.text = "Available Seats: ${selectedTrip.availableSeat}"
+            tvSeats.text = getString(R.string.remaining_seats, selectedTrip.availableSeat)
             tvSeats.visibility = View.VISIBLE
             bookButtonListen()
         } else {
-            if (selectedTrip.availableSeat == "0") emptyList.text = "No available seats"
-            else emptyList.text = "No proposals found"
+            if (selectedTrip.availableSeat == "0") emptyList.text = getString(R.string.no_seats_message)
+            else emptyList.text = getString(R.string.no_proposals_message)
             emptyList.visibility = View.VISIBLE
             bookButton.visibility = View.INVISIBLE
             bookButton.setOnClickListener { }
@@ -200,9 +200,9 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
             emptyList.visibility = View.INVISIBLE
         else {
             if (userListViewModel.tabBookings)
-                emptyList.text = "Ratings completed"
+                emptyList.text = getString(R.string.ratings_completed)
             else
-                emptyList.text = "No confirmed bookings"
+                emptyList.text = getString(R.string.no_bookings_message)
             emptyList.visibility = View.VISIBLE
         }
         recyclerView.adapter = UsersAdapter(
@@ -382,7 +382,7 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
                                 rating = ratingBar.rating,
                                 comment = comment.text.toString()
                             ),
-                            user = u,
+                            userEmail = u.email,
                             passenger = true,
                             b = sharedModel.getBooking(u)
                         ).addOnSuccessListener {

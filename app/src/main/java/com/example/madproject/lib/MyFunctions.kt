@@ -30,7 +30,6 @@ class MyFunctions {
             // Depending on the date and time, determine if the trip was terminated or not
             val current = Date()
             val inputFormat = SimpleDateFormat("MMM dd, yyyy HH:mm")
-            inputFormat.timeZone = TimeZone.getTimeZone("UTC")
 
             var tripDateTime = inputFormat.parse("$date $time") ?: return false
 

@@ -56,7 +56,7 @@ class AuthActivity : AppCompatActivity() {
     private fun startMainActivity() {
 
         // Set the current user inside the companion object of the "FirestoreRepository" class
-        FirestoreRepository.auth = mAuth.currentUser!!
+        FirestoreRepository.currentUser = mAuth.currentUser!!
 
         // Check if the current user already registered his account (second or following login)
         // or not (first login) by setting the flag

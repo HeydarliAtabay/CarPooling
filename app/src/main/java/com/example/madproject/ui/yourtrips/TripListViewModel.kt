@@ -80,6 +80,7 @@ class TripListViewModel: ViewModel() {
             (2). Add the trip to "confirmedTrips", and delete it from the other two lists (if present)
             (3). If there are no more available seats -> remove from "otherTrips", else add it to "otherTrips"
      */
+    @Suppress("LABEL_NAME_CLASH")
     private fun loadOtherTrips() {
         FirestoreRepository().getAllTrips()
             .addSnapshotListener(EventListener { value, error ->

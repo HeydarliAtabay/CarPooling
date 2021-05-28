@@ -36,6 +36,7 @@ import java.io.*
 import java.text.SimpleDateFormat
 import java.util.*
 
+@Suppress("DEPRECATION")
 class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     private lateinit var fullName: EditText
     private lateinit var nickName: EditText

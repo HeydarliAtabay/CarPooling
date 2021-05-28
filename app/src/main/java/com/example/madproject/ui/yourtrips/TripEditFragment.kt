@@ -35,6 +35,7 @@ import java.io.*
 import java.text.SimpleDateFormat
 import java.util.*
 
+@Suppress("DEPRECATION")
 class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     private var currentPhotoPath: String? = ""
     private lateinit var imageCar : ImageView

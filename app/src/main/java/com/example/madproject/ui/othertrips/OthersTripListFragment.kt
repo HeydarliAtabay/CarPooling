@@ -242,10 +242,10 @@ class OthersTripListFragment : Fragment() {
             }
             .filter {
                 // Filter the Departure Location
-                it.from.toLowerCase(Locale.ROOT).contains(filter.from.toLowerCase(Locale.ROOT))
+                it.from.lowercase().contains(filter.from.lowercase())
             }.filter {
                 // Filter the Arrival Location
-                it.to.toLowerCase(Locale.ROOT).contains(filter.to.toLowerCase(Locale.ROOT))
+                it.to.lowercase().contains(filter.to.lowercase())
             }.filter {
                 // Filter the Max Price
                 if (filter.price == "") true

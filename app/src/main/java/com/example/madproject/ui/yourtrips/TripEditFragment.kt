@@ -328,7 +328,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
 
         datePicker?.addOnPositiveButtonClickListener {
 
-            val inputFormat = SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH)
+            val inputFormat = SimpleDateFormat("dd MMM yyyy", Locale.ITALIAN)
             val outputFormat = SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH)
             departureDate.setText(outputFormat.format(inputFormat.parse(datePicker?.headerText!!)!!))
             departureTime.requestFocus()

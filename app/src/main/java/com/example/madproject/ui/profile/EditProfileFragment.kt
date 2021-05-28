@@ -309,7 +309,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         }
 
         picker?.addOnPositiveButtonClickListener {
-            val inputFormat = SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH)
+            val inputFormat = SimpleDateFormat("dd MMM yyyy", Locale.ITALIAN)
             val outputFormat = SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH)
             dateOfBirth.setText(outputFormat.format(inputFormat.parse(picker?.headerText!!)!!))
             phoneNumber.requestFocus()

@@ -81,6 +81,7 @@ class OthersTripListFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_others_trip_list, container, false)
     }
 
+    @ExperimentalStdlibApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -116,17 +117,6 @@ class OthersTripListFragment : Fragment() {
             }
         })
 
-        tripListViewModel.getConfirmedTrips().observe(viewLifecycleOwner, {
-            if (it != null) {
-                Log.d("test", "Confirmed Trips -> $it")
-            } else Log.d("test", "Confirmed Trips -> problem")
-        })
-
-        tripListViewModel.getInterestedTrips().observe(viewLifecycleOwner, {
-            if (it != null) {
-                Log.d("test", "Interested Trips -> $it")
-            } else Log.d("test", "Interested Trips -> problem")
-        })
 
         // Observe the dynamic filters
         filterViewModel.getFilter().observe(viewLifecycleOwner, {
@@ -232,6 +222,7 @@ class OthersTripListFragment : Fragment() {
     /*
     Filter the list of trips with the selected filters
      */
+    @ExperimentalStdlibApi
     private fun filteredTripList(longList: List<Trip>): List<Trip> {
 
         var list = longList
@@ -362,7 +353,7 @@ class OthersTripListFragment : Fragment() {
 
         datePicker?.addOnPositiveButtonClickListener {
 
-            val inputFormat = SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH)
+            val inputFormat = SimpleDateFormat("dd MMM yyyy", Locale.ITALIAN)
             val outputFormat = SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH)
             filterDate.setText(outputFormat.format(inputFormat.parse(datePicker?.headerText!!)!!))
             filterTime.requestFocus()

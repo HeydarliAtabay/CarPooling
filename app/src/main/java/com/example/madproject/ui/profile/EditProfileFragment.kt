@@ -36,7 +36,6 @@ import java.io.*
 import java.text.SimpleDateFormat
 import java.util.*
 
-
 class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     private lateinit var fullName: EditText
     private lateinit var nickName: EditText
@@ -155,7 +154,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         if (resultCode == AppCompatActivity.RESULT_OK) {
             when (requestCode) {
                 Requests.INTENT_CAPTURE_PHOTO.value -> {
-                    currentPhotoPath = MyFunctions.resizeSetImage(this.requireActivity(), model.bigPhotoPath, storageDir?.absolutePath)
+                    currentPhotoPath = resizeImage(this.requireActivity(), model.bigPhotoPath, storageDir?.absolutePath)
                     image.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath!!))
                     model.bigPhotoPath = ""
                 }
@@ -166,14 +165,14 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                             it
                         )
                     }
-                    val outputFile = MyFunctions.createImageFile(storageDir?.absolutePath).apply {
+                    val outputFile = createImageFile(storageDir?.absolutePath).apply {
                         model.bigPhotoPath = absolutePath
                     }
                     val fileOutputStream = FileOutputStream(outputFile)
                     inputStream?.copyTo(fileOutputStream)
                     fileOutputStream.close()
                     inputStream?.close()
-                    currentPhotoPath = MyFunctions.resizeSetImage(this.requireActivity(), model.bigPhotoPath, storageDir?.absolutePath)
+                    currentPhotoPath = resizeImage(this.requireActivity(), model.bigPhotoPath, storageDir?.absolutePath)
                     image.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath!!))
                     model.bigPhotoPath = ""
                 }
@@ -282,7 +281,6 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         }
     }
 
-    @SuppressLint("SimpleDateFormat")
     private fun setDatePicker() {
         val constraintsBuilder = CalendarConstraints.Builder().setValidator(
             DateValidatorPointBackward.now()
@@ -294,7 +292,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             )
 
         if (dateOfBirth.text.toString() != "") {
-            val currentDate = SimpleDateFormat("MMM dd, yyyy")
+            val currentDate = SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH)
             currentDate.timeZone = TimeZone.getTimeZone("UTC")
             val p = currentDate.parse(dateOfBirth.text.toString())
             datePicker = datePicker.setSelection(p?.time)
@@ -310,8 +308,8 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         }
 
         picker?.addOnPositiveButtonClickListener {
-            val inputFormat = SimpleDateFormat("dd MMM yyyy")
-            val outputFormat = SimpleDateFormat("MMM dd, yyyy")
+            val inputFormat = SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH)
+            val outputFormat = SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH)
             dateOfBirth.setText(outputFormat.format(inputFormat.parse(picker?.headerText!!)!!))
             phoneNumber.requestFocus()
         }
@@ -438,7 +436,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             takePictureIntent.resolveActivity(this.requireActivity().packageManager)?.also {
                 // Create the File where the photo should go
                 val photoFile: File? = try {
-                    MyFunctions.createImageFile(storageDir?.absolutePath).apply {
+                    createImageFile(storageDir?.absolutePath).apply {
                         // Save a file: path for use with ACTION_VIEW intents
                         model.bigPhotoPath = absolutePath
                     }

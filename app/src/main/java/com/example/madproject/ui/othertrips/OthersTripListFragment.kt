@@ -1,6 +1,5 @@
 package com.example.madproject.ui.othertrips
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.text.InputType
@@ -20,7 +19,10 @@ import com.example.madproject.data.Filters
 import com.example.madproject.data.FirestoreRepository
 import com.example.madproject.data.Profile
 import com.example.madproject.data.Trip
-import com.example.madproject.lib.MyFunctions
+import com.example.madproject.lib.isFuture
+import com.example.madproject.lib.parsePrice
+import com.example.madproject.lib.parseTime
+import com.example.madproject.lib.unParseTime
 import com.example.madproject.ui.profile.ProfileViewModel
 import com.example.madproject.ui.yourtrips.TripListViewModel
 import com.google.android.material.datepicker.CalendarConstraints
@@ -161,7 +163,7 @@ class OthersTripListFragment : Fragment() {
             filterViewModel.temporalFilters = Filters(
                 from = filterFrom.text.toString(),
                 to = filterTo.text.toString(),
-                price = MyFunctions.parsePrice(filterPrice.text.toString()),
+                price = parsePrice(filterPrice.text.toString()),
                 date = filterDate.text.toString(),
                 time = filterTime.text.toString()
             )
@@ -213,7 +215,7 @@ class OthersTripListFragment : Fragment() {
                     Filters(
                         from = filterFrom.text.toString(),
                         to = filterTo.text.toString(),
-                        price = MyFunctions.parsePrice(filterPrice.text.toString()),
+                        price = parsePrice(filterPrice.text.toString()),
                         date = filterDate.text.toString(),
                         time = filterTime.text.toString()
                     )
@@ -230,13 +232,13 @@ class OthersTripListFragment : Fragment() {
     /*
     Filter the list of trips with the selected filters
      */
-    @SuppressLint("SimpleDateFormat")
     private fun filteredTripList(longList: List<Trip>): List<Trip> {
 
         var list = longList
             .asSequence()
             .filter {
-                MyFunctions.isFuture(it.departureDate, it.departureTime, "")
+                isFuture(it.departureDate, it.departureTime, "")
+                //MyFunctions.isFuture(it.departureDate, it.departureTime, "")
             }
             .filter {
                 // Filter the Departure Location
@@ -263,8 +265,8 @@ class OthersTripListFragment : Fragment() {
                 if (filter.time == it.departureTime) true
                 else {
                     // "HH" instead of "hh" represents the 24h format
-                    val filterTime = SimpleDateFormat("HH:mm").parse(filter.time)
-                    val tripTime = SimpleDateFormat("HH:mm").parse(it.departureTime)
+                    val filterTime = SimpleDateFormat("HH:mm", Locale.ENGLISH).parse(filter.time)
+                    val tripTime = SimpleDateFormat("HH:mm", Locale.ENGLISH).parse(it.departureTime)
                     tripTime!!.after(filterTime)
                 }
             }.sortedWith(compareBy<Trip> { it.departureTime.split(":")[0].toInt() }
@@ -319,7 +321,7 @@ class OthersTripListFragment : Fragment() {
         filterPrice.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {  // lost focus
                 filterPrice.setSelection(0, 0)
-                filterPrice.setText(MyFunctions.parsePrice(filterPrice.text.toString()))
+                filterPrice.setText(parsePrice(filterPrice.text.toString()))
             } else {
                 view?.findViewById<TextInputLayout>(R.id.til_filterPrice)?.error = null
                 val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -331,7 +333,6 @@ class OthersTripListFragment : Fragment() {
     /*
     Set the date picker
      */
-    @SuppressLint("SimpleDateFormat")
     private fun setDatePicker() {
         val constraintsBuilder = CalendarConstraints.Builder().setValidator(
             DateValidatorPointForward.now()
@@ -344,7 +345,7 @@ class OthersTripListFragment : Fragment() {
             )
 
         if (filterDate.text.toString() != "") {
-            val currentDate = SimpleDateFormat("MMM dd, yyyy")
+            val currentDate = SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH)
             currentDate.timeZone = TimeZone.getTimeZone("UTC")
             val p = currentDate.parse(filterDate.text.toString())
             dPicker = dPicker.setSelection(p?.time)
@@ -361,8 +362,8 @@ class OthersTripListFragment : Fragment() {
 
         datePicker?.addOnPositiveButtonClickListener {
 
-            val inputFormat = SimpleDateFormat("dd MMM yyyy")
-            val outputFormat = SimpleDateFormat("MMM dd, yyyy")
+            val inputFormat = SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH)
+            val outputFormat = SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH)
             filterDate.setText(outputFormat.format(inputFormat.parse(datePicker?.headerText!!)!!))
             filterTime.requestFocus()
         }
@@ -380,8 +381,8 @@ class OthersTripListFragment : Fragment() {
         if (filterTime.text.toString() != "") {
             val s = filterTime.text.toString().split(":")
             if (s.size == 2) {
-                h = MyFunctions.unParseTime(s[0])
-                m = MyFunctions.unParseTime(s[1])
+                h = unParseTime(s[0])
+                m = unParseTime(s[1])
             }
         }
         timePicker = MaterialTimePicker.Builder()
@@ -400,7 +401,7 @@ class OthersTripListFragment : Fragment() {
         }
 
         timePicker?.addOnPositiveButtonClickListener {
-            filterTime.setText(MyFunctions.parseTime(timePicker?.hour, timePicker?.minute))
+            filterTime.setText(parseTime(timePicker?.hour, timePicker?.minute))
             filterPrice.requestFocus()
         }
 

@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.madproject.R
 import com.example.madproject.data.Trip
-import com.example.madproject.lib.MyFunctions
+import com.example.madproject.lib.isFuture
 import com.example.madproject.ui.profile.ProfileViewModel
 import com.example.madproject.ui.yourtrips.interestedusers.UserListViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -99,9 +99,9 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
 
         val currentList =
             if (tripListViewModel.tabCompletedTrips)
-                tripList.filter { !MyFunctions.isFuture(it.departureDate, it.departureTime, it.duration) }
+                tripList.filter { !isFuture(it.departureDate, it.departureTime, it.duration) }
             else
-                tripList.filter { MyFunctions.isFuture(it.departureDate, it.departureTime, it.duration) }
+                tripList.filter { isFuture(it.departureDate, it.departureTime, it.duration) }
 
         Log.d("test", "$currentList")
 

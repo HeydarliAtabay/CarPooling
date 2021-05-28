@@ -6,12 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.madproject.R
 import com.example.madproject.data.Rating
+import com.example.madproject.lib.DividerItemDecorator
 
 class CommentsFragment : Fragment(R.layout.fragment_comments) {
 
@@ -38,9 +39,12 @@ class CommentsFragment : Fragment(R.layout.fragment_comments) {
         totalRatings.visibility = View.INVISIBLE
         ratingBar.visibility = View.INVISIBLE
 
+        // Custom divider created by the extended class in MyFunctions.kt
+        val divider = DividerItemDecorator(ContextCompat.getDrawable(requireContext(), R.drawable.divider)!!)
+
         recyclerView.setHasFixedSize(true)
         recyclerView.setItemViewCacheSize(3)
-        recyclerView.addItemDecoration(DividerItemDecoration(this.requireContext(), LinearLayoutManager.VERTICAL))
+        recyclerView.addItemDecoration(divider)
         recyclerView.layoutManager = LinearLayoutManager(this.requireActivity())
 
         if (ratingsModel.showDriverRatings) {

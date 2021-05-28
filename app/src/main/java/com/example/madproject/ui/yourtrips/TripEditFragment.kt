@@ -21,8 +21,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.madproject.R
 import com.example.madproject.data.FirestoreRepository
 import com.example.madproject.data.Trip
-import com.example.madproject.lib.MyFunctions
-import com.example.madproject.lib.Requests
+import com.example.madproject.lib.*
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -164,7 +163,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         if (resultCode == AppCompatActivity.RESULT_OK) {
             when (requestCode) {
                 Requests.INTENT_CAPTURE_PHOTO.value -> {
-                    currentPhotoPath = MyFunctions.resizeSetImage(this.requireActivity(), sharedModel.bigPhotoPath, storageDir?.absolutePath)
+                    currentPhotoPath = resizeImage(this.requireActivity(), sharedModel.bigPhotoPath, storageDir?.absolutePath)
                     imageCar.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath!!))
                     sharedModel.bigPhotoPath = ""
                 }
@@ -175,14 +174,14 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
                             it
                         )
                     }
-                    val outputFile = MyFunctions.createImageFile(storageDir?.absolutePath).apply {
+                    val outputFile = createImageFile(storageDir?.absolutePath).apply {
                         sharedModel.bigPhotoPath = absolutePath
                     }
                     val fileOutputStream = FileOutputStream(outputFile)
                     inputStream?.copyTo(fileOutputStream)
                     fileOutputStream.close()
                     inputStream?.close()
-                    currentPhotoPath = MyFunctions.resizeSetImage(this.requireActivity(), sharedModel.bigPhotoPath, storageDir?.absolutePath)
+                    currentPhotoPath = resizeImage(this.requireActivity(), sharedModel.bigPhotoPath, storageDir?.absolutePath)
                     imageCar.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath!!))
                     sharedModel.bigPhotoPath = ""
                 }
@@ -249,7 +248,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
             }
         }
 
-        MyFunctions.durationTextListener(duration, context, view)
+        durationTextListener(duration, context, view)
 
         availableSeats.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {  // lost focus
@@ -267,7 +266,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
             if (!hasFocus) {  // lost focus
                 price.setSelection(0, 0)
                 price.hint = ""
-                price.setText(MyFunctions.parsePrice(price.text.toString()))
+                price.setText(parsePrice(price.text.toString()))
             } else {
                 view?.findViewById<TextInputLayout>(R.id.tilPrice)?.error = null
                 price.hint = "Price"
@@ -299,7 +298,6 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         }
     }
 
-    @SuppressLint("SimpleDateFormat")
     private fun setDatePicker() {
         val constraintsBuilder = CalendarConstraints.Builder().setValidator(
                 DateValidatorPointForward.now()
@@ -312,7 +310,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
             )
 
         if (departureDate.text.toString() != "") {
-            val currentDate = SimpleDateFormat("MMM dd, yyyy")
+            val currentDate = SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH)
             currentDate.timeZone = TimeZone.getTimeZone("UTC")
             val p = currentDate.parse(departureDate.text.toString())
             dPicker = dPicker.setSelection(p?.time)
@@ -329,8 +327,8 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
 
         datePicker?.addOnPositiveButtonClickListener {
 
-            val inputFormat = SimpleDateFormat("dd MMM yyyy")
-            val outputFormat = SimpleDateFormat("MMM dd, yyyy")
+            val inputFormat = SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH)
+            val outputFormat = SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH)
             departureDate.setText(outputFormat.format(inputFormat.parse(datePicker?.headerText!!)!!))
             departureTime.requestFocus()
         }
@@ -345,8 +343,8 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         if (departureTime.text.toString() != "") {
             val s = departureTime.text.toString().split(":")
             if (s.size == 2) {
-                h = MyFunctions.unParseTime(s[0])
-                m = MyFunctions.unParseTime(s[1])
+                h = unParseTime(s[0])
+                m = unParseTime(s[1])
             }
         }
         timePicker = MaterialTimePicker.Builder()
@@ -365,7 +363,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         }
 
         timePicker?.addOnPositiveButtonClickListener {
-            departureTime.setText(MyFunctions.parseTime(timePicker?.hour, timePicker?.minute))
+            departureTime.setText(parseTime(timePicker?.hour, timePicker?.minute))
             duration.requestFocus()
         }
 
@@ -380,11 +378,11 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
             to = arrival.text.toString(),
             departureDate = departureDate.text.toString(),
             departureTime = departureTime.text.toString(),
-            duration = MyFunctions.parseDuration(duration.text.toString()),
+            duration = parseDuration(duration.text.toString()),
             availableSeat = availableSeats.text.toString(),
             additionalInfo = additionalInfo.text.toString(),
             intermediateStops = intermediateStops.text.toString(),
-            price = MyFunctions.parsePrice(price.text.toString()),
+            price = parsePrice(price.text.toString()),
             ownerEmail = FirestoreRepository.currentUser.email!!
         )
         trip = sharedModel.selectedLocal
@@ -429,7 +427,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
             takePictureIntent.resolveActivity(this.requireActivity().packageManager)?.also {
                 // Create the File where the photo should go
                 val photoFile: File? = try {
-                    MyFunctions.createImageFile(storageDir?.absolutePath).apply {
+                    createImageFile(storageDir?.absolutePath).apply {
                         // Save a file: path for use with ACTION_VIEW intents
                         sharedModel.bigPhotoPath = absolutePath
                     }

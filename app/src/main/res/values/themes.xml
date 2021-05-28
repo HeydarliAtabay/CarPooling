@@ -24,7 +24,6 @@
         <!-- Customize your theme here. -->
         <item name="android:windowBackground">#EBFFFFFF</item>
         <item name="android:scrollbarThumbVertical">@color/gray</item>
-
         <item name="materialAlertDialogTheme">@style/AlertDialogTheme</item>
 
     </style>

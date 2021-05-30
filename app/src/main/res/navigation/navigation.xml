@@ -61,6 +61,11 @@
         <action
             android:id="@+id/action_tripList_to_userRate"
             app:destination="@id/userRate" />
+        <action
+            android:id="@+id/action_tripList_to_mapFragment"
+            app:destination="@id/mapFragment"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out" />
     </fragment>
 
     <fragment
@@ -110,6 +115,11 @@
             app:enterAnim="@anim/fade_in"
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/slide_in" />
+        <action
+            android:id="@+id/action_tripEdit_to_mapFragment"
+            app:destination="@id/mapFragment"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out" />
     </fragment>
 
     <fragment
@@ -170,5 +180,9 @@
             android:id="@+id/action_userRate_to_showProfilePrivacy"
             app:destination="@id/showProfilePrivacy" />
     </fragment>
+    <fragment
+        android:id="@+id/mapFragment"
+        android:name="com.example.madproject.ui.MapFragment"
+        android:label="MapFragment" />
 
 </navigation>

@@ -113,6 +113,14 @@
                     android:maxLength="30"
                     android:textColor="?attr/color"
                     android:textSize="16sp" />
+
+                <Button
+                    android:id="@+id/map_btn_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Button" />
+
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout

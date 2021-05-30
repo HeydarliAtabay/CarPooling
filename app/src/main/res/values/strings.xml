@@ -56,4 +56,6 @@
     <string name="camera_message">Use the camera to take a picture</string>
     <string name="save_message">Click to save</string>
     <string name="show_profiles_message">Click to see the profile</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

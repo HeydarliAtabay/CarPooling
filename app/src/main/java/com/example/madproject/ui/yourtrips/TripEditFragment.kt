@@ -49,6 +49,9 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     private lateinit var price : EditText
     private lateinit var additionalInfo : EditText
     private lateinit var intermediateStops : EditText
+    //this part is for testing only, then button will be changed
+    private lateinit var openMap: Button
+
     private var datePicker: MaterialDatePicker<Long>? = null
     private var timePicker: MaterialTimePicker? = null
     private val sharedModel: TripListViewModel by activityViewModels()
@@ -66,6 +69,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         price = view.findViewById(R.id.price)
         additionalInfo = view.findViewById(R.id.info)
         intermediateStops = view.findViewById(R.id.intermediate_stops)
+        openMap= view.findViewById(R.id.map_btn_1)
         storageDir = this.requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
 
         trip = sharedModel.selectedLocal
@@ -89,6 +93,10 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
 
         val editPhoto = view.findViewById<ImageButton>(R.id.imageButton2)
         registerForContextMenu(editPhoto)
+
+        openMap.setOnClickListener{
+            findNavController().navigate(R.id.action_tripEdit_to_mapFragment)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

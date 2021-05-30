@@ -2,6 +2,7 @@ package com.example.madproject.ui
 
 import android.app.AlertDialog
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -13,10 +14,10 @@ import androidx.navigation.fragment.findNavController
 import com.example.madproject.BuildConfig
 import com.example.madproject.R
 import org.osmdroid.config.Configuration
-import org.osmdroid.views.MapView
-import org.osmdroid.config.Configuration.*
+import org.osmdroid.bonuspack.location.GeocoderNominatim
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Overlay
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
@@ -42,21 +43,20 @@ class MapFragment : Fragment() {
 
         scope = arguments?.getString("scope")
 
-       /* mapView.overlays.add(object : Overlay() {
+        mapView.overlays.add(object : Overlay() {
 
             override fun onSingleTapConfirmed(e: MotionEvent?, mapView: MapView?): Boolean {
                 mapView ?: return false
                 e ?: return false
-                val projection = mapView.projection
-                val geoPoint = projection.fromPixels(e.x.toInt(), e.y.toInt())
-                Logger.info("${geoPoint.latitude} ${geoPoint.longitude}")
+                    val projection = mapView.projection
+                    val geoPoint = projection.fromPixels(e.x.toInt(), e.y.toInt())
+                    Log.d("OSM", "${geoPoint.latitude},${geoPoint.longitude}")
 
-                val location = GeocoderNominatim(Locale.getDefault(), BuildConfig.APPLICATION_ID)
+                    val location = GeocoderNominatim(Locale.getDefault(), BuildConfig.APPLICATION_ID)
                     .getFromLocation(geoPoint.latitude, geoPoint.longitude, 1)
                     .firstOrNull()
 
-                Logger.info(location, "Location selected")
-                Logger.info(location?.maxAddressLineIndex, "Location selected max address line index")
+                Log.d("OSM", "${location}")
 
                 val address =
                     when {
@@ -66,27 +66,24 @@ class MapFragment : Fragment() {
                     }
 
                 AlertDialog.Builder(requireContext())
-                    .setTitle("Sicuro?")
-                    .setMessage("Confermi questa posizione?\n\n${address}")
-                    .setPositiveButton("Conferma") {_, _ ->
-                        Logger.info(geoPoint.latitude, "latitude")
-                        Logger.info(geoPoint.longitude, "longitude")
-                        Logger.info(address, "location")
+                    .setTitle("Are you sure?")
+                    .setMessage("Do you confirm this position?\n\n${address}")
+                    .setPositiveButton("Confirm") {_, _ ->
                         val bundle = bundleOf(
                             "scope" to scope,
                             "latitude" to geoPoint.latitude,
                             "longitude" to geoPoint.longitude,
                             "location" to address
                         )
-                        this@MapViewFragment.findNavController().navigate(R.id.action_map_view_to_nav_trip_edit, bundle)
+                        this@MapFragment.findNavController().navigate(R.id.action_mapFragment_to_tripEdit, bundle)
                     }
-                    .setNegativeButton("Riprova") {_, _ -> }
+                    .setNegativeButton("Retry") {_, _ -> }
                     .create()
                     .show()
 
                 return true
             }
-        })*/
+        })
         return mapView
     }
 

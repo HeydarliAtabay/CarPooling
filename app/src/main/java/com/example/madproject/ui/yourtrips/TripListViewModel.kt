@@ -3,11 +3,20 @@ package com.example.madproject.ui.yourtrips
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.madproject.BuildConfig
 import com.example.madproject.data.Booking
 import com.example.madproject.data.FirestoreRepository
 import com.example.madproject.data.Trip
+import com.example.madproject.data.Location
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.EventListener
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.osmdroid.bonuspack.location.GeocoderNominatim
+import java.io.IOException
+import java.util.*
 
 class TripListViewModel: ViewModel() {
 
@@ -18,6 +27,9 @@ class TripListViewModel: ViewModel() {
         by lazy { MutableLiveData<List<Trip>>().also {
             loadOtherTrips()
         } }
+
+    private val _locations = MutableLiveData<List<Location>>(listOf())
+    val locations: LiveData<List<Location>> = _locations
 
     private val confirmedTrips: MutableLiveData<List<Trip>> = MutableLiveData()
     private val interestedTrips: MutableLiveData<List<Trip>> = MutableLiveData()
@@ -213,6 +225,27 @@ class TripListViewModel: ViewModel() {
 
         return selectedDB
     }
+
+    fun retrieveLocationsByName(value: String) {
+        viewModelScope.launch {
+            _locations.postValue(getFromLocationName(value))
+        }
+    }
+
+    private suspend fun getFromLocationName(value: String) : List<Location> {
+        return withContext(Dispatchers.IO) {
+            try {
+                GeocoderNominatim(Locale.getDefault(), BuildConfig.APPLICATION_ID)
+                    .getFromLocationName(value, 5)
+                    .map { Location(it) }
+            } catch (e: IOException) {
+                e.printStackTrace()
+                listOf<Location>()
+            }
+
+        }
+    }
+
 
     fun getUserTrips(): LiveData<List<Trip>> {
         return userTrips

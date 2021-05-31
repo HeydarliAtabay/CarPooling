@@ -1,5 +1,6 @@
 package com.example.madproject.ui.othertrips
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.text.InputType
@@ -179,6 +180,7 @@ class OthersTripListFragment : Fragment() {
     /*
     Create the filter dialog with the custom layout
      */
+    @SuppressLint("InflateParams")
     private fun launchFilterDialog() {
         filterViewModel.dialogOpened = true
         filterDialogView = LayoutInflater.from(this.requireActivity())

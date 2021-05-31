@@ -7,6 +7,7 @@ import com.example.madproject.data.FirestoreRepository
 import com.example.madproject.data.Profile
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.EventListener
+import com.google.firebase.firestore.ListenerRegistration
 
 class ProfileViewModel: ViewModel() {
 
@@ -14,6 +15,8 @@ class ProfileViewModel: ViewModel() {
         by lazy { MutableLiveData(Profile()).also { loadProfile() } }
 
     var localProfile = Profile()
+
+    private var listener: ListenerRegistration? = null
 
     // Variables to manage the photo inside trip edit
     var currentPhotoPath = ""
@@ -32,7 +35,7 @@ class ProfileViewModel: ViewModel() {
     var orientation = -1
 
     private fun loadProfile() {
-        FirestoreRepository().getUser().addSnapshotListener(EventListener { value, e ->
+        listener = FirestoreRepository().getUser().addSnapshotListener(EventListener { value, e ->
             if (e != null) {
                 yourProfile.value = null
                 return@EventListener
@@ -48,5 +51,9 @@ class ProfileViewModel: ViewModel() {
 
     fun setDBUser(p:Profile) : Task<Void> {
         return FirestoreRepository().setUser(p)
+    }
+
+    fun clearListeners() {
+        listener?.remove()
     }
 }

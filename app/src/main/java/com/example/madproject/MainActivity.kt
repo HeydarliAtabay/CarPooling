@@ -1,6 +1,5 @@
 package com.example.madproject
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageButton
@@ -17,13 +16,13 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.madproject.data.Profile
+import com.example.madproject.lib.performLogout
+import com.example.madproject.ui.comments.RatingsViewModel
 import com.example.madproject.ui.profile.ProfileViewModel
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.example.madproject.ui.yourtrips.TripListViewModel
+import com.example.madproject.ui.yourtrips.interestedusers.UserListViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import com.squareup.picasso.Picasso
 
 class MainActivity : AppCompatActivity() {
@@ -31,37 +30,40 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var navView: NavigationView
     private var profile = Profile()
-    private val model: ProfileViewModel by viewModels()
+    private val profileModel: ProfileViewModel by viewModels()
+    private val ratingsModel: RatingsViewModel by viewModels()
+    private val userListModel: UserListViewModel by viewModels()
+    private val tripListModel: TripListViewModel by viewModels()
     private lateinit var toolbar: Toolbar
     private lateinit var header: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Get the flag from the intent extra in order to know if the first registration is needed
+        profileModel.needRegistration = intent.getBooleanExtra("INTENT_NEED_REGISTRATION_EXTRA", false)
+
         setContentView(R.layout.activity_main)
 
         // Setup the Material Toolbar
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        // Get the flag from the intent extra in order to know if the first registration is needed
-        model.needRegistration = intent.getBooleanExtra("INTENT_NEED_REGISTRATION_EXTRA", false)
-
         setNavigation()
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        if (model.changedOrientation) {
-            model.changedOrientation = false
+        if (profileModel.changedOrientation) {
+            profileModel.changedOrientation = false
             // if the orientation is changed with the logout dialog opened, reopen it
-            performLogOut()
+            logOut()
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        if (model.logoutDialogOpened)
-            model.changedOrientation = true
+        if (profileModel.logoutDialogOpened)
+            profileModel.changedOrientation = true
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -83,8 +85,8 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
-        model.getDBUser().observe(this, {
-            if (it == null && model.needRegistration) {
+        profileModel.getDBUser().observe(this, {
+            if (it == null && profileModel.needRegistration) {
                 loadNavigationHeader()
             } else if (it == null) {
                 Toast.makeText(this, "Firebase failure!", Toast.LENGTH_LONG).show()
@@ -98,7 +100,7 @@ class MainActivity : AppCompatActivity() {
         val logoutButton = header.findViewById<ImageButton>(R.id.log_out_button)
 
         logoutButton.setOnClickListener {
-            performLogOut()
+            logOut()
         }
 
     }
@@ -115,40 +117,27 @@ class MainActivity : AppCompatActivity() {
     /*
     Function to perform the logout and to return to the Auth Activity
      */
-    private fun performLogOut() {
-        model.logoutDialogOpened = true
+    private fun logOut() {
+        profileModel.logoutDialogOpened = true
 
         MaterialAlertDialogBuilder(this)
             .setTitle("Log out")
             .setMessage("Do you want to log out from the Car Pooling app?")
             .setPositiveButton("Yes") { _, _ ->
 
-                val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                    .requestIdToken(getString(R.string.default_web_client_id))
-                    .requestEmail()
-                    .build()
+                // Remove all the Snapshot Listeners on Firebase before logging out
+                profileModel.clearListeners()
+                ratingsModel.clearListeners()
+                userListModel.clearListeners()
+                tripListModel.clearListeners()
 
-                // Sign out from Google
-                GoogleSignIn.getClient(this, gso).signOut()
-                    .addOnCompleteListener(this) {
-                        if (it.isSuccessful) {
-                            // Sign out from Firebase
-                            Firebase.auth.signOut()
-                            Toast.makeText(this, "Successfully logged out!", Toast.LENGTH_SHORT)
-                                .show()
-                            startActivity(Intent(this, AuthActivity::class.java))
-                            finish()
-                        } else {
-                            Toast.makeText(this, "Problem in the log out!", Toast.LENGTH_SHORT)
-                                .show()
-                        }
-                    }
+                performLogout(getString(R.string.default_web_client_id), this, this)
 
             }
             .setNegativeButton("No") { _, _ ->
             }
             .setOnDismissListener {
-                model.logoutDialogOpened = false
+                profileModel.logoutDialogOpened = false
             }
             .show()
     }

@@ -8,6 +8,7 @@ import com.example.madproject.data.FirestoreRepository
 import com.example.madproject.data.Trip
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.EventListener
+import com.google.firebase.firestore.ListenerRegistration
 
 class TripListViewModel: ViewModel() {
 
@@ -24,6 +25,14 @@ class TripListViewModel: ViewModel() {
 
     private var selectedDB: MutableLiveData<Trip> = MutableLiveData()
 
+    // Variables to manage the listeners registration
+    private var listener1: ListenerRegistration? = null
+    private var listener2: ListenerRegistration? = null
+    private var listenersMap1 = mutableMapOf<String, ListenerRegistration>()
+    private var listenersMap2 = mutableMapOf<String, ListenerRegistration>()
+
+    // Variables to manage the SnapshotListeners registrations
+
     var selectedLocal = Trip()
 
     // Vars to manage the photos
@@ -37,8 +46,8 @@ class TripListViewModel: ViewModel() {
     var deleteDialogOpened = false
     var changedOrientationDelete = false
 
-    // Flags used to manage the trip booking
-    var comingFromOther = false
+    // String used to manage the path of Trip Detail
+    var pathManagement = ""
 
     // Flag to manage the landscape selection of the tab
     var tabCompletedTrips = false
@@ -54,7 +63,7 @@ class TripListViewModel: ViewModel() {
     Snapshot listener in order to keep the list updated
      */
     private fun loadUserTrips() {
-        FirestoreRepository().getUserTrips().addSnapshotListener(EventListener { value, e ->
+        listener1 = FirestoreRepository().getUserTrips().addSnapshotListener(EventListener { value, e ->
             if (e != null) {
                 userTrips.value = null
                 return@EventListener
@@ -82,7 +91,7 @@ class TripListViewModel: ViewModel() {
      */
     @Suppress("LABEL_NAME_CLASH")
     private fun loadOtherTrips() {
-        FirestoreRepository().getAllTrips()
+        listener2 = FirestoreRepository().getAllTrips()
             .addSnapshotListener(EventListener { value, error ->
                 if (error != null) {
                     otherTrips.value = null
@@ -103,7 +112,7 @@ class TripListViewModel: ViewModel() {
                     if (trip == selectedLocal) selectedDB.value = trip
 
                     // For each trip query Firebase in order to get the related Bookings
-                    FirestoreRepository().getProposals(trip)
+                    listenersMap1[trip.id] = FirestoreRepository().getProposals(trip)
                         .addSnapshotListener(EventListener { prop, error1 ->
                             if (error1 != null) {
                                 otherTrips.value = null
@@ -117,7 +126,7 @@ class TripListViewModel: ViewModel() {
 
                             if (myProposals?.isEmpty() == true) {
                                 // If it does not find any proposal, look for a confirmed booking
-                                FirestoreRepository().getConfirmed(trip)
+                                listenersMap2[trip.id] = FirestoreRepository().getConfirmed(trip)
                                     .addSnapshotListener(EventListener { conf, error2 ->
 
                                         if (error2 != null) {
@@ -232,5 +241,16 @@ class TripListViewModel: ViewModel() {
 
     fun saveTrip(t: Trip): Task<Void> {
         return FirestoreRepository().insertTrip(t)
+    }
+
+    fun clearListeners() {
+        listener1?.remove()
+        listener2?.remove()
+        for (l in listenersMap1.values) {
+            l.remove()
+        }
+        for (l in listenersMap2.values) {
+            l.remove()
+        }
     }
 }

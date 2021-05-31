@@ -1,11 +1,13 @@
 package com.example.madproject.ui.yourtrips
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.madproject.R
@@ -30,9 +32,7 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
     private lateinit var price: TextView
     private lateinit var additionalInfo: TextView
     private lateinit var intermediateStops: TextView
-    private lateinit var fabBooking: FloatingActionButton
-    private lateinit var fabDelete: FloatingActionButton
-    private lateinit var fabRate: FloatingActionButton
+    private lateinit var fabButton: FloatingActionButton
     private val sharedModel: TripListViewModel by activityViewModels()
     private val userListModel: UserListViewModel by activityViewModels()
     private val profileModel: ProfileViewModel by activityViewModels()
@@ -52,45 +52,80 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
         // reset the flag to "false", since this fragment will set it to "true" if the required navigation is selected
         profileModel.comingFromPrivacy = false
 
-        if (!sharedModel.comingFromOther) {
+        //if (!sharedModel.comingFromOther) {
+        if (sharedModel.pathManagement != "comingFromOther") {
             userListModel.resetFilteredUsers()
         }
 
-        fabBooking = view.findViewById(R.id.fabBooking)
-        fabDelete = view.findViewById(R.id.fabDelete)
-        fabRate = view.findViewById(R.id.fabRate)
+        fabButton = view.findViewById(R.id.fabButton)
 
         trip = sharedModel.selectedLocal
 
-        if (sharedModel.comingFromOther) {
-            fabRate.hide()
-            fabDelete.hide()
-            fabBooking.show()
-            fabBooking.setOnClickListener {
+        // Looking at this variable of the view model it is possible to find the path of the navigation
+        // to this fragment. It has to have different behaviours basing on this path
+        when (sharedModel.pathManagement) {
+            "comingFromOther" -> {
+                // The FAB allows to propose a booking
+                fabButton.setImageResource(R.drawable.plus)
+                fabButton.setOnClickListener {
+                    createBookingDialog()
+                }
+            }
+            "tabUpcoming" -> {
+                // The FAB allows to delete the trip
+                fabButton.setImageResource(R.drawable.outline_delete_white_48)
+                fabButton.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.red))
+                fabButton.setOnClickListener {
+                    deleteTripDialog()
+                }
+            }
+            "tabCompleted" -> {
+                // The FAB allows to navigate to the passengers rating system
+                fabButton.setImageResource(R.drawable.ic_star)
+                fabButton.setOnClickListener {
+                    userListModel.selectedLocalTrip = trip
+                    profileModel.comingFromPrivacy = true
+                    findNavController().navigate(R.id.action_tripDetail_to_userRate)
+                }
+            }
+            "boughtCompletedTrips" -> {
+                // The FAB allows to add a rating related to the driver of that trip
+                fabButton.setImageResource(R.drawable.ic_star)
+                // Set the rating from the passenger
+            }
+            else -> {
+                fabButton.hide()
+                fabButton.setOnClickListener {  }
+            }
+        }
+
+        //if (sharedModel.comingFromOther) {
+        /*if (sharedModel.pathManagement == "comingFromOther") {
+            fabButton.setImageResource(R.drawable.plus)
+            fabButton.setOnClickListener {
                 createBookingDialog()
             }
         } else {
-            fabBooking.hide()
             if (sharedModel.tabCompletedTrips) {
-                fabDelete.hide()
-                fabRate.show()
-                fabRate.setOnClickListener {
+                fabButton.setImageResource(R.drawable.ic_star)
+                fabButton.setOnClickListener {
                     userListModel.selectedLocalTrip = trip
                     profileModel.comingFromPrivacy = true
                     findNavController().navigate(R.id.action_tripDetail_to_userRate)
                 }
             } else {
-                fabRate.hide()
-                fabDelete.show()
-                fabDelete.setOnClickListener {
+                fabButton.setImageResource(R.drawable.outline_delete_white_48)
+                fabButton.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.red))
+                fabButton.setOnClickListener {
                     deleteTripDialog()
                 }
             }
-        }
+        }*/
 
         sharedModel.getSelectedDB(trip).observe(viewLifecycleOwner, {
             if (it == null) {
-                if (sharedModel.comingFromOther) {
+                if (sharedModel.pathManagement == "comingFromOther") {
+                //if (sharedModel.comingFromOther) {
                     Toast.makeText(context, "This trip does not exist anymore!", Toast.LENGTH_SHORT).show()
                     findNavController().navigate(R.id.action_tripDetail_to_othersTripList)
                 } else
@@ -126,9 +161,11 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
-        if (!sharedModel.tabCompletedTrips) {
+        if (sharedModel.pathManagement == "comingFromOther" || sharedModel.pathManagement == "tabUpcoming") {
             inflater.inflate(R.menu.show_profiles, menu)
-            if (!sharedModel.comingFromOther)
+
+            //if (!sharedModel.comingFromOther)
+            if (sharedModel.pathManagement != "comingFromOther")
                 inflater.inflate(R.menu.edit_menu, menu)
         }
     }
@@ -144,7 +181,8 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
             R.id.profilesButton -> {
                 // If the user is inside others trip list he will navigate to the profile of the driver
                 // Else he will navigate to his booking manager
-                if (sharedModel.comingFromOther) {
+                if (sharedModel.pathManagement == "comingFromOther") {
+                //if (sharedModel.comingFromOther) {
                     userListModel.selectedLocalUserEmail = trip.ownerEmail
                     profileModel.comingFromPrivacy = true
                     findNavController().navigate(R.id.action_tripDetail_to_showProfilePrivacy)

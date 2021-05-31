@@ -1,7 +1,6 @@
 package com.example.madproject.ui.yourtrips
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.widget.Button
@@ -43,9 +42,12 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
         // reset the flag to "false", since this fragment will set it to "true" if the required navigation is selected
         profileModel.comingFromPrivacy = false
 
+        tripListViewModel.pathManagement = "tabUpcoming"
+
         if (tripListViewModel.tabCompletedTrips) {
             val tab = tabLayout.getTabAt(1)
             tab?.select()
+            tripListViewModel.pathManagement = "tabCompleted"
         }
 
         fab = view.findViewById(R.id.fab)
@@ -73,11 +75,13 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
                 when (tab?.contentDescription) {
                     "tabUpcoming" -> {
                         tripListViewModel.tabCompletedTrips = false
+                        tripListViewModel.pathManagement = "tabUpcoming"
                         setSelectedList()
                     }
 
                     "tabCompleted" -> {
                         tripListViewModel.tabCompletedTrips = true
+                        tripListViewModel.pathManagement = "tabCompleted"
                         setSelectedList()
                     }
                 }
@@ -102,8 +106,6 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
                 tripList.filter { !isFuture(it.departureDate, it.departureTime, it.duration) }
             else
                 tripList.filter { isFuture(it.departureDate, it.departureTime, it.duration) }
-
-        Log.d("test", "$currentList")
 
         if (currentList.isNotEmpty()) {
             emptyList.visibility = View.INVISIBLE

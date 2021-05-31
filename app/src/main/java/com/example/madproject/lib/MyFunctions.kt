@@ -1,19 +1,26 @@
 package com.example.madproject.lib
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.Toast
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.RecyclerView
+import com.example.madproject.AuthActivity
 import com.example.madproject.R
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.material.textfield.TextInputLayout
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
@@ -41,6 +48,29 @@ class DividerItemDecorator(private val mDivider: Drawable) : RecyclerView.ItemDe
 }
 
 /*
+    Function to perform the logout
+*/
+fun performLogout(requestIdToken: String, activity: Activity, context: Context) {
+    val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        .requestIdToken(requestIdToken)
+        .requestEmail()
+        .build()
+
+    // Sign out from Google
+    GoogleSignIn.getClient(activity, gso).signOut()
+        .addOnCompleteListener(activity) {
+            if (it.isSuccessful) {
+                // Sign out from Firebase
+                Firebase.auth.signOut()
+                Toast.makeText(context, "Successfully logged out!", Toast.LENGTH_SHORT)
+                    .show()
+                context.startActivity(Intent(activity, AuthActivity::class.java))
+                activity.finish()
+            }
+        }
+}
+
+/*
     Function to determine if the given date time ("date" - "time" + (optional)"duration") is before or
     after current date time
 */
@@ -58,8 +88,7 @@ fun isFuture(date: String, time: String, duration: String): Boolean {
         val newTime = tripDateTime.time + tripDuration.time
         tripDateTime = Date(newTime)
     }
-    Log.d("test", inputFormat.format(current))
-    Log.d("test", inputFormat.format(tripDateTime))
+
     return tripDateTime.after(current)
 }
 

@@ -28,6 +28,7 @@
     <string name="show_ratings">%s / 5</string>
     <string name="no_ratings">No ratings</string>
     <string name="book_button">Book Trip</string>
+    <string name="fab_trip_detail_button">Manage Floating Button</string>
     <string name="edit_button">Edit</string>
     <string name="delete_button">Delete Trip</string>
     <string name="remaining_seats">Available Seats: %s</string>

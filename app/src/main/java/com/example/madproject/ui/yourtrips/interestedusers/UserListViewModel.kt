@@ -9,6 +9,7 @@ import com.example.madproject.data.Profile
 import com.example.madproject.data.Trip
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.EventListener
+import com.google.firebase.firestore.ListenerRegistration
 
 class UserListViewModel: ViewModel() {
 
@@ -19,6 +20,12 @@ class UserListViewModel: ViewModel() {
     private var selectedBookingsProposals: List<Booking> = listOf()
     private var selectedConfirmedBookings: List<Booking> = listOf()
     var selectedLocalUserEmail = ""
+
+    // Variables used to manage the listeners
+    private var listener1: ListenerRegistration? = null
+    private var listener2: ListenerRegistration? = null
+    private var listener3: ListenerRegistration? = null
+    private var listener4: ListenerRegistration? = null
 
     // Manage the selected Trip update
     var selectedLocalTrip = Trip()
@@ -41,7 +48,7 @@ class UserListViewModel: ViewModel() {
     }
 
     private fun loadOtherUsers() {
-        FirestoreRepository().getUsersList().addSnapshotListener(EventListener { value, e ->
+        listener1 = FirestoreRepository().getUsersList().addSnapshotListener(EventListener { value, e ->
             if (e != null) {
                 allUsers = mutableListOf()
                 return@EventListener
@@ -68,7 +75,7 @@ class UserListViewModel: ViewModel() {
     }
 
     fun getProposals(): LiveData<List<Profile>> {
-        FirestoreRepository().getProposals(selectedLocalTrip).addSnapshotListener(EventListener { value, e ->
+        listener2 = FirestoreRepository().getProposals(selectedLocalTrip).addSnapshotListener(EventListener { value, e ->
 
             if (e != null) {
                 proposals.value = null
@@ -97,7 +104,7 @@ class UserListViewModel: ViewModel() {
     }
 
     fun getConfirmed(): LiveData<List<Profile>> {
-        FirestoreRepository().getConfirmed(selectedLocalTrip).addSnapshotListener(EventListener { value, e ->
+        listener3 = FirestoreRepository().getConfirmed(selectedLocalTrip).addSnapshotListener(EventListener { value, e ->
 
             if (e != null) {
                 proposals.value = null
@@ -147,7 +154,7 @@ class UserListViewModel: ViewModel() {
 
     fun getDBTrip(): LiveData<Trip> {
         selectedTrip.value = selectedLocalTrip
-        FirestoreRepository().getTrip(selectedLocalTrip).addSnapshotListener(EventListener { value, e ->
+        listener4 = FirestoreRepository().getTrip(selectedLocalTrip).addSnapshotListener(EventListener { value, e ->
 
             if (e != null) {
                 selectedTrip.value = Trip()
@@ -157,5 +164,12 @@ class UserListViewModel: ViewModel() {
             selectedTrip.value = value?.toObject(Trip::class.java)
         })
         return selectedTrip
+    }
+
+    fun clearListeners() {
+        listener1?.remove()
+        listener2?.remove()
+        listener3?.remove()
+        listener4?.remove()
     }
 }

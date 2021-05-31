@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.text.InputType
-import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
@@ -20,10 +19,7 @@ import com.example.madproject.data.Filters
 import com.example.madproject.data.FirestoreRepository
 import com.example.madproject.data.Profile
 import com.example.madproject.data.Trip
-import com.example.madproject.lib.isFuture
-import com.example.madproject.lib.parsePrice
-import com.example.madproject.lib.parseTime
-import com.example.madproject.lib.unParseTime
+import com.example.madproject.lib.*
 import com.example.madproject.ui.profile.ProfileViewModel
 import com.example.madproject.ui.yourtrips.TripListViewModel
 import com.google.android.material.datepicker.CalendarConstraints
@@ -65,6 +61,11 @@ class OthersTripListFragment : Fragment() {
          */
         if (profileViewModel.needRegistration) {
             val email = FirestoreRepository.currentUser.email ?: ""
+            if (email == "") {
+                // email field cannot be empty -> there were some problem in the sign-in -> logout
+                Toast.makeText(requireContext(), "Missing email, try to sign-in again!", Toast.LENGTH_SHORT).show()
+                performLogout(getString(R.string.default_web_client_id), requireActivity(), requireContext())
+            }
             val name = FirestoreRepository.currentUser.displayName ?: ""
             val phone = FirestoreRepository.currentUser.phoneNumber ?: ""
             val image = if (FirestoreRepository.currentUser.photoUrl != null) FirestoreRepository.currentUser.photoUrl.toString()
@@ -89,7 +90,8 @@ class OthersTripListFragment : Fragment() {
         emptyList = view.findViewById(R.id.emptyList)
         filterDialogBuilder = MaterialAlertDialogBuilder(this.requireActivity())
 
-        if (tripListViewModel.comingFromOther) tripListViewModel.comingFromOther = false
+        //if (tripListViewModel.comingFromOther) tripListViewModel.comingFromOther = false
+        if (tripListViewModel.pathManagement == "comingFromOther") tripListViewModel.pathManagement = ""
 
         // Reset the flag that manages the tab selection in "your trips", after going to this page from navigation drawer
         tripListViewModel.tabCompletedTrips = false
@@ -109,7 +111,6 @@ class OthersTripListFragment : Fragment() {
                 Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
             } else {
                 tripList = filteredTripList(it)
-                Log.d("test", "Other Trips -> $it")
                 if (tripList.isNotEmpty())
                     emptyList.visibility = View.INVISIBLE
                 else
@@ -430,7 +431,8 @@ class OthersTripListFragment : Fragment() {
 
                 cv.setOnClickListener {
                     sharedModel.selectedLocal = t
-                    sharedModel.comingFromOther = true
+                    sharedModel.pathManagement = "comingFromOther"
+                    //sharedModel.comingFromOther = true
                     findNavController(itemView).navigate(R.id.action_othersTripList_to_tripDetail)
                 }
 

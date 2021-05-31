@@ -3,7 +3,6 @@ package com.example.madproject.ui.yourtrips.interestedusers
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.widget.*
@@ -50,7 +49,7 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
         proposals = userListViewModel.getProposals().value ?: listOf()
 
         // If the user list refers to a "Completed trip", load the proper view
-        if (tripListViewModel.tabCompletedTrips) {
+        if (tripListViewModel.pathManagement == "tabCompleted") {
 
             tabLayout.visibility = View.INVISIBLE
 
@@ -296,7 +295,7 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
                 fullName.text = u.fullName
 
                 // If the user comes to this list to rate the passengers load the proper view
-                if (tripListModel.tabCompletedTrips) {
+                if (tripListModel.pathManagement == "tabCompleted") {
                     check.setBackgroundResource(R.drawable.button_state_selector)
                     check.setImageResource(R.drawable.ic_star)
                     check.setOnClickListener {
@@ -327,7 +326,7 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
 
                 cv.setOnClickListener {
                     sharedModel.selectedLocalUserEmail = u.email
-                    if (tripListModel.tabCompletedTrips) {
+                    if (tripListModel.pathManagement == "tabCompleted") {
                         findNavController(itemView)
                             .navigate(R.id.action_userRate_to_showProfilePrivacy)
                     } else
@@ -397,7 +396,6 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
                                 "Problems in adding the rating!",
                                 Toast.LENGTH_SHORT
                             ).show()
-                            Log.d("test", it.message ?: "no Exc")
                         }
                     }
                     .setNegativeButton("No") { _, _ ->

@@ -73,4 +73,9 @@ class RatingsViewModel: ViewModel() {
         return driverRatings
     }
 
+    fun clearListeners() {
+        driverListener?.remove()
+        passengerListener?.remove()
+    }
+
 }

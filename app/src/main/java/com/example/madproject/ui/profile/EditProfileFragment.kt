@@ -76,7 +76,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
 
     override fun onPause() {
         super.onPause()
-        closeKeyboard()
+        closeKeyboard(requireActivity())
         if (picker?.isVisible == true) picker?.dismiss()
         updateProfile()
         model.currentPhotoPath = currentPhotoPath ?: ""
@@ -181,38 +181,6 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     }
 
     /*
-    Function to perform the logout
-
-    private fun performLogout() {
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.default_web_client_id))
-            .requestEmail()
-            .build()
-
-        // Sign out from Google
-        GoogleSignIn.getClient(this.requireActivity(), gso).signOut()
-            .addOnCompleteListener(this.requireActivity()) {
-                if (it.isSuccessful) {
-                    // Sign out from Firebase
-                    Firebase.auth.signOut()
-                    Toast.makeText(this.requireContext(), "Successfully logged out!", Toast.LENGTH_SHORT)
-                        .show()
-                    startActivity(Intent(this.requireActivity(), AuthActivity::class.java))
-                    this.requireActivity().finish()
-                }
-            }
-    }*/
-
-    private fun closeKeyboard() {
-        val v = this.requireActivity().currentFocus
-        if (v != null) {
-            val imm = this.requireActivity()
-                .getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.hideSoftInputFromWindow(v.windowToken, 0)
-        }
-    }
-
-    /*
     Function to manage the listeners on the edit texts
      */
     private fun fixEditText() {
@@ -287,7 +255,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             )
 
         if (dateOfBirth.text.toString() != "") {
-            val currentDate = SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH)
+            val currentDate = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
             currentDate.timeZone = TimeZone.getTimeZone("UTC")
             val p = currentDate.parse(dateOfBirth.text.toString())
             datePicker = datePicker.setSelection(p?.time)
@@ -303,8 +271,8 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         }
 
         picker?.addOnPositiveButtonClickListener {
-            val inputFormat = SimpleDateFormat("dd MMM yyyy", Locale.ITALIAN)
-            val outputFormat = SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH)
+            val inputFormat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
+            val outputFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
             dateOfBirth.setText(outputFormat.format(inputFormat.parse(picker?.headerText!!)!!))
             phoneNumber.requestFocus()
         }

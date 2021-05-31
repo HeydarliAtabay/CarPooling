@@ -77,12 +77,12 @@ fun performLogout(requestIdToken: String, activity: Activity, context: Context) 
 fun isFuture(date: String, time: String, duration: String): Boolean {
     // Depending on the date and time, determine if the trip was terminated or not
     val current = Date()
-    val inputFormat = SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.ENGLISH)
+    val inputFormat = SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault())
 
     var tripDateTime = inputFormat.parse("$date $time") ?: return false
 
     if (duration != "") {
-        val inputDurationFormat = SimpleDateFormat("HH:mm", Locale.ENGLISH)
+        val inputDurationFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
         inputDurationFormat.timeZone = TimeZone.getTimeZone("UTC")
         val tripDuration = inputDurationFormat.parse(duration) ?: return false
         val newTime = tripDateTime.time + tripDuration.time
@@ -97,11 +97,22 @@ fun isFuture(date: String, time: String, duration: String): Boolean {
 */
 fun createImageFile(storagePath: String?): File {
     // Create an image file name
-    val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.ENGLISH).format(Date())
+    val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
 
     val filename = "$storagePath/$timeStamp.jpg"
 
     return File(filename)
+}
+
+/*
+    Function to close the keyboard
+ */
+fun closeKeyboard(activity: Activity) {
+    val v = activity.currentFocus
+    if (v != null) {
+        val imm = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(v.windowToken, 0)
+    }
 }
 
 /*

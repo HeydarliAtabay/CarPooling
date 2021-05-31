@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.text.InputType
+import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.view.inputmethod.InputMethodManager
@@ -125,7 +126,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
 
     override fun onPause() {
         super.onPause()
-        closeKeyboard()
+        closeKeyboard(requireActivity())
         if (datePicker?.isVisible == true) datePicker?.dismiss()
         if (timePicker?.isVisible == true) timePicker?.dismiss()
         updateTrip()
@@ -170,6 +171,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
                 }
 
                 Requests.INTENT_PHOTO_FROM_GALLERY.value -> {
+                    Log.d("test", "returned intent")
                     val inputStream: InputStream? = data?.data?.let {
                         this.requireActivity().contentResolver.openInputStream(
                             it
@@ -192,14 +194,6 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
                 File(sharedModel.bigPhotoPath).delete()
                 sharedModel.bigPhotoPath = ""
             }
-        }
-    }
-
-    private fun closeKeyboard() {
-        val v = this.requireActivity().currentFocus
-        if (v != null) {
-            val imm = this.requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.hideSoftInputFromWindow(v.windowToken, 0)
         }
     }
 
@@ -311,7 +305,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
             )
 
         if (departureDate.text.toString() != "") {
-            val currentDate = SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH)
+            val currentDate = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
             currentDate.timeZone = TimeZone.getTimeZone("UTC")
             val p = currentDate.parse(departureDate.text.toString())
             dPicker = dPicker.setSelection(p?.time)
@@ -328,8 +322,8 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
 
         datePicker?.addOnPositiveButtonClickListener {
 
-            val inputFormat = SimpleDateFormat("dd MMM yyyy", Locale.ITALIAN)
-            val outputFormat = SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH)
+            val inputFormat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
+            val outputFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
             departureDate.setText(outputFormat.format(inputFormat.parse(datePicker?.headerText!!)!!))
             departureTime.requestFocus()
         }
@@ -411,10 +405,10 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
 
     /*
     Start the intent to choose a new picture from the gallery
-     */
+    */
     private fun dispatchChoosePictureIntent() {
         val pickIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
-        this.requireActivity().intent.type = "image/*"
+        requireActivity().intent.type = "image/*"
         startActivityForResult(pickIntent, Requests.INTENT_PHOTO_FROM_GALLERY.value)
     }
 

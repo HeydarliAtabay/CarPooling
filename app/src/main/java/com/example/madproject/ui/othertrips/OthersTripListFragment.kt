@@ -259,8 +259,8 @@ class OthersTripListFragment : Fragment() {
                 if (filter.time == it.departureTime) true
                 else {
                     // "HH" instead of "hh" represents the 24h format
-                    val filterTime = SimpleDateFormat("HH:mm", Locale.ENGLISH).parse(filter.time)
-                    val tripTime = SimpleDateFormat("HH:mm", Locale.ENGLISH).parse(it.departureTime)
+                    val filterTime = SimpleDateFormat("HH:mm", Locale.getDefault()).parse(filter.time)
+                    val tripTime = SimpleDateFormat("HH:mm", Locale.getDefault()).parse(it.departureTime)
                     tripTime!!.after(filterTime)
                 }
             }.sortedWith(compareBy<Trip> { it.departureTime.split(":")[0].toInt() }
@@ -339,7 +339,7 @@ class OthersTripListFragment : Fragment() {
             )
 
         if (filterDate.text.toString() != "") {
-            val currentDate = SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH)
+            val currentDate = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
             currentDate.timeZone = TimeZone.getTimeZone("UTC")
             val p = currentDate.parse(filterDate.text.toString())
             dPicker = dPicker.setSelection(p?.time)
@@ -356,8 +356,8 @@ class OthersTripListFragment : Fragment() {
 
         datePicker?.addOnPositiveButtonClickListener {
 
-            val inputFormat = SimpleDateFormat("dd MMM yyyy", Locale.ITALIAN)
-            val outputFormat = SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH)
+            val inputFormat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
+            val outputFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
             filterDate.setText(outputFormat.format(inputFormat.parse(datePicker?.headerText!!)!!))
             filterTime.requestFocus()
         }

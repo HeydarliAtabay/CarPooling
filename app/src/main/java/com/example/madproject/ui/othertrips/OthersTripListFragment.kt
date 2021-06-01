@@ -229,10 +229,9 @@ class OthersTripListFragment : Fragment() {
 
         var list = longList
             .asSequence()
-            /*.filter {
+            .filter {
                 isFuture(it.departureDate, it.departureTime, "")
-                //MyFunctions.isFuture(it.departureDate, it.departureTime, "")
-            }*/
+            }
             .filter {
                 // Filter the Departure Location
                 it.from.lowercase().contains(filter.from.lowercase())

@@ -1,5 +1,6 @@
 package com.example.madproject.data
 
+import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.*
@@ -173,6 +174,8 @@ class FirestoreRepository {
         val collection = if (passenger) "passengerRatings" else "driverRatings"
         val ratingCollectionRef = fireStoreDB.collection("users/$userEmail/$collection")
 
+        Log.d("test", "col -> $collection")
+
         return fireStoreDB.runTransaction { transaction ->
             r.nickName = transaction.get(fireStoreDB.collection("users")
                 .document(currentUser.email!!))
@@ -180,11 +183,11 @@ class FirestoreRepository {
 
             val newId = ratingCollectionRef.document().id
 
-            // set the new rating
 
 
-            transaction.update(fireStoreDB.collection("trips/${r.tripId}/confirmedBookings").document(b.id),
-                if (passenger) "passengerRated" else "driverRated", true)
+            Log.d("test", "test 1")
+
+
 
             // delete the corresponding booking if both passenger and driver were rated
             val pr = transaction.get(fireStoreDB.collection("trips/${r.tripId}/confirmedBookings").
@@ -192,11 +195,20 @@ class FirestoreRepository {
             val dr = transaction.get(fireStoreDB.collection("trips/${r.tripId}/confirmedBookings").
                     document(b.id)).getBoolean("driverRated")
 
+            Log.d("test", "test 2")
+
             if (pr == true && dr == true) {
                 transaction.delete(
                     fireStoreDB.collection("trips/${r.tripId}/confirmedBookings").document(b.id)
                 )
+            } else {
+                // update the booking document setting the flag
+                transaction.update(fireStoreDB.collection("trips/${r.tripId}/confirmedBookings").document(b.id),
+                    if (passenger) "passengerRated" else "driverRated", true)
             }
+
+            Log.d("test", "test 3")
+            // set the new rating
             transaction.set(
                 ratingCollectionRef.document(newId),
                 r

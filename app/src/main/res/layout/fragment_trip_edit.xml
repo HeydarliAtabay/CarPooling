@@ -301,27 +301,44 @@
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/text_input_layout14"
-                style="@style/MyTextInputLayout"
+            <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:hint="@string/stops"
-                app:endIconMode="clear_text"
-                app:startIconDrawable="@drawable/outline_add_location_black_24">
+                android:layout_height="match_parent"
+                android:layout_marginBottom="10dp"
+                android:orientation="horizontal">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/intermediate_stops"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="match_parent"
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/text_input_layout14"
+                    style="@style/MyTextInputLayout"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:ems="18"
-                    android:inputType="textCapWords"
-                    android:maxLength="250"
-                    android:textColor="?attr/color"
-                    android:textSize="16sp" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:hint="@string/stops"
+                    app:endIconMode="clear_text"
+                    app:startIconDrawable="@drawable/outline_add_location_black_24">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/intermediate_stops"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ems="15"
+                        android:inputType="textCapWords"
+                        android:maxLength="250"
+                        android:textColor="?attr/color"
+                        android:textSize="16sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <ImageButton
+                    android:id="@+id/addIntermediateStops"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:contentDescription="@string/add_departure"
+                    android:src="@drawable/outline_add_location_alt_24" />
+
+            </LinearLayout>
 
         </LinearLayout>
     </ScrollView>

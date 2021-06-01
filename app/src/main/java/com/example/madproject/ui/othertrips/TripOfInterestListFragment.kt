@@ -1,26 +1,24 @@
 package com.example.madproject.ui.othertrips
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.text.InputType
+import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.Navigation.findNavController
-import androidx.navigation.fragment.findNavController
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.madproject.R
 import com.example.madproject.data.Filters
-import com.example.madproject.data.FirestoreRepository
-import com.example.madproject.data.Profile
 import com.example.madproject.data.Trip
-import com.example.madproject.lib.*
-import com.example.madproject.ui.profile.ProfileViewModel
+import com.example.madproject.lib.parsePrice
+import com.example.madproject.lib.parseTime
+import com.example.madproject.lib.unParseTime
 import com.example.madproject.ui.yourtrips.TripListViewModel
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointForward
@@ -33,7 +31,9 @@ import com.squareup.picasso.Picasso
 import java.text.SimpleDateFormat
 import java.util.*
 
-class OthersTripListFragment : Fragment() {
+
+class TripOfInterestListFragment : Fragment(R.layout.fragment_others_trip_list) {
+
     private var tripList = listOf<Trip>()
     private var filter = Filters()
     private lateinit var emptyList: TextView
@@ -47,55 +47,21 @@ class OthersTripListFragment : Fragment() {
     private var datePicker: MaterialDatePicker<Long>? = null
     private var timePicker: MaterialTimePicker? = null
     private val tripListViewModel: TripListViewModel by activityViewModels()
-    private val profileViewModel: ProfileViewModel by activityViewModels()
     private val filterViewModel: FilterViewModel by activityViewModels()
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-
-        /*
-        If the "needRegistration" flag is true the navigation is redirected to the registration fragment
-         */
-        if (profileViewModel.needRegistration) {
-            val email = FirestoreRepository.currentUser.email ?: ""
-            if (email == "") {
-                // email field cannot be empty -> there were some problem in the sign-in -> logout
-                Toast.makeText(requireContext(), "Missing email, try to sign-in again!", Toast.LENGTH_SHORT).show()
-                performLogout(getString(R.string.default_web_client_id), requireActivity(), requireContext())
-            }
-            val name = FirestoreRepository.currentUser.displayName ?: ""
-            val phone = FirestoreRepository.currentUser.phoneNumber ?: ""
-            val image = if (FirestoreRepository.currentUser.photoUrl != null) FirestoreRepository.currentUser.photoUrl.toString()
-            else ""
-
-            profileViewModel.localProfile = Profile(
-                email = email,
-                fullName = name,
-                phoneNumber = phone,
-                imageUrl = image
-            )
-            findNavController().navigate(R.id.action_othersTripList_to_registerProfile)
-        }
-
-        return inflater.inflate(R.layout.fragment_others_trip_list, container, false)
-    }
 
     @ExperimentalStdlibApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        emptyList = view.findViewById(R.id.emptyList)
-        filterDialogBuilder = MaterialAlertDialogBuilder(this.requireActivity())
-
-        if (tripListViewModel.pathManagement == "comingFromOther") tripListViewModel.pathManagement = ""
-
         // Reset the flags that manages the tab selection in "Your Trips" and "Booked Trips",
         // after going to this page from navigation drawer
         tripListViewModel.tabCompletedTrips = false
         tripListViewModel.tabCompletedTripsBooked = false
+
+        tripListViewModel.pathManagement = "interestedTrips"
+
+        emptyList = view.findViewById(R.id.emptyList)
+        filterDialogBuilder = MaterialAlertDialogBuilder(this.requireActivity())
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
         recyclerView.setHasFixedSize(true)
@@ -107,11 +73,12 @@ class OthersTripListFragment : Fragment() {
         setHasOptionsMenu(true)
 
         // Observe the dynamic list of trips
-        tripListViewModel.getOtherTrips().observe(viewLifecycleOwner, {
+        tripListViewModel.getInterestedTrips().observe(viewLifecycleOwner, {
             if (it == null) {
                 Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
             } else {
                 tripList = filteredTripList(it)
+                Log.d("test", "Other Trips -> $it")
                 if (tripList.isNotEmpty())
                     emptyList.visibility = View.INVISIBLE
                 else
@@ -119,7 +86,6 @@ class OthersTripListFragment : Fragment() {
                 recyclerView.adapter = TripsAdapter(tripList, tripListViewModel)
             }
         })
-
 
         // Observe the dynamic filters
         filterViewModel.getFilter().observe(viewLifecycleOwner, {
@@ -182,7 +148,6 @@ class OthersTripListFragment : Fragment() {
     /*
     Create the filter dialog with the custom layout
      */
-    @SuppressLint("InflateParams")
     private fun launchFilterDialog() {
         filterViewModel.dialogOpened = true
         filterDialogView = LayoutInflater.from(this.requireActivity())
@@ -201,8 +166,7 @@ class OthersTripListFragment : Fragment() {
 
         fixEditText()
 
-        filterDialogBuilder
-            .setView(filterDialogView)
+        filterDialogBuilder.setView(filterDialogView)
             .setTitle("Filter the trip list")
             .setPositiveButton("Apply") { _, _ ->
                 filterViewModel.setFilter(
@@ -231,9 +195,6 @@ class OthersTripListFragment : Fragment() {
 
         var list = longList
             .asSequence()
-            .filter {
-                isFuture(it.departureDate, it.departureTime, "")
-            }
             .filter {
                 // Filter the Departure Location
                 it.from.lowercase().contains(filter.from.lowercase())
@@ -411,7 +372,7 @@ class OthersTripListFragment : Fragment() {
             private val date = itemView.findViewById<TextView>(R.id.date_txt)
             private val time = itemView.findViewById<TextView>(R.id.time_txt)
             private val price = itemView.findViewById<TextView>(R.id.price_txt)
-            private val bookTripButton = itemView.findViewById<Button>(R.id.editTripButton)
+            private val cardButton = itemView.findViewById<Button>(R.id.editTripButton)
             private val cv = itemView.findViewById<CardView>(R.id.card_view)
 
             /*
@@ -423,80 +384,20 @@ class OthersTripListFragment : Fragment() {
                 date.text = t.departureDate
                 time.text = t.departureTime
                 price.text = t.price
+                cardButton.visibility = View.INVISIBLE
+                cardButton.setOnClickListener {  }
                 if (t.imageUrl != "") {
-
                     Picasso.get().load(t.imageUrl).placeholder(R.drawable.car_example).error(R.drawable.car_example).into(image)
                 } else image.setImageResource(R.drawable.car_example)
-                bookTripButton.text = itemView.context.getString(R.string.book_button)
 
                 cv.setOnClickListener {
                     sharedModel.selectedLocal = t
-                    sharedModel.pathManagement = "comingFromOther"
-                    //sharedModel.comingFromOther = true
-                    findNavController(itemView).navigate(R.id.action_othersTripList_to_tripDetail)
+                    Navigation.findNavController(itemView).navigate(R.id.action_interestingTrips_to_tripDetail)
                 }
-
-                bookTripButton.setOnClickListener {
-                    sharedModel.tripIdInDialog = t.id
-                    openBookingDialog(t, sharedModel)
-                }
-
-                if (sharedModel.tripIdInDialog == t.id) {
-                    openBookingDialog(t, sharedModel)
-                }
-
             }
 
             fun unbind() {
-                bookTripButton.setOnClickListener {  }
                 cv.setOnClickListener {  }
-            }
-
-            private fun openBookingDialog(t: Trip, sharedModel: TripListViewModel) {
-                MaterialAlertDialogBuilder(itemView.context)
-                    .setTitle("New Booking")
-                    .setMessage("Are you sure to book this trip?")
-                    .setPositiveButton("Yes") { _, _ ->
-                        bookTheTrip(t)
-                    }
-                    .setNegativeButton("No") { _, _ ->
-                    }
-                    .setOnDismissListener {
-                        sharedModel.tripIdInDialog = ""
-                    }
-                    .show()
-            }
-
-            private fun bookTheTrip(trip: Trip) {
-                FirestoreRepository().controlBookings(trip)
-                    .addOnSuccessListener { it1 ->
-                        if (it1.documents.size != 0) {
-                            Toast.makeText(itemView.context, "Trip already booked", Toast.LENGTH_SHORT)
-                                .show()
-                        } else {
-                            FirestoreRepository().controlProposals(trip)
-                                .addOnSuccessListener { it2 ->
-                                    if (it2.documents.size != 0) {
-                                        Toast.makeText(itemView.context, "Trip already booked", Toast.LENGTH_SHORT)
-                                            .show()
-                                    } else {
-                                        FirestoreRepository().proposeBooking(trip)
-                                            .addOnSuccessListener {
-                                                Toast.makeText(itemView.context, "Booking request successfully sent!", Toast.LENGTH_SHORT).show()
-                                            }
-                                            .addOnFailureListener {
-                                                Toast.makeText(itemView.context, "The booking request had a trouble, please retry!", Toast.LENGTH_SHORT).show()
-                                            }
-                                    }
-                                }
-                                .addOnFailureListener {
-                                    Toast.makeText(itemView.context, "DB access failure", Toast.LENGTH_SHORT).show()
-                                }
-                        }
-                    }
-                    .addOnFailureListener {
-                        Toast.makeText(itemView.context, "DB access failure", Toast.LENGTH_SHORT).show()
-                    }
             }
         }
 

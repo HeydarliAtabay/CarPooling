@@ -180,15 +180,26 @@ class FirestoreRepository {
 
             val newId = ratingCollectionRef.document().id
 
+            // delete the corresponding booking if both passenger and driver were rated
+            val pr = transaction.get(fireStoreDB.collection("trips/${r.tripId}/confirmedBookings").
+            document(b.id)).getBoolean("passengerRated")
+            val dr = transaction.get(fireStoreDB.collection("trips/${r.tripId}/confirmedBookings").
+            document(b.id)).getBoolean("driverRated")
+
+            if (pr == true && dr == true) {
+                transaction.delete(
+                    fireStoreDB.collection("trips/${r.tripId}/confirmedBookings").document(b.id)
+                )
+            } else {
+                // update the booking document setting the flag
+                transaction.update(fireStoreDB.collection("trips/${r.tripId}/confirmedBookings").document(b.id),
+                    if (passenger) "passengerRated" else "driverRated", true)
+            }
+
             // set the new rating
             transaction.set(
                 ratingCollectionRef.document(newId),
                 r
-            )
-
-            // delete the corresponding booking
-            transaction.delete(
-                fireStoreDB.collection("trips/${r.tripId}/confirmedBookings").document(b.id)
             )
         }
     }

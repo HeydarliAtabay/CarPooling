@@ -62,8 +62,10 @@ class ShowProfileFragment : Fragment() {
 
         // Load these information only if it is shown the current user profile
         if (!profileModel.comingFromPrivacy) {
-            // Reset the flag that manages the tab selection in "your trips", after going to this page from navigation drawer
+            // Reset the flags that manages the tab selection in "Your Trips" and "Booked Trips",
+            // after going to this page from navigation drawer
             tripListModel.tabCompletedTrips = false
+            tripListModel.tabCompletedTripsBooked = false
             dateOfBirth = view.findViewById(R.id.dateOfBirth)
             phoneNumber = view.findViewById(R.id.phoneNumber)
             location = view.findViewById(R.id.location)

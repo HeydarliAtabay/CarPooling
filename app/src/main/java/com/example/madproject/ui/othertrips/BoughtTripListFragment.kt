@@ -1,28 +1,26 @@
-package com.example.madproject.ui.yourtrips
+package com.example.madproject.ui.othertrips
 
 import android.os.Bundle
+import android.util.Log
 import android.view.*
+import android.widget.*
 import androidx.fragment.app.Fragment
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.Navigation.findNavController
-import androidx.navigation.fragment.findNavController
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.madproject.R
 import com.example.madproject.data.Trip
 import com.example.madproject.lib.isFuture
 import com.example.madproject.ui.profile.ProfileViewModel
+import com.example.madproject.ui.yourtrips.TripListViewModel
 import com.example.madproject.ui.yourtrips.interestedusers.UserListViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.squareup.picasso.Picasso
 
-class TripListFragment : Fragment(R.layout.fragment_trip_list) {
+class BoughtTripListFragment : Fragment(R.layout.fragment_trip_list) {
     private var tripList = listOf<Trip>()
     private lateinit var emptyList: TextView
     private lateinit var emptyList2: TextView
@@ -39,30 +37,29 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
         emptyList2 = view.findViewById(R.id.emptyList2)
         tabLayout = view.findViewById(R.id.tabUserTrips)
 
-        // Reset the flag that manages the tab selection in "Booked Trips",
+        // Reset the flag that manages the tab selection in "Your Trips",
         // after going to this page from navigation drawer
-        tripListViewModel.tabCompletedTripsBooked = false
+        tripListViewModel.tabCompletedTrips = false
 
-        // reset the flag to "false", since this fragment will set it to "true" if the required navigation is selected
-        profileModel.comingFromPrivacy = false
+        tripListViewModel.pathManagement = "boughtUpcomingTrips"
 
-        tripListViewModel.pathManagement = "tabUpcoming"
-
-        if (tripListViewModel.tabCompletedTrips) {
+        if (tripListViewModel.tabCompletedTripsBooked) {
             val tab = tabLayout.getTabAt(1)
             tab?.select()
-            tripListViewModel.pathManagement = "tabCompleted"
+            tripListViewModel.pathManagement = "boughtCompletedTrips"
         }
 
         fab = view.findViewById(R.id.fab)
+        fab.hide()
+        emptyList2.visibility = View.INVISIBLE
 
         recyclerView = view.findViewById(R.id.recyclerView)
         recyclerView.setHasFixedSize(true)
         recyclerView.setItemViewCacheSize(3)
         recyclerView.layoutManager = LinearLayoutManager(this.requireActivity())
 
-        // Load the list of trips created by the current user from the DB
-        tripListViewModel.getUserTrips().observe(viewLifecycleOwner, {
+        // Load the list of booked trips for the current user from the DB
+        tripListViewModel.getConfirmedTrips().observe(viewLifecycleOwner, {
             if (it == null) {
                 Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
             } else {
@@ -78,14 +75,14 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
                 // Handle tab select
                 when (tab?.contentDescription) {
                     "tabUpcoming" -> {
-                        tripListViewModel.tabCompletedTrips = false
-                        tripListViewModel.pathManagement = "tabUpcoming"
+                        tripListViewModel.tabCompletedTripsBooked = false
+                        tripListViewModel.pathManagement = "boughtUpcomingTrips"
                         setSelectedList()
                     }
 
                     "tabCompleted" -> {
-                        tripListViewModel.tabCompletedTrips = true
-                        tripListViewModel.pathManagement = "tabCompleted"
+                        tripListViewModel.tabCompletedTripsBooked = true
+                        tripListViewModel.pathManagement = "boughtCompletedTrips"
                         setSelectedList()
                     }
                 }
@@ -96,27 +93,22 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
             override fun onTabUnselected(tab: TabLayout.Tab?) {}
         })
 
-        fab.setOnClickListener{
-            tripListViewModel.selectedLocal = Trip()
-            tripListViewModel.useDBImage = true
-            findNavController().navigate(R.id.action_tripList_to_tripEdit)
-        }
     }
 
     private fun setSelectedList() {
 
         val currentList =
-            if (tripListViewModel.tabCompletedTrips)
+            if (tripListViewModel.tabCompletedTripsBooked)
                 tripList.filter { !isFuture(it.departureDate, it.departureTime, it.duration) }
             else
                 tripList.filter { isFuture(it.departureDate, it.departureTime, it.duration) }
 
+        Log.d("test", "$currentList")
+
         if (currentList.isNotEmpty()) {
             emptyList.visibility = View.INVISIBLE
-            emptyList2.visibility = View.INVISIBLE
         } else {
             emptyList.visibility = View.VISIBLE
-            emptyList2.visibility = View.VISIBLE
         }
         recyclerView.adapter = TripsAdapter(currentList, tripListViewModel, userListModel, profileModel)
 
@@ -154,21 +146,19 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
 
                 cv.setOnClickListener {
                     tlViewModel.selectedLocal = t
-                    findNavController(itemView).navigate(R.id.action_tripList_to_tripDetail)
+                    Navigation.findNavController(itemView).navigate(R.id.action_bookedTrips_to_tripDetail)
                 }
 
-                cardButton.text =
-                    if (tlViewModel.tabCompletedTrips) "Rate Passengers" else "Edit"
+                if (tlViewModel.tabCompletedTripsBooked)
+                    cardButton.text = itemView.context.getString(R.string.rate_driver)
+                else
+                    cardButton.visibility = View.INVISIBLE
 
                 cardButton.setOnClickListener {
                     tlViewModel.selectedLocal = t
-                    if (tlViewModel.tabCompletedTrips) {
-                        ulViewModel.selectedLocalTrip = t
-                        profileViewModel.comingFromPrivacy = true
-                        findNavController(itemView).navigate(R.id.action_tripList_to_userRate)
-                    } else {
-                        tlViewModel.useDBImage = true
-                        findNavController(itemView).navigate(R.id.action_tripList_to_tripEdit)
+                    if (tlViewModel.tabCompletedTripsBooked) {
+                        // Open the rating dialog
+                        Toast.makeText(itemView.context, "Open the rating dialog", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -186,7 +176,7 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TripViewHolder {
             val v= LayoutInflater.from(parent.context)
-                    .inflate(R.layout.recyclerview_card_trip, parent,false)
+                .inflate(R.layout.recyclerview_card_trip, parent,false)
             return TripViewHolder(v)
         }
 

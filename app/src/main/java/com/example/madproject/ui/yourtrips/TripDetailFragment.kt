@@ -140,11 +140,10 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
-        if (sharedModel.pathManagement == "comingFromOther" || sharedModel.pathManagement == "tabUpcoming") {
+        if (sharedModel.pathManagement != "tabCompleted") {
             inflater.inflate(R.menu.show_profiles, menu)
 
-            //if (!sharedModel.comingFromOther)
-            if (sharedModel.pathManagement != "comingFromOther")
+            if (sharedModel.pathManagement == "tabUpcoming")
                 inflater.inflate(R.menu.edit_menu, menu)
         }
     }
@@ -158,18 +157,17 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
                 true
             }
             R.id.profilesButton -> {
-                // If the user is inside others trip list he will navigate to the profile of the driver
-                // Else he will navigate to his booking manager
-                if (sharedModel.pathManagement == "comingFromOther") {
-                //if (sharedModel.comingFromOther) {
-                    userListModel.selectedLocalUserEmail = trip.ownerEmail
-                    profileModel.comingFromPrivacy = true
-                    findNavController().navigate(R.id.action_tripDetail_to_showProfilePrivacy)
-                } else {
+                // If the user comes from tabUpcoming, he has to access the booking manager of that trip
+                // Else he will navigate to the profile of the driver
+                if (sharedModel.pathManagement == "tabUpcoming") {
                     userListModel.selectedLocalTrip = trip
                     userListModel.tabBookings = false
                     profileModel.comingFromPrivacy = true
                     findNavController().navigate(R.id.action_tripDetail_to_userList)
+                } else {
+                    userListModel.selectedLocalUserEmail = trip.ownerEmail
+                    profileModel.comingFromPrivacy = true
+                    findNavController().navigate(R.id.action_tripDetail_to_showProfilePrivacy)
                 }
                 true
             }

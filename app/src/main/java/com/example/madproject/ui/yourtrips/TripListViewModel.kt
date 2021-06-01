@@ -49,8 +49,9 @@ class TripListViewModel: ViewModel() {
     // String used to manage the path of Trip Detail
     var pathManagement = ""
 
-    // Flag to manage the landscape selection of the tab
+    // Flags to manage the landscape selection of the tab in OthersTripListFragment and BoughtTripListFragment
     var tabCompletedTrips = false
+    var tabCompletedTripsBooked = false
 
     // Data used to manage the booking dialog restore state from OtherTripsFragment
     var tripIdInDialog = ""

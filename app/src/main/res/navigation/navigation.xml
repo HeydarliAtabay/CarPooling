@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/showProfile"
         android:name="com.example.madproject.ui.profile.ShowProfileFragment"
-        android:label="Your profile"
+        android:label="Your Profile"
         tools:layout="@layout/fragment_show_profile" >
         <action
             android:id="@+id/action_showProfile_to_editProfile"
@@ -24,13 +24,13 @@
     <fragment
         android:id="@+id/comments"
         android:name="com.example.madproject.ui.comments.CommentsFragment"
-        android:label="Your comments"
+        android:label="Reviews"
         tools:layout="@layout/fragment_comments" />
 
     <fragment
         android:id="@+id/editProfile"
         android:name="com.example.madproject.ui.profile.EditProfileFragment"
-        android:label="Edit your profile..."
+        android:label="Edit Your Profile..."
         tools:layout="@layout/fragment_edit_profile" >
         <action
             android:id="@+id/action_editProfile_to_showProfile"
@@ -43,7 +43,7 @@
     <fragment
         android:id="@+id/tripList"
         android:name="com.example.madproject.ui.yourtrips.TripListFragment"
-        android:label="Your Trips"
+        android:label="Your Created Trips"
         tools:layout="@layout/fragment_trip_list" >
 
         <action
@@ -66,7 +66,7 @@
     <fragment
         android:id="@+id/tripDetail"
         android:name="com.example.madproject.ui.yourtrips.TripDetailFragment"
-        android:label="Trip details"
+        android:label="Trip Details"
         tools:layout="@layout/fragment_trip_detail" >
 
         <action
@@ -104,7 +104,7 @@
     <fragment
         android:id="@+id/tripEdit"
         android:name="com.example.madproject.ui.yourtrips.TripEditFragment"
-        android:label="Edit your trip..."
+        android:label="Edit Your Trip..."
         tools:layout="@layout/fragment_trip_edit" >
 
         <action
@@ -147,7 +147,7 @@
     <fragment
         android:id="@+id/showProfilePrivacy"
         android:name="com.example.madproject.ui.profile.ShowProfileFragment"
-        android:label="Profile details"
+        android:label="Profile Details"
         tools:layout="@layout/fragment_show_profile" >
         <action
             android:id="@+id/action_showProfilePrivacy_to_comments"
@@ -157,7 +157,7 @@
     <fragment
         android:id="@+id/registerProfile"
         android:name="com.example.madproject.ui.profile.EditProfileFragment"
-        android:label="Register your data..."
+        android:label="Register Your Profile..."
         tools:layout="@layout/fragment_edit_profile" >
         <action
             android:id="@+id/action_registerProfile_to_othersTripList"
@@ -167,7 +167,7 @@
     <fragment
         android:id="@+id/userRate"
         android:name="com.example.madproject.ui.yourtrips.interestedusers.UserListFragment"
-        android:label="Rate passengers"
+        android:label="Rate Passengers"
         tools:layout="@layout/fragment_user_list" >
         <action
             android:id="@+id/action_userRate_to_showProfilePrivacy"
@@ -177,8 +177,27 @@
     <fragment
         android:id="@+id/showMap"
         android:name="com.example.madproject.ui.map.ShowMapFragment"
-        android:label="Trip route"
+        android:label="Trip Route"
         tools:layout="@layout/fragment_show_map" >
     </fragment>
 
+    <fragment
+        android:id="@+id/bookedTrips"
+        android:name="com.example.madproject.ui.othertrips.BoughtTripListFragment"
+        android:label="Booked Trips"
+        tools:layout="@layout/fragment_trip_list">
+        <action
+            android:id="@+id/action_bookedTrips_to_tripDetail"
+            app:destination="@id/tripDetail" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/interestingTrips"
+        android:name="com.example.madproject.ui.othertrips.TripOfInterestListFragment"
+        android:label="Trips You're Interested In"
+        tools:layout="@layout/fragment_others_trip_list">
+        <action
+            android:id="@+id/action_interestingTrips_to_tripDetail"
+            app:destination="@id/tripDetail" />
+    </fragment>
 </navigation>

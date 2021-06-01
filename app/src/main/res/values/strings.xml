@@ -48,6 +48,7 @@
     <string name="new_trip_button">Create a new Trip</string>
     <string name="proposals_tab_id">tabProp</string>
     <string name="proposals_tab_text">Proposals</string>
+    <string name="rate_driver">Rate Driver</string>
     <string name="bookings_tab_id">tabBook</string>
     <string name="bookings_tab_text">Confirmed Bookings</string>
     <string name="confirm_bookings_button">Confirm the bookings</string>

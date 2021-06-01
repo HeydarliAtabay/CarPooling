@@ -77,12 +77,12 @@ fun performLogout(requestIdToken: String, activity: Activity, context: Context) 
 fun isFuture(date: String, time: String, duration: String): Boolean {
     // Depending on the date and time, determine if the trip was terminated or not
     val current = Date()
-    val inputFormat = SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault())
+    val inputFormat = SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.ENGLISH)
 
     var tripDateTime = inputFormat.parse("$date $time") ?: return false
 
     if (duration != "") {
-        val inputDurationFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+        val inputDurationFormat = SimpleDateFormat("HH:mm", Locale.ENGLISH)
         inputDurationFormat.timeZone = TimeZone.getTimeZone("UTC")
         val tripDuration = inputDurationFormat.parse(duration) ?: return false
         val newTime = tripDateTime.time + tripDuration.time

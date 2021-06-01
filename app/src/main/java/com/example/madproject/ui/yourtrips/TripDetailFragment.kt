@@ -3,6 +3,7 @@ package com.example.madproject.ui.yourtrips
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.*
+import android.widget.ImageButton
 import androidx.fragment.app.Fragment
 import android.widget.ImageView
 import android.widget.TextView
@@ -23,6 +24,7 @@ import com.squareup.picasso.Picasso
 class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
     private lateinit var imageCar: ImageView
     private lateinit var departure: TextView
+    private lateinit var showMap: ImageButton
     private lateinit var arrival: TextView
     private lateinit var departureDate: TextView
     private lateinit var departureTime: TextView
@@ -40,6 +42,7 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         imageCar = view.findViewById(R.id.imageCar)
         departure = view.findViewById(R.id.departure_location)
+        showMap = view.findViewById(R.id.openMap)
         arrival = view.findViewById(R.id.arrival_location)
         departureDate = view.findViewById(R.id.date)
         departureTime = view.findViewById(R.id.time)
@@ -99,29 +102,6 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
             }
         }
 
-        //if (sharedModel.comingFromOther) {
-        /*if (sharedModel.pathManagement == "comingFromOther") {
-            fabButton.setImageResource(R.drawable.plus)
-            fabButton.setOnClickListener {
-                createBookingDialog()
-            }
-        } else {
-            if (sharedModel.tabCompletedTrips) {
-                fabButton.setImageResource(R.drawable.ic_star)
-                fabButton.setOnClickListener {
-                    userListModel.selectedLocalTrip = trip
-                    profileModel.comingFromPrivacy = true
-                    findNavController().navigate(R.id.action_tripDetail_to_userRate)
-                }
-            } else {
-                fabButton.setImageResource(R.drawable.outline_delete_white_48)
-                fabButton.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.red))
-                fabButton.setOnClickListener {
-                    deleteTripDialog()
-                }
-            }
-        }*/
-
         sharedModel.getSelectedDB(trip).observe(viewLifecycleOwner, {
             if (it == null) {
                 if (sharedModel.pathManagement == "comingFromOther") {
@@ -143,12 +123,11 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
         if (sharedModel.changedOrientationBooking) {
             createBookingDialog()
             sharedModel.changedOrientationBooking = false
-        }
-
-        if (sharedModel.changedOrientationDelete) {
+        } else if (sharedModel.changedOrientationDelete) {
             deleteTripDialog()
             sharedModel.changedOrientationDelete = false
         }
+
     }
 
     override fun onPause() {
@@ -259,6 +238,12 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
         price.text = trip.price
         additionalInfo.text = trip.additionalInfo
         intermediateStops.text = trip.intermediateStops
+
+        showMap.setOnClickListener {
+            // Navigate to the map
+            findNavController().navigate(R.id.action_tripDetail_to_showMap)
+        }
+
         if (trip.imageUrl != "") {
             Picasso.get().load(trip.imageUrl).placeholder(R.drawable.car_example).error(R.drawable.car_example).into(imageCar)
         } else imageCar.setImageResource(R.drawable.car_example)

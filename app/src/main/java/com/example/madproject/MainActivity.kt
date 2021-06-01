@@ -1,5 +1,10 @@
 package com.example.madproject
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageButton
@@ -18,12 +23,16 @@ import androidx.navigation.ui.setupWithNavController
 import com.example.madproject.data.Profile
 import com.example.madproject.lib.performLogout
 import com.example.madproject.ui.comments.RatingsViewModel
+import com.example.madproject.ui.map.ShowMapFragment
 import com.example.madproject.ui.profile.ProfileViewModel
 import com.example.madproject.ui.yourtrips.TripListViewModel
 import com.example.madproject.ui.yourtrips.interestedusers.UserListViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
 import com.squareup.picasso.Picasso
+import org.osmdroid.config.Configuration
+import org.osmdroid.config.IConfigurationProvider
+import org.osmdroid.tileprovider.util.StorageUtils
 
 class MainActivity : AppCompatActivity() {
 
@@ -37,12 +46,30 @@ class MainActivity : AppCompatActivity() {
     private lateinit var toolbar: Toolbar
     private lateinit var header: View
 
+    private var showMapFragment: ShowMapFragment? = null
+
+    private val networkReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            try {
+                showMapFragment?.invalidateMapView()
+            } catch (e: NullPointerException) {
+                Toast.makeText(this@MainActivity, "Cannot initialize the Map View!", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Get the flag from the intent extra in order to know if the first registration is needed
         profileModel.needRegistration = intent.getBooleanExtra("INTENT_NEED_REGISTRATION_EXTRA", false)
 
+        val provider: IConfigurationProvider = Configuration.getInstance()
+        provider.userAgentValue = BuildConfig.APPLICATION_ID
+        provider.osmdroidBasePath = StorageUtils.getStorage()
+        provider.osmdroidTileCache = StorageUtils.getStorage()
         setContentView(R.layout.activity_main)
+
+        registerReceiver(networkReceiver, IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
 
         // Setup the Material Toolbar
         toolbar = findViewById(R.id.toolbar)
@@ -62,6 +89,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        unregisterReceiver(networkReceiver)
         if (profileModel.logoutDialogOpened)
             profileModel.changedOrientation = true
     }

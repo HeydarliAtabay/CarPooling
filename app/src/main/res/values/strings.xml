@@ -57,4 +57,7 @@
     <string name="camera_message">Use the camera to take a picture</string>
     <string name="save_message">Click to save</string>
     <string name="show_profiles_message">Click to see the profile</string>
+    <string name="add_departure">Pinpoint departure location</string>
+    <string name="add_arrival">Pinpoint arrival location</string>
+    <string name="trip_route">See the trip route</string>
 </resources>

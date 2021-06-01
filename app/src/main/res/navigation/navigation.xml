@@ -96,6 +96,9 @@
         <action
             android:id="@+id/action_tripDetail_to_userRate"
             app:destination="@id/userRate" />
+        <action
+            android:id="@+id/action_tripDetail_to_showMap"
+            app:destination="@id/showMap" />
     </fragment>
 
     <fragment
@@ -169,6 +172,13 @@
         <action
             android:id="@+id/action_userRate_to_showProfilePrivacy"
             app:destination="@id/showProfilePrivacy" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/showMap"
+        android:name="com.example.madproject.ui.map.ShowMapFragment"
+        android:label="Trip route"
+        tools:layout="@layout/fragment_show_map" >
     </fragment>
 
 </navigation>

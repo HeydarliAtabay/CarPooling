@@ -220,8 +220,8 @@ class TripOfInterestListFragment : Fragment(R.layout.fragment_others_trip_list) 
                 if (filter.time == it.departureTime) true
                 else {
                     // "HH" instead of "hh" represents the 24h format
-                    val filterTime = SimpleDateFormat("HH:mm", Locale.getDefault()).parse(filter.time)
-                    val tripTime = SimpleDateFormat("HH:mm", Locale.getDefault()).parse(it.departureTime)
+                    val filterTime = SimpleDateFormat("HH:mm", Locale.ENGLISH).parse(filter.time)
+                    val tripTime = SimpleDateFormat("HH:mm", Locale.ENGLISH).parse(it.departureTime)
                     tripTime!!.after(filterTime)
                 }
             }.sortedWith(compareBy<Trip> { it.departureTime.split(":")[0].toInt() }
@@ -300,7 +300,7 @@ class TripOfInterestListFragment : Fragment(R.layout.fragment_others_trip_list) 
             )
 
         if (filterDate.text.toString() != "") {
-            val currentDate = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+            val currentDate = SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH)
             currentDate.timeZone = TimeZone.getTimeZone("UTC")
             val p = currentDate.parse(filterDate.text.toString())
             dPicker = dPicker.setSelection(p?.time)
@@ -318,7 +318,7 @@ class TripOfInterestListFragment : Fragment(R.layout.fragment_others_trip_list) 
         datePicker?.addOnPositiveButtonClickListener {
 
             val inputFormat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
-            val outputFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+            val outputFormat = SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH)
             filterDate.setText(outputFormat.format(inputFormat.parse(datePicker?.headerText!!)!!))
             filterTime.requestFocus()
         }

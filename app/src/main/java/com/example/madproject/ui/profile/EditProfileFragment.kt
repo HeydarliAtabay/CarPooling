@@ -255,7 +255,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             )
 
         if (dateOfBirth.text.toString() != "") {
-            val currentDate = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+            val currentDate = SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH)
             currentDate.timeZone = TimeZone.getTimeZone("UTC")
             val p = currentDate.parse(dateOfBirth.text.toString())
             datePicker = datePicker.setSelection(p?.time)
@@ -272,7 +272,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
 
         picker?.addOnPositiveButtonClickListener {
             val inputFormat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
-            val outputFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+            val outputFormat = SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH)
             dateOfBirth.setText(outputFormat.format(inputFormat.parse(picker?.headerText!!)!!))
             phoneNumber.requestFocus()
         }

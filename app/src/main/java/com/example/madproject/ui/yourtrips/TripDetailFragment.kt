@@ -79,6 +79,11 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
                     profileModel.comingFromPrivacy = true
                     findNavController().navigate(R.id.action_tripDetail_to_userRate)
                 }
+            } else if (sharedModel.comingFromUpcomingBooked) {
+                fabRate.hide()
+                fabDelete.hide()
+                fabBooking.hide()
+
             } else {
                 fabRate.hide()
                 fabDelete.show()
@@ -126,10 +131,14 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
-        if (!sharedModel.tabCompletedTrips) {
+        if (sharedModel.comingFromUpcomingBooked) {
             inflater.inflate(R.menu.show_profiles, menu)
-            if (!sharedModel.comingFromOther)
-                inflater.inflate(R.menu.edit_menu, menu)
+        } else {
+            if (!sharedModel.tabCompletedTrips) {
+                inflater.inflate(R.menu.show_profiles, menu)
+                if (!sharedModel.comingFromOther)
+                    inflater.inflate(R.menu.edit_menu, menu)
+            }
         }
     }
 
@@ -144,11 +153,11 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
             R.id.profilesButton -> {
                 // If the user is inside others trip list he will navigate to the profile of the driver
                 // Else he will navigate to his booking manager
-                if (sharedModel.comingFromOther) {
+                if (sharedModel.comingFromOther || sharedModel.comingFromUpcomingBooked) {
                     userListModel.selectedLocalUserEmail = trip.ownerEmail
                     profileModel.comingFromPrivacy = true
                     findNavController().navigate(R.id.action_tripDetail_to_showProfilePrivacy)
-                } else {
+                } else if (!sharedModel.comingFromOther){
                     userListModel.selectedLocalTrip = trip
                     userListModel.tabBookings = false
                     profileModel.comingFromPrivacy = true

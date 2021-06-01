@@ -11,7 +11,7 @@ import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.Navigation.findNavController
+import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,7 +20,6 @@ import com.example.madproject.data.Filters
 import com.example.madproject.data.FirestoreRepository
 import com.example.madproject.data.Profile
 import com.example.madproject.data.Trip
-import com.example.madproject.lib.isFuture
 import com.example.madproject.lib.parsePrice
 import com.example.madproject.lib.parseTime
 import com.example.madproject.lib.unParseTime
@@ -37,7 +36,9 @@ import com.squareup.picasso.Picasso
 import java.text.SimpleDateFormat
 import java.util.*
 
-class OthersTripListFragment : Fragment() {
+
+class TripsOfInterestListFragment : Fragment(R.layout.fragment_others_trip_list) {
+
     private var tripList = listOf<Trip>()
     private var filter = Filters()
     private lateinit var emptyList: TextView
@@ -51,48 +52,13 @@ class OthersTripListFragment : Fragment() {
     private var datePicker: MaterialDatePicker<Long>? = null
     private var timePicker: MaterialTimePicker? = null
     private val tripListViewModel: TripListViewModel by activityViewModels()
-    private val profileViewModel: ProfileViewModel by activityViewModels()
     private val filterViewModel: FilterViewModel by activityViewModels()
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-
-        /*
-        If the "needRegistration" flag is true the navigation is redirected to the registration fragment
-         */
-        if (profileViewModel.needRegistration) {
-            val email = FirestoreRepository.currentUser.email ?: ""
-            val name = FirestoreRepository.currentUser.displayName ?: ""
-            val phone = FirestoreRepository.currentUser.phoneNumber ?: ""
-            val image = if (FirestoreRepository.currentUser.photoUrl != null) FirestoreRepository.currentUser.photoUrl.toString()
-            else ""
-
-            profileViewModel.localProfile = Profile(
-                email = email,
-                fullName = name,
-                phoneNumber = phone,
-                imageUrl = image
-            )
-            findNavController().navigate(R.id.action_othersTripList_to_registerProfile)
-        }
-
-        return inflater.inflate(R.layout.fragment_others_trip_list, container, false)
-    }
-
-    @ExperimentalStdlibApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         emptyList = view.findViewById(R.id.emptyList)
         filterDialogBuilder = MaterialAlertDialogBuilder(this.requireActivity())
-
-        if (tripListViewModel.comingFromOther) tripListViewModel.comingFromOther = false
-
-        // Reset the flag that manages the tab selection in "your trips", after going to this page from navigation drawer
-        tripListViewModel.tabCompletedTrips = false
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
         recyclerView.setHasFixedSize(true)
@@ -104,7 +70,7 @@ class OthersTripListFragment : Fragment() {
         setHasOptionsMenu(true)
 
         // Observe the dynamic list of trips
-        tripListViewModel.getOtherTrips().observe(viewLifecycleOwner, {
+        tripListViewModel.getInterestedTrips().observe(viewLifecycleOwner, {
             if (it == null) {
                 Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
             } else {
@@ -117,7 +83,6 @@ class OthersTripListFragment : Fragment() {
                 recyclerView.adapter = TripsAdapter(tripList, tripListViewModel)
             }
         })
-
 
         // Observe the dynamic filters
         filterViewModel.getFilter().observe(viewLifecycleOwner, {
@@ -180,7 +145,6 @@ class OthersTripListFragment : Fragment() {
     /*
     Create the filter dialog with the custom layout
      */
-    @SuppressLint("InflateParams")
     private fun launchFilterDialog() {
         filterViewModel.dialogOpened = true
         filterDialogView = LayoutInflater.from(this.requireActivity())
@@ -199,8 +163,7 @@ class OthersTripListFragment : Fragment() {
 
         fixEditText()
 
-        filterDialogBuilder
-            .setView(filterDialogView)
+        filterDialogBuilder.setView(filterDialogView)
             .setTitle("Filter the trip list")
             .setPositiveButton("Apply") { _, _ ->
                 filterViewModel.setFilter(
@@ -224,21 +187,20 @@ class OthersTripListFragment : Fragment() {
     /*
     Filter the list of trips with the selected filters
      */
-    @ExperimentalStdlibApi
+    @SuppressLint("SimpleDateFormat")
     private fun filteredTripList(longList: List<Trip>): List<Trip> {
 
         var list = longList
             .asSequence()
             /*.filter {
-                isFuture(it.departureDate, it.departureTime, "")
-                //MyFunctions.isFuture(it.departureDate, it.departureTime, "")
+                MyFunctions.isFuture(it.departureDate, it.departureTime, "")
             }*/
             .filter {
                 // Filter the Departure Location
-                it.from.lowercase().contains(filter.from.lowercase())
+                it.from.toLowerCase(Locale.ROOT).contains(filter.from.toLowerCase(Locale.ROOT))
             }.filter {
                 // Filter the Arrival Location
-                it.to.lowercase().contains(filter.to.lowercase())
+                it.to.toLowerCase(Locale.ROOT).contains(filter.to.toLowerCase(Locale.ROOT))
             }.filter {
                 // Filter the Max Price
                 if (filter.price == "") true
@@ -258,8 +220,8 @@ class OthersTripListFragment : Fragment() {
                 if (filter.time == it.departureTime) true
                 else {
                     // "HH" instead of "hh" represents the 24h format
-                    val filterTime = SimpleDateFormat("HH:mm", Locale.ENGLISH).parse(filter.time)
-                    val tripTime = SimpleDateFormat("HH:mm", Locale.ENGLISH).parse(it.departureTime)
+                    val filterTime = SimpleDateFormat("HH:mm").parse(filter.time)
+                    val tripTime = SimpleDateFormat("HH:mm").parse(it.departureTime)
                     tripTime!!.after(filterTime)
                 }
             }.sortedWith(compareBy<Trip> { it.departureTime.split(":")[0].toInt() }
@@ -326,6 +288,7 @@ class OthersTripListFragment : Fragment() {
     /*
     Set the date picker
      */
+    @SuppressLint("SimpleDateFormat")
     private fun setDatePicker() {
         val constraintsBuilder = CalendarConstraints.Builder().setValidator(
             DateValidatorPointForward.now()
@@ -338,7 +301,7 @@ class OthersTripListFragment : Fragment() {
             )
 
         if (filterDate.text.toString() != "") {
-            val currentDate = SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH)
+            val currentDate = SimpleDateFormat("MMM dd, yyyy")
             currentDate.timeZone = TimeZone.getTimeZone("UTC")
             val p = currentDate.parse(filterDate.text.toString())
             dPicker = dPicker.setSelection(p?.time)
@@ -355,8 +318,8 @@ class OthersTripListFragment : Fragment() {
 
         datePicker?.addOnPositiveButtonClickListener {
 
-            val inputFormat = SimpleDateFormat("dd MMM yyyy", Locale.ITALIAN)
-            val outputFormat = SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH)
+            val inputFormat = SimpleDateFormat("dd MMM yyyy")
+            val outputFormat = SimpleDateFormat("MMM dd, yyyy")
             filterDate.setText(outputFormat.format(inputFormat.parse(datePicker?.headerText!!)!!))
             filterTime.requestFocus()
         }
@@ -426,18 +389,15 @@ class OthersTripListFragment : Fragment() {
 
                     Picasso.get().load(t.imageUrl).placeholder(R.drawable.car_example).error(R.drawable.car_example).into(image)
                 } else image.setImageResource(R.drawable.car_example)
-                bookTripButton.text = itemView.context.getString(R.string.book_button)
+                bookTripButton.text = "Book trip"
 
                 cv.setOnClickListener {
                     sharedModel.selectedLocal = t
                     sharedModel.comingFromOther = true
-                    findNavController(itemView).navigate(R.id.action_othersTripList_to_tripDetail)
+                    Navigation.findNavController(itemView).navigate(R.id.action_interestingTrips_to_tripDetail)
                 }
 
-                bookTripButton.setOnClickListener {
-                    sharedModel.tripIdInDialog = t.id
-                    openBookingDialog(t, sharedModel)
-                }
+                bookTripButton.visibility = View.INVISIBLE
 
                 if (sharedModel.tripIdInDialog == t.id) {
                     openBookingDialog(t, sharedModel)
@@ -446,7 +406,7 @@ class OthersTripListFragment : Fragment() {
             }
 
             fun unbind() {
-                bookTripButton.setOnClickListener {  }
+                //bookTripButton.setOnClickListener {  }
                 cv.setOnClickListener {  }
             }
 

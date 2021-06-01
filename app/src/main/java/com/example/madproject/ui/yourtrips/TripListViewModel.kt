@@ -40,6 +40,9 @@ class TripListViewModel: ViewModel() {
     // Flags used to manage the trip booking
     var comingFromOther = false
 
+    //Flag to manage the right trip details, coming from booked upcoming trips
+    var comingFromUpcomingBooked = false
+
     // Flag to manage the landscape selection of the tab
     var tabCompletedTrips = false
 

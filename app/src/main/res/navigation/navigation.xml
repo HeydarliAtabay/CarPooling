@@ -129,6 +129,29 @@
     </fragment>
 
     <fragment
+        android:id="@+id/interestingTrips"
+        android:name="com.example.madproject.ui.othertrips.TripsOfInterestListFragment"
+        android:label="Interesting Trips"
+        tools:layout="@layout/fragment_others_trip_list">
+        <action
+            android:id="@+id/action_interestingTrips_to_tripDetail"
+            app:destination="@id/tripDetail" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/bookedTrips"
+        android:name="com.example.madproject.ui.othertrips.BoughtTripsListFragment"
+        android:label="Booked Trips"
+        tools:layout="@layout/fragment_trip_list">
+        <action
+            android:id="@+id/action_bookedTrips_to_tripDetail"
+            app:destination="@id/tripDetail" />
+        <action
+            android:id="@+id/action_bookedTrips_to_userRate"
+            app:destination="@id/userRate" />
+    </fragment>
+
+    <fragment
         android:id="@+id/userList"
         android:name="com.example.madproject.ui.yourtrips.interestedusers.UserListFragment"
         android:label="Bookings Management"

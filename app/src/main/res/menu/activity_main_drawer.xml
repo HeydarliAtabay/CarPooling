@@ -9,6 +9,19 @@
             android:icon="@drawable/ic_map_black_24dp"
             android:tint="?attr/color"
             android:title="Available Trips" />
+
+        <item
+            android:id="@+id/bookedTrips"
+            android:icon="@drawable/outline_euro_black_24"
+            android:tint="?attr/color"
+            android:title="Booked Trips" />
+
+        <item
+            android:id="@+id/interestingTrips"
+            android:icon="@drawable/outline_favorite_border_black_24"
+            android:tint="?attr/color"
+            android:title="Interesting Trips" />
+
         <item
             android:id="@+id/tripList"
             android:icon="@drawable/outline_directions_car_24"
@@ -19,7 +32,7 @@
             android:id="@+id/showProfile"
             android:icon="@drawable/ic_person_outline_black_24dp"
             android:tint="?attr/color"
-            android:title="Profile info" />
+            android:title="Profile Info" />
     </group>
 
 </menu>

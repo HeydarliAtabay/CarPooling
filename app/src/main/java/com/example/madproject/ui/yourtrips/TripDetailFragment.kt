@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.widget.ImageViewCompat
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.madproject.R
@@ -61,6 +62,10 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
         }
 
         fabButton = view.findViewById(R.id.fabButton)
+        ImageViewCompat.setImageTintList(fabButton,null)
+        ImageViewCompat.setImageTintList(showMap,null)
+
+
 
         trip = sharedModel.selectedLocal
 
@@ -69,6 +74,7 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
         when (sharedModel.pathManagement) {
             "comingFromOther" -> {
                 // The FAB allows to propose a booking
+
                 fabButton.setImageResource(R.drawable.plus)
                 fabButton.setOnClickListener {
                     createBookingDialog()

@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent">
 
     <RelativeLayout
         android:id="@+id/RelativeLayout2"
@@ -22,20 +22,20 @@
         app:layout_constraintVertical_weight="1">
 
         <com.google.android.material.card.MaterialCardView
+            style="@style/CardViewBorder"
             android:layout_width="270dp"
             android:layout_height="180dp"
             android:layout_centerInParent="true"
             app:cardCornerRadius="10dp"
-            app:cardElevation="0dp"
-            style="@style/CardViewBorder">
+            app:cardElevation="0dp">
 
             <ImageView
                 android:id="@+id/imageCar"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:adjustViewBounds="true"
-                android:src="@drawable/car_example"
                 android:scaleType="centerCrop"
+                android:src="@drawable/car_example"
                 tools:srcCompat="@tools:sample/avatars" />
         </com.google.android.material.card.MaterialCardView>
 
@@ -53,8 +53,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintVertical_weight="2"
-        app:layout_constraintTop_toBottomOf="@+id/RelativeLayout2">
+        app:layout_constraintTop_toBottomOf="@+id/RelativeLayout2"
+        app:layout_constraintVertical_weight="2">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -66,8 +66,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="4dp"
-                android:textSize="12sp"
-                android:text="Departure:" />
+                android:text="Departure:"
+                android:textSize="12sp" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -81,21 +81,11 @@
                     android:id="@+id/departure_location"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:drawablePadding="8dp"
                     android:layout_gravity="center_vertical"
+                    android:drawablePadding="8dp"
                     android:ems="15"
                     android:textSize="16sp"
                     app:drawableStartCompat="@drawable/outline_trip_origin_black_24" />
-
-                <ImageButton
-                    android:id="@+id/openMap"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:contentDescription="@string/trip_route"
-                    android:src="@drawable/ic_map" />
 
             </LinearLayout>
 
@@ -104,8 +94,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="4dp"
-                android:textSize="12sp"
-                android:text="Arrival:" />
+                android:text="Arrival:"
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/arrival_location"
@@ -115,17 +105,17 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="20dp"
                 android:drawablePadding="8dp"
-                app:drawableStartCompat="@drawable/outline_location_on_black_24"
                 android:ems="15"
-                android:textSize="16sp"/>
+                android:textSize="16sp"
+                app:drawableStartCompat="@drawable/outline_location_on_black_24" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="4dp"
-                android:textSize="12sp"
-                android:text="Date:" />
+                android:text="Date:"
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/date"
@@ -134,18 +124,18 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="20dp"
-                android:ems="15"
                 android:drawablePadding="8dp"
-                app:drawableStartCompat="@drawable/outline_calendar_today_black_24"
-                android:textSize="16sp"/>
+                android:ems="15"
+                android:textSize="16sp"
+                app:drawableStartCompat="@drawable/outline_calendar_today_black_24" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="4dp"
-                android:textSize="12sp"
-                android:text="Time:" />
+                android:text="Time:"
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/time"
@@ -154,18 +144,18 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="20dp"
-                android:ems="15"
                 android:drawablePadding="8dp"
-                app:drawableStartCompat="@drawable/outline_schedule_black_24"
-                android:textSize="16sp"/>
+                android:ems="15"
+                android:textSize="16sp"
+                app:drawableStartCompat="@drawable/outline_schedule_black_24" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="4dp"
-                android:textSize="12sp"
-                android:text="Estimated duration:" />
+                android:text="Estimated duration:"
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/duration"
@@ -174,18 +164,18 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="20dp"
-                android:ems="15"
                 android:drawablePadding="8dp"
-                app:drawableStartCompat="@drawable/outline_hourglass_top_black_24"
-                android:textSize="16sp"/>
+                android:ems="15"
+                android:textSize="16sp"
+                app:drawableStartCompat="@drawable/outline_hourglass_top_black_24" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="4dp"
-                android:textSize="12sp"
-                android:text="Available seats:" />
+                android:text="Available seats:"
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/seats"
@@ -194,18 +184,18 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="20dp"
-                android:ems="15"
                 android:drawablePadding="8dp"
-                app:drawableStartCompat="@drawable/outline_chair_black_24"
-                android:textSize="16sp"/>
+                android:ems="15"
+                android:textSize="16sp"
+                app:drawableStartCompat="@drawable/outline_chair_black_24" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="4dp"
-                android:textSize="12sp"
-                android:text="Price:" />
+                android:text="Price:"
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/price"
@@ -215,17 +205,17 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="20dp"
                 android:drawablePadding="8dp"
-                app:drawableStartCompat="@drawable/outline_euro_black_24"
                 android:ems="15"
-                android:textSize="16sp"/>
+                android:textSize="16sp"
+                app:drawableStartCompat="@drawable/outline_euro_black_24" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="4dp"
-                android:textSize="12sp"
-                android:text="Additional information:" />
+                android:text="Additional information:"
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/info"
@@ -234,18 +224,18 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="20dp"
-                android:ems="15"
                 android:drawablePadding="8dp"
-                app:drawableStartCompat="@drawable/outline_info_black_24"
-                android:textSize="16sp"/>
+                android:ems="15"
+                android:textSize="16sp"
+                app:drawableStartCompat="@drawable/outline_info_black_24" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="4dp"
-                android:textSize="12sp"
-                android:text="Intermediate stops:" />
+                android:text="Intermediate stops:"
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/intermediate_stops"
@@ -254,14 +244,15 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="20dp"
-                android:ems="15"
                 android:drawablePadding="8dp"
-                app:drawableStartCompat="@drawable/outline_add_location_black_24"
-                android:textSize="16sp"/>
+                android:ems="15"
+                android:textSize="16sp"
+                app:drawableStartCompat="@drawable/outline_add_location_black_24" />
 
         </LinearLayout>
 
     </ScrollView>
+    <!-- plus-->
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabButton"
@@ -270,12 +261,31 @@
         android:layout_gravity="end|bottom"
         android:layout_margin="20dp"
         android:contentDescription="@string/fab_trip_detail_button"
-        android:src="@drawable/plus"
+        android:scrollbarThumbHorizontal="@null"
+        android:src="@drawable/ic_map"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.954"
+        app:layout_constraintHorizontal_bias="0.97"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/RelativeLayout2"
-        app:layout_constraintVertical_bias="0.944" />
+        app:layout_constraintVertical_bias="1.0"
+        app:rippleColor="@color/white" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/openMap"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_margin="20dp"
+        android:contentDescription="@string/fab_trip_detail_button"
+        android:scrollbarThumbHorizontal="@null"
+        android:src="@drawable/ic_map"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.97"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/RelativeLayout2"
+        app:layout_constraintVertical_bias="0.82"
+        app:rippleColor="@color/white" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

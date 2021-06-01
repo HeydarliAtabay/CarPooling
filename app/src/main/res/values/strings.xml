@@ -1,4 +1,5 @@
 <resources>
+    <integer name="google_play_services_version">12451000</integer>
     <string name="app_name">Car Pooling</string>
     <string name="title1">Welcome to the</string>
     <string name="title2">Car Pooling Application!</string>

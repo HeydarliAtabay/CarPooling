@@ -305,7 +305,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
             )
 
         if (departureDate.text.toString() != "") {
-            val currentDate = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+            val currentDate = SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH)
             currentDate.timeZone = TimeZone.getTimeZone("UTC")
             val p = currentDate.parse(departureDate.text.toString())
             dPicker = dPicker.setSelection(p?.time)
@@ -323,7 +323,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         datePicker?.addOnPositiveButtonClickListener {
 
             val inputFormat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
-            val outputFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+            val outputFormat = SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH)
             departureDate.setText(outputFormat.format(inputFormat.parse(datePicker?.headerText!!)!!))
             departureTime.requestFocus()
         }

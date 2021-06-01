@@ -22,6 +22,10 @@
         android:largeHeap="true"
         android:theme="@style/Theme.MADProject" >
 
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.example.android.fileprovider"

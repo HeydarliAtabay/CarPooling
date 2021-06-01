@@ -61,4 +61,5 @@
     <string name="add_departure">Pinpoint departure location</string>
     <string name="add_arrival">Pinpoint arrival location</string>
     <string name="trip_route">See the trip route</string>
+    <integer name="google_play_services_version">12451000</integer>
 </resources>

@@ -9,7 +9,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
-import android.text.Editable
 import android.text.InputType
 import android.util.Log
 import android.view.*
@@ -65,7 +64,6 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        Log.d("test", "TripEdit created")
         // Removing the back navigation to show Map
         findNavController().popBackStack(
             R.id.showMap, true)
@@ -90,7 +88,6 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
 
         sharedModel.orientation = this.requireActivity().requestedOrientation
 
-        setValues()
 
         fixEditText()
 
@@ -106,6 +103,11 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
 
         val editPhoto = view.findViewById<ImageButton>(R.id.imageButton2)
         registerForContextMenu(editPhoto)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        setValues()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -382,7 +384,6 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     }
 
     private fun updateTrip() {
-        Log.d("test", "updateTrip")
         sharedModel.selectedLocal = Trip(
             id = trip.id,
             imageUrl = trip.imageUrl,
@@ -404,10 +405,6 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     }
 
     private fun setValues() {
-        Log.d("test", "setting values")
-        Log.d("test", "model.trip.from -> ${trip.from}")
-
-        //departure.text = trip.from.toEditable()
         departure.setText(trip.from)
         arrival.setText(trip.to)
         departureDate.setText(trip.departureDate)
@@ -567,6 +564,3 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         }
     }
 }
-
-fun String.toEditable(): Editable =  Editable.Factory.getInstance().newEditable(this)
-

@@ -122,7 +122,7 @@
                         android:layout_height="wrap_content"
                         android:ems="15"
                         android:inputType="textCapSentences"
-                        android:maxLength="30"
+                        android:maxLength="150"
                         android:textColor="?attr/color"
                         android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -161,7 +161,7 @@
                         android:layout_height="wrap_content"
                         android:ems="15"
                         android:inputType="textCapSentences"
-                        android:maxLength="30"
+                        android:maxLength="150"
                         android:textColor="?attr/color"
                         android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -330,7 +330,7 @@
                         android:layout_height="wrap_content"
                         android:ems="15"
                         android:inputType="textCapWords"
-                        android:maxLength="250"
+                        android:maxLength="500"
                         android:textColor="?attr/color"
                         android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>

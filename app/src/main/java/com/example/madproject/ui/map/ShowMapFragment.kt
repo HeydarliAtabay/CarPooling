@@ -1,6 +1,8 @@
 package com.example.madproject.ui.map
 
 import android.content.Context
+import android.location.Address
+import android.location.Geocoder
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.util.Log
@@ -24,16 +26,21 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.*
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
+import java.util.*
 
 @Suppress("DEPRECATION")
 class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
+    var count = 0
     private lateinit var mMapView: MapView
     private var mScaleBarOverlay: ScaleBarOverlay? = null
     private var mRotationGestureOverlay: RotationGestureOverlay? = null
     private var path = mutableListOf<GeoPoint>()
     private var trip = Trip()
     private val mapModel: MapViewModel by activityViewModels()
-    private val tripModel: TripListViewModel by activityViewModels()
+    private val tripListViewModel : TripListViewModel by activityViewModels()
+    private var arr = ""
+    private var dep = ""
+    private var interStops = mutableListOf<String>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -147,53 +154,82 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
                 }
             })
         }
-        /*mMapView.overlays.add(object : Overlay() {
-            override fun onSingleTapConfirmed(
-                e: MotionEvent,
-                mapView: MapView
-            ): Boolean {
-
-                Dispatchers.IO.dispatch(GlobalScope.coroutineContext) {
-
-                    count++
-                    val projection = mapView.projection
-                    val geoPoint = projection.fromPixels(
-                        e.x.toInt(),
-                        e.y.toInt()
-                    )
-
-                    val gp: GeoPoint = geoPoint as GeoPoint
-                    path.add(gp)
-                    val startMarker = Marker(mapView)
-                    startMarker.position = geoPoint
-                    startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                    if (count==1)
-                        startMarker.icon = ResourcesCompat.getDrawable(requireContext().resources, R.drawable.segnaposto_black_100, null)
-                    else startMarker.icon = ResourcesCompat.getDrawable(requireContext().resources, R.drawable.segnaposto_red_100, null)
-                    mapView.overlays.add(startMarker)
-
-                    tripModel.selectedLocal.routeCoordinates.add(3, com.google.firebase.firestore.GeoPoint(gp.latitude, gp.longitude))
 
 
-                    if (count == 2) {
-                        val roadManager: RoadManager =
-                            OSRMRoadManager(requireContext(), BuildConfig.APPLICATION_ID)
+        // Alby
+        if(mapModel.pathManagement!="showRoute") {
+            mMapView.overlays.add(object : Overlay() {
+                override fun onSingleTapConfirmed(
+                    e: MotionEvent,
+                    mapView: MapView
+                ): Boolean {
+                    Dispatchers.IO.dispatch(GlobalScope.coroutineContext) {
 
-                        val array = arrayListOf<GeoPoint>()
-                        array.addAll(path)
-                        val road = roadManager.getRoad(array)
-                        val roadOverlay = RoadManager.buildRoadOverlay(road)
-                        roadOverlay.outlinePaint.color = ContextCompat.getColor(requireContext(), R.color.red)
-                        roadOverlay.outlinePaint.strokeWidth = 15.0F
-                        mapView.overlays.add(roadOverlay)
+                        if(mapModel.pathManagement!="selectIntStops") {
+                            mapView.overlays.removeLast()
+                            mapView.invalidate()
+                        }
+
+                        val projection = mapView.projection
+                        val geoPoint = projection.fromPixels(
+                            e.x.toInt(),
+                            e.y.toInt()
+                        )
+
+                        val gp: GeoPoint = geoPoint as GeoPoint
+
+                        val geocoder = Geocoder(requireContext(), Locale.getDefault())
+                        val addresses: List<Address> = geocoder.getFromLocation(gp.latitude, gp.longitude, 1)
+                        var cityname = ""
+                        var state = ""
+                        var address1 = ""
+
+                        if (addresses.isNotEmpty()) {
+                            cityname = addresses[0].locality ?: ""
+                            state = addresses[0].countryCode ?: ""
+                            address1 = addresses[0].thoroughfare ?: ""
+                        }
+                        val final = "$cityname ($state) $address1"
+                        Log.d("test", "$cityname ($state) $address1")
+
+                        if(mapModel.pathManagement=="selectDeparture") {
+                            dep=final
+                        }
+                        else if(mapModel.pathManagement=="selectArrival") {
+                            arr=final
+                        }
+                        else {
+                            interStops.add(final)
+                        }
+
+                        val startMarker = Marker(mapView)
+                        startMarker.position = geoPoint
+                        startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                        if (mapModel.pathManagement=="selectDeparture") startMarker.icon = ResourcesCompat.getDrawable(
+                            requireContext().resources,
+                            R.drawable.segnaposto_black_100,
+                            null
+                        )
+                        else if(mapModel.pathManagement=="selectArrival") startMarker.icon = ResourcesCompat.getDrawable(
+                            requireContext().resources,
+                            R.drawable.segnaposto_red_100,
+                            null
+                        )
+                        else startMarker.icon = ResourcesCompat.getDrawable(
+                            requireContext().resources,
+                            R.drawable.segnaposto_blue_100,
+                            null
+                        )
+
+                        mapView.overlays.add(startMarker)
+
+                        mapView.invalidate()
+
                     }
-
-                    mapView.invalidate()
-
+                    return true
                 }
-                return true
-            }
-        })*/
+            })
+        }
 
     }
 
@@ -226,8 +262,8 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
         var latitude = java.lang.Double.valueOf("45.056628")
         var longitude = java.lang.Double.valueOf("7.671299")
         if ((mapModel.pathManagement == "showRoute")) {
-            latitude = tripModel.selectedLocal.departureCoordinates?.latitude ?: 45.056628
-            longitude = tripModel.selectedLocal.departureCoordinates?.longitude ?: 7.671299
+            latitude = tripListViewModel.selectedLocal.departureCoordinates?.latitude ?: 45.056628
+            longitude = tripListViewModel.selectedLocal.departureCoordinates?.longitude ?: 7.671299
         }
 
         Log.d("test", "$latitude")
@@ -245,6 +281,11 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.saveButton -> {
+                when (mapModel.pathManagement) {
+                    "selectDeparture" -> tripListViewModel.selectedLocal.from = dep
+                    "selectArrival" -> tripListViewModel.selectedLocal.to = arr
+                    "selectIntStops" -> tripListViewModel.selectedLocal.intermediateStops = interStops.joinToString("\n- ","- ")
+                }
 
                 findNavController().popBackStack()
                 true

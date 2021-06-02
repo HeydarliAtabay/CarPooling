@@ -26,20 +26,17 @@ class TripListViewModel : ViewModel() {
     private val interestedTrips: MutableLiveData<List<Trip>> = MutableLiveData()
 
     private var selectedDB: MutableLiveData<Trip> = MutableLiveData()
+    var selectedLocal = Trip()
 
     // This list is needed to record every trip grabbed and created by other users. In this way we can
     // easily check if a trip was deleted or not
     private var allTrips = mutableListOf<Trip>()
 
-    // Variables to manage the listeners registration
+    // Variables to manage the SnapshotListeners registrations
     private var listener1: ListenerRegistration? = null
     private var listener2: ListenerRegistration? = null
     private var listenersMap1 = mutableMapOf<String, ListenerRegistration>()
     private var listenersMap2 = mutableMapOf<String, ListenerRegistration>()
-
-    // Variables to manage the SnapshotListeners registrations
-
-    var selectedLocal = Trip()
 
     // Vars to manage the photos
     var currentPhotoPath = ""
@@ -52,7 +49,15 @@ class TripListViewModel : ViewModel() {
     var deleteDialogOpened = false
     var changedOrientationDelete = false
 
-    // String used to manage the path of Trip Detail
+    /*
+        String used to manage the path of Trip Detail. Possible values:
+            - "comingFromOther" -> path "Available Trips"
+            - "tabUpcoming"     -> path "Created Trips (Upcoming trips)"
+            - "tabCompleted"    -> path "Created Trips (Completed trips)"
+            - "boughtUpcoming"  -> path "Bought Trips (Upcoming trips)"
+            - "tabUpcoming"     -> path "Bought Trips (Upcoming trips)"
+            - "interestedTrips" -> path "Interested Trips"
+     */
     var pathManagement = ""
 
     // Flags to manage the landscape selection of the tab in OthersTripListFragment and BoughtTripListFragment

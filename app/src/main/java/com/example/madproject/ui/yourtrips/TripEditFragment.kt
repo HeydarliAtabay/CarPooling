@@ -27,7 +27,6 @@ import com.example.madproject.ui.map.MapViewModel
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
@@ -55,8 +54,6 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     private lateinit var departureButton: ImageButton
     private lateinit var arrivalButton: ImageButton
     private lateinit var intStopsButton: ImageButton
-    private lateinit var mapDialogBuilder: MaterialAlertDialogBuilder
-    private lateinit var mapDialogView : View
     private var datePicker: MaterialDatePicker<Long>? = null
     private var timePicker: MaterialTimePicker? = null
     private val sharedModel: TripListViewModel by activityViewModels()
@@ -85,8 +82,6 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         arrivalButton = view.findViewById(R.id.addArrival)
         intStopsButton = view.findViewById(R.id.addIntermediateStops)
         storageDir = this.requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-
-        mapDialogBuilder = MaterialAlertDialogBuilder(requireActivity())
 
         trip = sharedModel.selectedLocal
         currentPhotoPath = sharedModel.currentPhotoPath

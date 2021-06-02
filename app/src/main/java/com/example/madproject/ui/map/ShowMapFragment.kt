@@ -133,12 +133,10 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
         mScaleBarOverlay!!.setScaleBarOffset(dm.widthPixels / 2, 10)
         mMapView.overlays.add(mScaleBarOverlay)
 
-
         //support for map rotation
         mRotationGestureOverlay = RotationGestureOverlay(mMapView)
         mRotationGestureOverlay!!.isEnabled = true
         mMapView.overlays.add(mRotationGestureOverlay)
-
 
         //needed for pinch zooms
         mMapView.setMultiTouchControls(true)

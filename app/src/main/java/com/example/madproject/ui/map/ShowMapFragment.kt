@@ -107,7 +107,7 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
                         val startMarker = Marker(mMapView)
                         startMarker.position = gp
                         startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                        startMarker.icon = ResourcesCompat.getDrawable(requireContext().resources, R.drawable.segnaposto_black_100, null)
+                        startMarker.icon = ResourcesCompat.getDrawable(requireContext().resources, R.drawable.segnaposto_blue_100, null)
 
                         mMapView.overlays.add(startMarker)
                     }
@@ -169,17 +169,12 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
                             state = addresses[0].countryCode ?: ""
                             address1 = addresses[0].thoroughfare ?: ""
                         }
-                        val final = "$cityname ($state) $address1"
-                        Log.d("test", "$cityname ($state) $address1")
+                        val final = "$cityname ($state), $address1"
 
-                        if(mapModel.pathManagement=="selectDeparture") {
-                            dep=final
-                        }
-                        else if(mapModel.pathManagement=="selectArrival") {
-                            arr=final
-                        }
-                        else {
-                            interStops.add(final)
+                        when (mapModel.pathManagement) {
+                            "selectedDeparture" -> dep = final
+                            "selectedArrival" -> arr = final
+                            else -> interStops.add(final)
                         }
 
                         val startMarker = Marker(mapView)

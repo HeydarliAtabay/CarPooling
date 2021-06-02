@@ -27,6 +27,7 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.*
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
+import org.osmdroid.views.overlay.infowindow.InfoWindow
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -101,6 +102,7 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
                     // Insert the departure coordinate
                     val depGp = GeoPoint(trip.departureCoordinates!!.latitude, trip.departureCoordinates!!.longitude)
                     val depStartMarker = Marker(mMapView)
+                    depStartMarker.title = "Departure:\n\n"+ getLocationString(trip.departureCoordinates!!.latitude,trip.departureCoordinates!!.longitude,requireContext())
                     depStartMarker.position = depGp
                     depStartMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                     depStartMarker.icon = ResourcesCompat.getDrawable(requireContext().resources, R.drawable.segnaposto_black_100, null)
@@ -111,6 +113,8 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
                         val gp = GeoPoint(point.latitude, point.longitude)
                         path.add(gp)
                         val startMarker = Marker(mMapView)
+                        startMarker.title = "Intermediate stop:\n\n"+ getLocationString(point.latitude,point.longitude,requireContext())
+                        startMarker.textLabelFontSize = 1
                         startMarker.position = gp
                         startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                         startMarker.icon = ResourcesCompat.getDrawable(requireContext().resources, R.drawable.segnaposto_blue_100, null)
@@ -121,6 +125,7 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
                     // Insert the arrival coordinate
                     val arrGp = GeoPoint(trip.arrivalCoordinates!!.latitude, trip.arrivalCoordinates!!.longitude)
                     val arrStartMarker = Marker(mMapView)
+                    arrStartMarker.title = "Arrival:\n\n"+getLocationString(trip.arrivalCoordinates!!.latitude,trip.arrivalCoordinates!!.longitude,requireContext())
                     arrStartMarker.position = arrGp
                     arrStartMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                     arrStartMarker.icon = ResourcesCompat.getDrawable(requireContext().resources, R.drawable.segnaposto_red_100, null)

@@ -47,6 +47,8 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     private val model: ProfileViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         fullName = view.findViewById(R.id.fullName)
         nickName = view.findViewById(R.id.nickName)
         location = view.findViewById(R.id.location)
@@ -85,7 +87,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.save_profile, menu)
+        inflater.inflate(R.menu.save_menu, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

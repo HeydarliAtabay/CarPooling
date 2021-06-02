@@ -103,8 +103,6 @@ class BoughtTripListFragment : Fragment(R.layout.fragment_trip_list) {
             else
                 tripList.filter { isFuture(it.departureDate, it.departureTime, it.duration) }
 
-        Log.d("test", "$currentList")
-
         if (currentList.isNotEmpty()) {
             emptyList.visibility = View.INVISIBLE
         } else {

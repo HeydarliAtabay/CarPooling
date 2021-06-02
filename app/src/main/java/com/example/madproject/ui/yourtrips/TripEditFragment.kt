@@ -23,9 +23,11 @@ import com.example.madproject.R
 import com.example.madproject.data.FirestoreRepository
 import com.example.madproject.data.Trip
 import com.example.madproject.lib.*
+import com.example.madproject.ui.map.MapViewModel
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
@@ -50,13 +52,25 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     private lateinit var price : EditText
     private lateinit var additionalInfo : EditText
     private lateinit var intermediateStops : EditText
+    private lateinit var departureButton: ImageButton
+    private lateinit var arrivalButton: ImageButton
+    private lateinit var intStopsButton: ImageButton
+    private lateinit var mapDialogBuilder: MaterialAlertDialogBuilder
+    private lateinit var mapDialogView : View
     private var datePicker: MaterialDatePicker<Long>? = null
     private var timePicker: MaterialTimePicker? = null
     private val sharedModel: TripListViewModel by activityViewModels()
+    private val mapModel: MapViewModel by activityViewModels()
     private lateinit var trip: Trip
     private var storageDir: File? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // Removing the back navigation to show Map
+        findNavController().popBackStack(
+            R.id.showMap, true)
+
         imageCar = view.findViewById(R.id.imageCar)
         departure = view.findViewById(R.id.departure_location)
         arrival = view.findViewById(R.id.arrival_location)
@@ -67,7 +81,12 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         price = view.findViewById(R.id.price)
         additionalInfo = view.findViewById(R.id.info)
         intermediateStops = view.findViewById(R.id.intermediate_stops)
+        departureButton = view.findViewById(R.id.addDeparture)
+        arrivalButton = view.findViewById(R.id.addArrival)
+        intStopsButton = view.findViewById(R.id.addIntermediateStops)
         storageDir = this.requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+
+        mapDialogBuilder = MaterialAlertDialogBuilder(requireActivity())
 
         trip = sharedModel.selectedLocal
         currentPhotoPath = sharedModel.currentPhotoPath
@@ -94,7 +113,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.save_profile, menu)
+        inflater.inflate(R.menu.save_menu, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -393,6 +412,21 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         price.setText(trip.price)
         additionalInfo.setText(trip.additionalInfo)
         intermediateStops.setText(trip.intermediateStops)
+
+        departureButton.setOnClickListener {
+            mapModel.pathManagement = "selectDeparture"
+            findNavController().navigate(R.id.action_tripEdit_to_showMap)
+        }
+
+        arrivalButton.setOnClickListener {
+            mapModel.pathManagement = "selectArrival"
+            findNavController().navigate(R.id.action_tripEdit_to_showMap)
+        }
+
+        intStopsButton.setOnClickListener {
+            mapModel.pathManagement = "selectIntStops"
+            findNavController().navigate(R.id.action_tripEdit_to_showMap)
+        }
 
         if ((trip.imageUrl == "") && (currentPhotoPath == "")) imageCar.setImageResource(R.drawable.car_example)
         else if ((trip.imageUrl == "") && (currentPhotoPath != "")) imageCar.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath))

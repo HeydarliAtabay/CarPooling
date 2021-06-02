@@ -1,5 +1,6 @@
 package com.example.madproject.ui.yourtrips
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,20 +11,25 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.EventListener
 import com.google.firebase.firestore.ListenerRegistration
 
-class TripListViewModel: ViewModel() {
+class TripListViewModel : ViewModel() {
 
     private val userTrips: MutableLiveData<List<Trip>>
-        by lazy { MutableLiveData<List<Trip>>().also { loadUserTrips() } }
+            by lazy { MutableLiveData<List<Trip>>().also { loadUserTrips() } }
 
     private val otherTrips: MutableLiveData<List<Trip>>
-        by lazy { MutableLiveData<List<Trip>>().also {
-            loadOtherTrips()
-        } }
-
+            by lazy {
+                MutableLiveData<List<Trip>>().also {
+                    loadOtherTrips()
+                }
+            }
     private val confirmedTrips: MutableLiveData<List<Trip>> = MutableLiveData()
     private val interestedTrips: MutableLiveData<List<Trip>> = MutableLiveData()
 
     private var selectedDB: MutableLiveData<Trip> = MutableLiveData()
+
+    // This list is needed to record every trip grabbed and created by other users. In this way we can
+    // easily check if a trip was deleted or not
+    private var allTrips = mutableListOf<Trip>()
 
     // Variables to manage the listeners registration
     private var listener1: ListenerRegistration? = null
@@ -64,20 +70,21 @@ class TripListViewModel: ViewModel() {
     Snapshot listener in order to keep the list updated
      */
     private fun loadUserTrips() {
-        listener1 = FirestoreRepository().getUserTrips().addSnapshotListener(EventListener { value, e ->
-            if (e != null) {
-                userTrips.value = null
-                return@EventListener
-            }
+        listener1 =
+            FirestoreRepository().getUserTrips().addSnapshotListener(EventListener { value, e ->
+                if (e != null) {
+                    userTrips.value = null
+                    return@EventListener
+                }
 
-            val retrievedTrips: MutableList<Trip> = mutableListOf()
-            for (doc in value!!) {
-                val t = doc.toObject(Trip::class.java)
-                retrievedTrips.add(t)
-                if (t.id == selectedLocal.id) selectedDB.value = t
-            }
-            userTrips.value = retrievedTrips
-        })
+                val retrievedTrips: MutableList<Trip> = mutableListOf()
+                for (doc in value!!) {
+                    val t = doc.toObject(Trip::class.java)
+                    retrievedTrips.add(t)
+                    if (t.id == selectedLocal.id) selectedDB.value = t
+                }
+                userTrips.value = retrievedTrips
+            })
     }
 
     /*
@@ -106,9 +113,11 @@ class TripListViewModel: ViewModel() {
                     mutableListOf() // retrieved Interested trips (with a booking proposal)
                 val retrievedConfTrips: MutableList<Trip> =
                     mutableListOf() // retrieved Confirmed trips (whit a confirmed booking)
+                allTrips = mutableListOf()
 
                 for (t in value!!) {
                     val trip = t.toObject(Trip::class.java)
+                    allTrips.add(trip)
                     // Update the trip which is in "tripDetail"
                     if (trip == selectedLocal) selectedDB.value = trip
 
@@ -137,33 +146,39 @@ class TripListViewModel: ViewModel() {
                                             return@EventListener
                                         }
 
-                                        val myConfirmed = conf?.map { p -> p.toObject(Booking::class.java) }
-                                            ?.filter { p -> p.clientEmail == FirestoreRepository.currentUser.email }
+                                        val myConfirmed =
+                                            conf?.map { p -> p.toObject(Booking::class.java) }
+                                                ?.filter { p -> p.clientEmail == FirestoreRepository.currentUser.email }
 
                                         if (myConfirmed?.isEmpty() == true) {
                                             // If it does not also find any confirmed booking, add the trip to otherTrips
                                             if (trip.availableSeat.toInt() == 0) {
-                                                if (trip == selectedDB.value) selectedDB.value = null
-                                                if (retrievedAvTrips.contains(trip)) { retrievedAvTrips.remove(trip) }
+                                                if (trip == selectedDB.value) selectedDB.value =
+                                                    null
+                                                if (retrievedAvTrips.contains(trip)) {
+                                                    retrievedAvTrips.remove(trip)
+                                                }
 
                                             } else retrievedAvTrips.add(trip)
 
                                             otherTrips.value = retrievedAvTrips
+                                            interestedTrips.value = retrievedIntTrips
+                                            confirmedTrips.value = retrievedConfTrips
                                         } else {
                                             // If it finds a confirmed booking, add the trip to confirmedTrips
 
                                             // Check if this trip is in another list and remove it
                                             if (retrievedAvTrips.contains(trip)) {
                                                 retrievedAvTrips.remove(trip)
-                                                otherTrips.value = retrievedAvTrips
                                             }
                                             if (retrievedIntTrips.contains(trip)) {
                                                 retrievedIntTrips.remove(trip)
-                                                confirmedTrips.value = retrievedIntTrips
                                             }
 
                                             retrievedConfTrips.add(trip)
 
+                                            otherTrips.value = retrievedAvTrips
+                                            interestedTrips.value = retrievedIntTrips
                                             confirmedTrips.value = retrievedConfTrips
                                         }
                                     })
@@ -181,45 +196,52 @@ class TripListViewModel: ViewModel() {
                                 }
 
                                 retrievedIntTrips.add(trip)
+                                otherTrips.value = retrievedAvTrips
                                 interestedTrips.value = retrievedIntTrips
+                                confirmedTrips.value = retrievedConfTrips
                             }
                         })
                 }
+
+                // If the trip in "selectedLocal" is not present in any list, it means that the trip was deleted,
+                // Set "selectedDB" to null
+                if (!allTrips.contains(selectedLocal))
+                    selectedDB.value = null
             })
     }
 
     /*
    Function used for the procedure of loading dynamically (looking for DB changes), the trip on
    trip detail fragment:
-       - "t" is the trip selected, it is needed to get live updates for this trip
+       - "selectedLocal" is the trip selected, it is needed to get live updates for this trip
        - The function looks for this trip in the populated lists and updates the MutableLiveData
          "selectedDB"
        - "selectedDB" will remain update inside the snapshot listeners in the above functions
     */
-    fun getSelectedDB(t: Trip): LiveData<Trip> {
+    fun getSelectedDB(): LiveData<Trip> {
         // Check whether the selected trip is contained in the "userTrips"
         if (userTrips.value != null) {
-            if (userTrips.value!!.contains(t))
-                selectedDB.value = userTrips.value!![userTrips.value!!.indexOf(t)]
+            if (userTrips.value!!.contains(selectedLocal))
+                selectedDB.value = userTrips.value!![userTrips.value!!.indexOf(selectedLocal)]
         }
 
         // Check whether the selected trip is contained in the "otherTrips"
         if (otherTrips.value != null) {
-            if (otherTrips.value!!.contains(t))
-                selectedDB.value = otherTrips.value!![otherTrips.value!!.indexOf(t)]
+            if (otherTrips.value!!.contains(selectedLocal))
+                selectedDB.value = otherTrips.value!![otherTrips.value!!.indexOf(selectedLocal)]
         }
 
         // Check whether the selected trip is contained in the "interestedTrips"
         if (interestedTrips.value != null) {
-            if (interestedTrips.value!!.contains(t))
-                selectedDB.value = interestedTrips.value!![interestedTrips.value!!.indexOf(t)]
+            if (interestedTrips.value!!.contains(selectedLocal))
+                selectedDB.value = interestedTrips.value!![interestedTrips.value!!.indexOf(selectedLocal)]
         }
 
         // Check whether the selected trip is contained in the "confirmedTrips"
         if (confirmedTrips.value == null) return selectedDB
 
-        if (confirmedTrips.value!!.contains(t))
-            selectedDB.value = confirmedTrips.value!![confirmedTrips.value!!.indexOf(t)]
+        if (confirmedTrips.value!!.contains(selectedLocal))
+            selectedDB.value = confirmedTrips.value!![confirmedTrips.value!!.indexOf(selectedLocal)]
 
         return selectedDB
     }

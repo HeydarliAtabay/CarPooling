@@ -116,8 +116,11 @@ class UserListViewModel: ViewModel() {
             for (doc in value!!) {
                 val booking = doc.toObject(Booking::class.java)
                 retrievedBookings.add(booking)
-                for (user in allUsers) {
-                    if (booking.clientEmail == user.email) retrievedUsers.add(user)
+                // Insert only the passengers who did not receive a rating
+                if (!booking.passengerRated) {
+                    for (user in allUsers) {
+                        if (booking.clientEmail == user.email) retrievedUsers.add(user)
+                    }
                 }
             }
             confirmedBook.value = retrievedUsers

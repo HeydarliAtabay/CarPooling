@@ -432,7 +432,6 @@ class OthersTripListFragment : Fragment() {
                 cv.setOnClickListener {
                     sharedModel.selectedLocal = t
                     sharedModel.pathManagement = "comingFromOther"
-                    //sharedModel.comingFromOther = true
                     findNavController(itemView).navigate(R.id.action_othersTripList_to_tripDetail)
                 }
 

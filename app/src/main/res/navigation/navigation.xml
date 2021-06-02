@@ -18,7 +18,10 @@
             app:popExitAnim="@anim/slide_out" />
         <action
             android:id="@+id/action_showProfile_to_comments"
-            app:destination="@id/comments" />
+            app:destination="@id/comments"
+            app:enterAnim="@anim/slide_in"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out" />
     </fragment>
 
     <fragment
@@ -60,7 +63,10 @@
             app:popExitAnim="@anim/slide_out" />
         <action
             android:id="@+id/action_tripList_to_userRate"
-            app:destination="@id/userRate" />
+            app:destination="@id/userRate"
+            app:enterAnim="@anim/slide_in"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out" />
     </fragment>
 
     <fragment
@@ -82,12 +88,6 @@
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/slide_out" />
         <action
-            android:id="@+id/action_tripDetail_to_othersTripList"
-            app:destination="@id/othersTripList" />
-        <action
-            android:id="@+id/action_tripDetail_to_tripList"
-            app:destination="@id/tripList" />
-        <action
             android:id="@+id/action_tripDetail_to_showProfilePrivacy"
             app:destination="@id/showProfilePrivacy"
             app:enterAnim="@anim/slide_in"
@@ -95,10 +95,16 @@
             app:popExitAnim="@anim/slide_out" />
         <action
             android:id="@+id/action_tripDetail_to_userRate"
-            app:destination="@id/userRate" />
+            app:destination="@id/userRate"
+            app:enterAnim="@anim/slide_in"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out" />
         <action
             android:id="@+id/action_tripDetail_to_showMap"
-            app:destination="@id/showMap" />
+            app:destination="@id/showMap"
+            app:enterAnim="@anim/slide_in"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out" />
     </fragment>
 
     <fragment
@@ -113,6 +119,12 @@
             app:enterAnim="@anim/fade_in"
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/slide_in" />
+        <action
+            android:id="@+id/action_tripEdit_to_showMap"
+            app:destination="@id/showMap"
+            app:enterAnim="@anim/slide_in"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out" />
     </fragment>
 
     <fragment
@@ -128,7 +140,10 @@
             app:popExitAnim="@anim/slide_out" />
         <action
             android:id="@+id/action_othersTripList_to_registerProfile"
-            app:destination="@id/registerProfile" />
+            app:destination="@id/registerProfile"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/slide_in" />
     </fragment>
 
     <fragment
@@ -151,7 +166,10 @@
         tools:layout="@layout/fragment_show_profile" >
         <action
             android:id="@+id/action_showProfilePrivacy_to_comments"
-            app:destination="@id/comments" />
+            app:destination="@id/comments"
+            app:enterAnim="@anim/slide_in"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out" />
     </fragment>
 
     <fragment
@@ -161,7 +179,10 @@
         tools:layout="@layout/fragment_edit_profile" >
         <action
             android:id="@+id/action_registerProfile_to_othersTripList"
-            app:destination="@id/othersTripList" />
+            app:destination="@id/othersTripList"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/slide_in" />
     </fragment>
 
     <fragment
@@ -171,7 +192,10 @@
         tools:layout="@layout/fragment_user_list" >
         <action
             android:id="@+id/action_userRate_to_showProfilePrivacy"
-            app:destination="@id/showProfilePrivacy" />
+            app:destination="@id/showProfilePrivacy"
+            app:enterAnim="@anim/slide_in"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out" />
     </fragment>
 
     <fragment
@@ -179,6 +203,12 @@
         android:name="com.example.madproject.ui.map.ShowMapFragment"
         android:label="Trip Route"
         tools:layout="@layout/fragment_show_map" >
+        <action
+            android:id="@+id/action_showMap_to_tripEdit"
+            app:destination="@id/tripEdit"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/slide_in" />
     </fragment>
 
     <fragment
@@ -188,16 +218,22 @@
         tools:layout="@layout/fragment_trip_list">
         <action
             android:id="@+id/action_bookedTrips_to_tripDetail"
-            app:destination="@id/tripDetail" />
+            app:destination="@id/tripDetail"
+            app:enterAnim="@anim/slide_in"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out" />
     </fragment>
 
     <fragment
         android:id="@+id/interestingTrips"
         android:name="com.example.madproject.ui.othertrips.TripOfInterestListFragment"
-        android:label="Trips You're Interested In"
+        android:label="Trip Proposals"
         tools:layout="@layout/fragment_others_trip_list">
         <action
             android:id="@+id/action_interestingTrips_to_tripDetail"
-            app:destination="@id/tripDetail" />
+            app:destination="@id/tripDetail"
+            app:enterAnim="@anim/slide_in"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out" />
     </fragment>
 </navigation>

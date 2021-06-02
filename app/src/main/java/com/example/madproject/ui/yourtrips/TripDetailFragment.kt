@@ -15,6 +15,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.madproject.R
 import com.example.madproject.data.FirestoreRepository
 import com.example.madproject.data.Trip
+import com.example.madproject.ui.map.MapViewModel
 import com.example.madproject.ui.profile.ProfileViewModel
 import com.example.madproject.ui.yourtrips.interestedusers.UserListViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -25,7 +26,7 @@ import com.squareup.picasso.Picasso
 class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
     private lateinit var imageCar: ImageView
     private lateinit var departure: TextView
-    private lateinit var showMap: ImageButton
+    private lateinit var showMap: FloatingActionButton
     private lateinit var arrival: TextView
     private lateinit var departureDate: TextView
     private lateinit var departureTime: TextView
@@ -39,8 +40,10 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
     private val sharedModel: TripListViewModel by activityViewModels()
     private val userListModel: UserListViewModel by activityViewModels()
     private val profileModel: ProfileViewModel by activityViewModels()
+    private val mapModel: MapViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         imageCar = view.findViewById(R.id.imageCar)
         departure = view.findViewById(R.id.departure_location)
         showMap = view.findViewById(R.id.openMap)
@@ -56,7 +59,6 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
         // reset the flag to "false", since this fragment will set it to "true" if the required navigation is selected
         profileModel.comingFromPrivacy = false
 
-        //if (!sharedModel.comingFromOther) {
         if (sharedModel.pathManagement != "comingFromOther") {
             userListModel.resetFilteredUsers()
         }
@@ -64,8 +66,6 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
         fabButton = view.findViewById(R.id.fabButton)
         ImageViewCompat.setImageTintList(fabButton,null)
         ImageViewCompat.setImageTintList(showMap,null)
-
-
 
         trip = sharedModel.selectedLocal
 
@@ -108,14 +108,17 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
             }
         }
 
-        sharedModel.getSelectedDB(trip).observe(viewLifecycleOwner, {
+        sharedModel.getSelectedDB().observe(viewLifecycleOwner, {
             if (it == null) {
-                if (sharedModel.pathManagement == "comingFromOther") {
-                //if (sharedModel.comingFromOther) {
+
+                if ((sharedModel.pathManagement == "comingFromOther") ||
+                    (sharedModel.pathManagement == "boughtUpcomingTrips") ||
+                    (sharedModel.pathManagement == "interestedTrips")
+                ) {
                     Toast.makeText(context, "This trip does not exist anymore!", Toast.LENGTH_SHORT).show()
-                    findNavController().navigate(R.id.action_tripDetail_to_othersTripList)
-                } else
-                    Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_SHORT).show()
+                    findNavController().popBackStack()
+                } else Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_SHORT).show()
+
             } else {
                 trip = it
                 setValuesTrip()
@@ -214,7 +217,7 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
                             "Trip successfully deleted!",
                             Toast.LENGTH_SHORT
                         ).show()
-                        findNavController().navigate(R.id.action_tripDetail_to_tripList)
+                        findNavController().popBackStack()
                     }
                     .addOnFailureListener {
                         Toast.makeText(
@@ -245,6 +248,7 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
 
         showMap.setOnClickListener {
             // Navigate to the map
+            mapModel.pathManagement = "showRoute"
             findNavController().navigate(R.id.action_tripDetail_to_showMap)
         }
 

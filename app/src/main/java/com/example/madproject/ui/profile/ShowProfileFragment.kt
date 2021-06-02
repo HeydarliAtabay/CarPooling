@@ -51,6 +51,12 @@ class ShowProfileFragment : Fragment() {
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // Removing the back navigation to Edit Profile
+        findNavController().popBackStack(
+            R.id.editProfile, true)
+
         fullName = view.findViewById(R.id.fullName)
         nickName = view.findViewById(R.id.nickName)
         email = view.findViewById(R.id.email)

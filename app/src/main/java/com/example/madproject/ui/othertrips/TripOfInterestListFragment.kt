@@ -1,5 +1,6 @@
 package com.example.madproject.ui.othertrips
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.text.InputType
@@ -78,7 +79,6 @@ class TripOfInterestListFragment : Fragment(R.layout.fragment_others_trip_list) 
                 Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
             } else {
                 tripList = filteredTripList(it)
-                Log.d("test", "Other Trips -> $it")
                 if (tripList.isNotEmpty())
                     emptyList.visibility = View.INVISIBLE
                 else
@@ -148,6 +148,7 @@ class TripOfInterestListFragment : Fragment(R.layout.fragment_others_trip_list) 
     /*
     Create the filter dialog with the custom layout
      */
+    @SuppressLint("InflateParams")
     private fun launchFilterDialog() {
         filterViewModel.dialogOpened = true
         filterDialogView = LayoutInflater.from(this.requireActivity())

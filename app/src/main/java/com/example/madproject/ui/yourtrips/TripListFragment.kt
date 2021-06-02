@@ -35,6 +35,11 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // Removing the back navigation to Edit Trip
+        findNavController().popBackStack(
+            R.id.tripEdit, true)
+
         emptyList = view.findViewById(R.id.emptyList)
         emptyList2 = view.findViewById(R.id.emptyList2)
         tabLayout = view.findViewById(R.id.tabUserTrips)

@@ -89,6 +89,7 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
         }
 
         if (mapModel.pathManagement == "showRoute") {
+            // Here we have to show the route of the trip
             Dispatchers.IO.dispatch(GlobalScope.coroutineContext) {
 
                 if ((trip.departureCoordinates != null) && (trip.arrivalCoordinates != null)) {
@@ -135,29 +136,8 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
                     mMapView.invalidate()
                 }
             }
-        }
-
-        if (mapModel.pathManagement == "selectIntStops") {
-            var count = 0
-            mMapView.overlays.add(object : Overlay() {
-                override fun onSingleTapConfirmed(
-                    e: MotionEvent,
-                    mapView: MapView
-                ): Boolean {
-                    Dispatchers.IO.dispatch(GlobalScope.coroutineContext) {
-                        count++
-                        if (count <= 5) {
-
-                        }
-                    }
-                    return true
-                }
-            })
-        }
-
-
-        // Alby
-        if(mapModel.pathManagement!="showRoute") {
+        } else {
+            // Here we have to select a new position
             mMapView.overlays.add(object : Overlay() {
                 override fun onSingleTapConfirmed(
                     e: MotionEvent,

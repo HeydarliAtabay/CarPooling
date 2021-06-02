@@ -3,6 +3,7 @@ package com.example.madproject.ui.map
 import android.content.Context
 import android.os.Bundle
 import android.util.DisplayMetrics
+import android.util.Log
 import android.view.*
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
@@ -12,6 +13,8 @@ import androidx.navigation.fragment.findNavController
 import com.example.madproject.BuildConfig
 import com.example.madproject.MainActivity
 import com.example.madproject.R
+import com.example.madproject.data.Trip
+import com.example.madproject.ui.yourtrips.TripListViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import org.osmdroid.api.IGeoPoint
@@ -24,12 +27,13 @@ import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 
 @Suppress("DEPRECATION")
 class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
-    var count = 0
     private lateinit var mMapView: MapView
     private var mScaleBarOverlay: ScaleBarOverlay? = null
     private var mRotationGestureOverlay: RotationGestureOverlay? = null
     private var path = mutableListOf<GeoPoint>()
+    private var trip = Trip()
     private val mapModel: MapViewModel by activityViewModels()
+    private val tripModel: TripListViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -77,14 +81,80 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
             "selectIntStops" -> (requireActivity() as MainActivity).supportActionBar?.title = "Select Intermediate Stops"
         }
 
+        if (mapModel.pathManagement == "showRoute") {
+            Dispatchers.IO.dispatch(GlobalScope.coroutineContext) {
 
-        mMapView.overlays.add(object : Overlay() {
+                if ((trip.departureCoordinates != null) && (trip.arrivalCoordinates != null)) {
+                    // Insert the departure coordinate
+                    val depGp = GeoPoint(trip.departureCoordinates!!.latitude, trip.departureCoordinates!!.longitude)
+                    val depStartMarker = Marker(mMapView)
+                    depStartMarker.position = depGp
+                    depStartMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                    depStartMarker.icon = ResourcesCompat.getDrawable(requireContext().resources, R.drawable.segnaposto_black_100, null)
+                    mMapView.overlays.add(depStartMarker)
+
+                    for (point in trip.intermediateCoordinates) {
+                        val gp = GeoPoint(point.latitude, point.longitude)
+                        path.add(gp)
+                        val startMarker = Marker(mMapView)
+                        startMarker.position = gp
+                        startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                        startMarker.icon = ResourcesCompat.getDrawable(requireContext().resources, R.drawable.segnaposto_black_100, null)
+
+                        mMapView.overlays.add(startMarker)
+                    }
+
+                    // Insert the arrival coordinate
+                    val arrGp = GeoPoint(trip.departureCoordinates!!.latitude, trip.departureCoordinates!!.longitude)
+                    val arrStartMarker = Marker(mMapView)
+                    arrStartMarker.position = arrGp
+                    arrStartMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                    arrStartMarker.icon = ResourcesCompat.getDrawable(requireContext().resources, R.drawable.segnaposto_red_100, null)
+                    mMapView.overlays.add(arrStartMarker)
+
+                    // Draw the Route of trip
+                    val roadManager: RoadManager =
+                        OSRMRoadManager(requireContext(), BuildConfig.APPLICATION_ID)
+
+                    val array = arrayListOf<GeoPoint>()
+                    array.addAll(path)
+                    val road = roadManager.getRoad(array)
+                    val roadOverlay = RoadManager.buildRoadOverlay(road)
+                    roadOverlay.outlinePaint.color =
+                        ContextCompat.getColor(requireContext(), R.color.red)
+                    roadOverlay.outlinePaint.strokeWidth = 15.0F
+                    mMapView.overlays.add(roadOverlay)
+
+                    mMapView.invalidate()
+                }
+            }
+        }
+
+        if (mapModel.pathManagement == "selectIntStops") {
+            var count = 0
+            mMapView.overlays.add(object : Overlay() {
+                override fun onSingleTapConfirmed(
+                    e: MotionEvent,
+                    mapView: MapView
+                ): Boolean {
+                    Dispatchers.IO.dispatch(GlobalScope.coroutineContext) {
+                        count++
+                        if (count <= 5) {
+
+                        }
+                    }
+                    return true
+                }
+            })
+        }
+        /*mMapView.overlays.add(object : Overlay() {
             override fun onSingleTapConfirmed(
                 e: MotionEvent,
                 mapView: MapView
             ): Boolean {
 
                 Dispatchers.IO.dispatch(GlobalScope.coroutineContext) {
+
                     count++
                     val projection = mapView.projection
                     val geoPoint = projection.fromPixels(
@@ -97,9 +167,13 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
                     val startMarker = Marker(mapView)
                     startMarker.position = geoPoint
                     startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                    if (count==1) startMarker.icon = ResourcesCompat.getDrawable(requireContext().resources, R.drawable.segnaposto_black_100, null)
+                    if (count==1)
+                        startMarker.icon = ResourcesCompat.getDrawable(requireContext().resources, R.drawable.segnaposto_black_100, null)
                     else startMarker.icon = ResourcesCompat.getDrawable(requireContext().resources, R.drawable.segnaposto_red_100, null)
                     mapView.overlays.add(startMarker)
+
+                    tripModel.selectedLocal.routeCoordinates.add(3, com.google.firebase.firestore.GeoPoint(gp.latitude, gp.longitude))
+
 
                     if (count == 2) {
                         val roadManager: RoadManager =
@@ -119,7 +193,7 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
                 }
                 return true
             }
-        })
+        })*/
 
     }
 
@@ -145,13 +219,19 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
         mMapView.isTilesScaledToDpi = true
 
         //the rest of this is restoring the last map location the user looked at
-        val zoomLevel = 6.0
+        val zoomLevel = if (mapModel.pathManagement == "showRoute") 5.5 else 7.0
         mMapView.controller.setZoom(zoomLevel)
         mMapView.setMapOrientation(0.0F, false)
-        val latitudeString = "45.056628"
-        val longitudeString = "7.671299"
-        val latitude = java.lang.Double.valueOf(latitudeString)
-        val longitude = java.lang.Double.valueOf(longitudeString)
+
+        var latitude = java.lang.Double.valueOf("45.056628")
+        var longitude = java.lang.Double.valueOf("7.671299")
+        if ((mapModel.pathManagement == "showRoute")) {
+            latitude = tripModel.selectedLocal.departureCoordinates?.latitude ?: 45.056628
+            longitude = tripModel.selectedLocal.departureCoordinates?.longitude ?: 7.671299
+        }
+
+        Log.d("test", "$latitude")
+
         mMapView.setExpectedCenter(GeoPoint(latitude, longitude))
         setHasOptionsMenu(true)
     }
@@ -165,7 +245,8 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.saveButton -> {
-                findNavController().navigate(R.id.action_showMap_to_tripEdit)
+
+                findNavController().popBackStack()
                 true
             }
             else -> super.onOptionsItemSelected(item)

@@ -1,6 +1,7 @@
 package com.example.madproject.ui.map
 
 import androidx.lifecycle.ViewModel
+import org.osmdroid.util.GeoPoint
 
 class MapViewModel: ViewModel() {
 
@@ -12,4 +13,6 @@ class MapViewModel: ViewModel() {
             - "selectIntStops"  -> path "Trip Edit -> Select Intermediate Trips"
      */
     var pathManagement = ""
+
+    var geoPoints = mutableListOf<GeoPoint>()
 }

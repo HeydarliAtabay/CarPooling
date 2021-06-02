@@ -92,7 +92,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
 
         sharedModel.orientation = this.requireActivity().requestedOrientation
 
-        //setValues()
+        //setValues move to Resume
 
         fixEditText()
 

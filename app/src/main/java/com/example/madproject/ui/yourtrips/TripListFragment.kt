@@ -148,8 +148,8 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
             Populate the card view of each trip
              */
             fun bind(t: Trip, tlViewModel: TripListViewModel, ulViewModel: UserListViewModel, profileViewModel: ProfileViewModel) {
-                from.text = t.from
-                to.text = t.to
+                from.text = t.from.substring(0, if(t.from.contains(",")) t.from.indexOf(",") else t.from.lastIndex)
+                to.text = t.to.substring(0, if(t.to.contains(",")) t.to.indexOf(",") else t.to.lastIndex)
                 date.text = t.departureDate
                 time.text = t.departureTime
                 price.text = t.price

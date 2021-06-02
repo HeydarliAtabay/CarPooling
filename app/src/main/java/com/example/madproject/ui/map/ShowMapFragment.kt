@@ -119,8 +119,7 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
                             state = addresses[0].countryCode ?: ""
                             address1 = addresses[0].thoroughfare ?: ""
                         }
-                        val final = "$cityname ($state) $address1"
-                        Log.d("test", "$cityname ($state) $address1")
+                        val final = "$cityname ($state), $address1"
 
                         if(mapModel.pathManagement=="selectDeparture") {
                             dep=final

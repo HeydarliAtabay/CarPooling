@@ -9,7 +9,9 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.text.Editable
 import android.text.InputType
+import android.text.TextWatcher
 import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
@@ -33,9 +35,11 @@ import com.google.android.material.timepicker.TimeFormat
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.squareup.picasso.Picasso
+import okhttp3.MediaType.Companion.toMediaType
 import java.io.*
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.log
 
 @Suppress("DEPRECATION")
 class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
@@ -88,7 +92,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
 
         sharedModel.orientation = this.requireActivity().requestedOrientation
 
-        setValues()
+        //setValues()
 
         fixEditText()
 
@@ -104,6 +108,11 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
 
         val editPhoto = view.findViewById<ImageButton>(R.id.imageButton2)
         registerForContextMenu(editPhoto)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        setValues()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -398,6 +407,8 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     }
 
     private fun setValues() {
+        Log.d("test", trip.from+"--"+trip.to)
+        departure.destroyDrawingCache()
         departure.setText(trip.from)
         arrival.setText(trip.to)
         departureDate.setText(trip.departureDate)

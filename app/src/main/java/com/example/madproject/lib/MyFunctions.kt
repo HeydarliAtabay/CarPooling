@@ -6,6 +6,8 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
+import android.location.Address
+import android.location.Geocoder
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -46,6 +48,24 @@ class DividerItemDecorator(private val mDivider: Drawable) : RecyclerView.ItemDe
             mDivider.draw(canvas)
         }
     }
+}
+
+/*
+    Function to get the Location as string from the coordinates
+*/
+fun getLocationString(latitude: Double, longitude: Double, context: Context): String {
+    val geocoder = Geocoder(context, Locale.getDefault())
+    val addresses: List<Address> = geocoder.getFromLocation(latitude, longitude, 1)
+    var cityName = ""
+    var state = ""
+    var address1 = ""
+
+    if (addresses.isNotEmpty()) {
+        cityName = addresses[0].locality ?: ""
+        state = addresses[0].countryCode ?: ""
+        address1 = addresses[0].thoroughfare ?: ""
+    }
+    return "$cityName ($state), $address1"
 }
 
 /*

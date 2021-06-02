@@ -385,6 +385,14 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     }
 
     private fun updateTrip() {
+
+        // Check if the inserted coordinates correspond to the texts
+        if (trip.departureCoordinates != null) {
+
+        }
+
+
+
         sharedModel.selectedLocal = Trip(
             id = trip.id,
             imageUrl = trip.imageUrl,

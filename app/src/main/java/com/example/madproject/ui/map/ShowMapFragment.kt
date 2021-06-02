@@ -16,6 +16,7 @@ import com.example.madproject.BuildConfig
 import com.example.madproject.MainActivity
 import com.example.madproject.R
 import com.example.madproject.data.Trip
+import com.example.madproject.lib.getLocationString
 import com.example.madproject.ui.yourtrips.TripListViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -164,19 +165,8 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
 
                         val gp: GeoPoint = geoPoint as GeoPoint
 
-                        val geocoder = Geocoder(requireContext(), Locale.getDefault())
-                        val addresses: List<Address> = geocoder.getFromLocation(gp.latitude, gp.longitude, 1)
-                        var cityname = ""
-                        var state = ""
-                        var address1 = ""
+                        val final = getLocationString(gp.latitude, gp.longitude, requireContext())
 
-                        if (addresses.isNotEmpty()) {
-                            cityname = addresses[0].locality ?: ""
-                            state = addresses[0].countryCode ?: ""
-                            address1 = addresses[0].thoroughfare ?: ""
-                        }
-                        val final = "$cityname ($state), $address1"
-                        Log.d("test", final)
                         when (mapModel.pathManagement) {
                             "selectDeparture" -> {
                                 dep = final

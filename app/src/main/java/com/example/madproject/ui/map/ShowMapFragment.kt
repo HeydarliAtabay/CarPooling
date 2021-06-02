@@ -35,6 +35,7 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
     private var mScaleBarOverlay: ScaleBarOverlay? = null
     private var mRotationGestureOverlay: RotationGestureOverlay? = null
     private var path = mutableListOf<GeoPoint>()
+    private var trip = Trip()
     private val mapModel: MapViewModel by activityViewModels()
     private val tripListViewModel : TripListViewModel by activityViewModels()
     private var arr = ""
@@ -87,7 +88,56 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
             "selectIntStops" -> (requireActivity() as MainActivity).supportActionBar?.title = "Select Intermediate Stops"
         }
 
-        if(mapModel.pathManagement!="showRoute") {
+        if (mapModel.pathManagement == "showRoute") {
+            // Here we have to show the route of the trip
+            Dispatchers.IO.dispatch(GlobalScope.coroutineContext) {
+
+                if ((trip.departureCoordinates != null) && (trip.arrivalCoordinates != null)) {
+                    // Insert the departure coordinate
+                    val depGp = GeoPoint(trip.departureCoordinates!!.latitude, trip.departureCoordinates!!.longitude)
+                    val depStartMarker = Marker(mMapView)
+                    depStartMarker.position = depGp
+                    depStartMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                    depStartMarker.icon = ResourcesCompat.getDrawable(requireContext().resources, R.drawable.segnaposto_black_100, null)
+                    mMapView.overlays.add(depStartMarker)
+
+                    for (point in trip.intermediateCoordinates) {
+                        val gp = GeoPoint(point.latitude, point.longitude)
+                        path.add(gp)
+                        val startMarker = Marker(mMapView)
+                        startMarker.position = gp
+                        startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                        startMarker.icon = ResourcesCompat.getDrawable(requireContext().resources, R.drawable.segnaposto_blue_100, null)
+
+                        mMapView.overlays.add(startMarker)
+                    }
+
+                    // Insert the arrival coordinate
+                    val arrGp = GeoPoint(trip.departureCoordinates!!.latitude, trip.departureCoordinates!!.longitude)
+                    val arrStartMarker = Marker(mMapView)
+                    arrStartMarker.position = arrGp
+                    arrStartMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                    arrStartMarker.icon = ResourcesCompat.getDrawable(requireContext().resources, R.drawable.segnaposto_red_100, null)
+                    mMapView.overlays.add(arrStartMarker)
+
+                    // Draw the Route of trip
+                    val roadManager: RoadManager =
+                        OSRMRoadManager(requireContext(), BuildConfig.APPLICATION_ID)
+
+                    val array = arrayListOf<GeoPoint>()
+                    array.addAll(path)
+                    val road = roadManager.getRoad(array)
+                    val roadOverlay = RoadManager.buildRoadOverlay(road)
+                    roadOverlay.outlinePaint.color =
+                        ContextCompat.getColor(requireContext(), R.color.red)
+                    roadOverlay.outlinePaint.strokeWidth = 15.0F
+                    mMapView.overlays.add(roadOverlay)
+
+                    mMapView.invalidate()
+                }
+            }
+        } else {
+            // Here we have to select a new position
             mMapView.overlays.add(object : Overlay() {
                 override fun onSingleTapConfirmed(
                     e: MotionEvent,
@@ -121,14 +171,10 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
                         }
                         val final = "$cityname ($state), $address1"
 
-                        if(mapModel.pathManagement=="selectDeparture") {
-                            dep=final
-                        }
-                        else if(mapModel.pathManagement=="selectArrival") {
-                            arr=final
-                        }
-                        else {
-                            interStops.add(final)
+                        when (mapModel.pathManagement) {
+                            "selectedDeparture" -> dep = final
+                            "selectedArrival" -> arr = final
+                            else -> interStops.add(final)
                         }
 
                         val startMarker = Marker(mapView)
@@ -184,13 +230,19 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
         mMapView.isTilesScaledToDpi = true
 
         //the rest of this is restoring the last map location the user looked at
-        val zoomLevel = 6.0
+        val zoomLevel = if (mapModel.pathManagement == "showRoute") 5.5 else 7.0
         mMapView.controller.setZoom(zoomLevel)
         mMapView.setMapOrientation(0.0F, false)
-        val latitudeString = "45.056628"
-        val longitudeString = "7.671299"
-        val latitude = java.lang.Double.valueOf(latitudeString)
-        val longitude = java.lang.Double.valueOf(longitudeString)
+
+        var latitude = java.lang.Double.valueOf("45.056628")
+        var longitude = java.lang.Double.valueOf("7.671299")
+        if ((mapModel.pathManagement == "showRoute")) {
+            latitude = tripListViewModel.selectedLocal.departureCoordinates?.latitude ?: 45.056628
+            longitude = tripListViewModel.selectedLocal.departureCoordinates?.longitude ?: 7.671299
+        }
+
+        Log.d("test", "$latitude")
+
         mMapView.setExpectedCenter(GeoPoint(latitude, longitude))
         setHasOptionsMenu(true)
     }

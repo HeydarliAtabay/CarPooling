@@ -202,14 +202,7 @@
         android:id="@+id/showMap"
         android:name="com.example.madproject.ui.map.ShowMapFragment"
         android:label="Trip Route"
-        tools:layout="@layout/fragment_show_map" >
-        <action
-            android:id="@+id/action_showMap_to_tripEdit"
-            app:destination="@id/tripEdit"
-            app:enterAnim="@anim/fade_in"
-            app:exitAnim="@anim/fade_out"
-            app:popEnterAnim="@anim/slide_in" />
-    </fragment>
+        tools:layout="@layout/fragment_show_map" />
 
     <fragment
         android:id="@+id/bookedTrips"

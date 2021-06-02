@@ -406,6 +406,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     }
 
     private fun setValues() {
+        Log.d("test", trip.from)
         departure.setText(trip.from)
         arrival.setText(trip.to)
         departureDate.setText(trip.departureDate)

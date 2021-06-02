@@ -27,20 +27,24 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.*
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 import java.util.*
+import kotlin.collections.ArrayList
 
 @Suppress("DEPRECATION")
 class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
-    var count = 0
     private lateinit var mMapView: MapView
     private var mScaleBarOverlay: ScaleBarOverlay? = null
     private var mRotationGestureOverlay: RotationGestureOverlay? = null
     private var path = mutableListOf<GeoPoint>()
-    private var trip = Trip()
+    //private var trip = Trip()
     private val mapModel: MapViewModel by activityViewModels()
     private val tripListViewModel : TripListViewModel by activityViewModels()
+    private lateinit var trip : Trip
     private var arr = ""
     private var dep = ""
     private var interStops = mutableListOf<String>()
+    private var arrivalGeoPoint : GeoPoint? = null
+    private var departureGeoPoint : GeoPoint? = null
+    private var interGeoPoints = arrayListOf<GeoPoint>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -80,7 +84,6 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         // Setting the proper title
         when (mapModel.pathManagement) {
             "selectDeparture" -> (requireActivity() as MainActivity).supportActionBar?.title = "Select Departure"
@@ -89,6 +92,7 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
         }
 
         if (mapModel.pathManagement == "showRoute") {
+            trip = tripListViewModel.selectedLocal
             // Here we have to show the route of the trip
             Dispatchers.IO.dispatch(GlobalScope.coroutineContext) {
 
@@ -99,6 +103,7 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
                     depStartMarker.position = depGp
                     depStartMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                     depStartMarker.icon = ResourcesCompat.getDrawable(requireContext().resources, R.drawable.segnaposto_black_100, null)
+                    path.add(depGp)
                     mMapView.overlays.add(depStartMarker)
 
                     for (point in trip.intermediateCoordinates) {
@@ -113,11 +118,12 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
                     }
 
                     // Insert the arrival coordinate
-                    val arrGp = GeoPoint(trip.departureCoordinates!!.latitude, trip.departureCoordinates!!.longitude)
+                    val arrGp = GeoPoint(trip.arrivalCoordinates!!.latitude, trip.arrivalCoordinates!!.longitude)
                     val arrStartMarker = Marker(mMapView)
                     arrStartMarker.position = arrGp
                     arrStartMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                     arrStartMarker.icon = ResourcesCompat.getDrawable(requireContext().resources, R.drawable.segnaposto_red_100, null)
+                    path.add(arrGp)
                     mMapView.overlays.add(arrStartMarker)
 
                     // Draw the Route of trip
@@ -170,11 +176,20 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
                             address1 = addresses[0].thoroughfare ?: ""
                         }
                         val final = "$cityname ($state), $address1"
-
+                        Log.d("test", final)
                         when (mapModel.pathManagement) {
-                            "selectedDeparture" -> dep = final
-                            "selectedArrival" -> arr = final
-                            else -> interStops.add(final)
+                            "selectDeparture" -> {
+                                dep = final
+                                departureGeoPoint = gp
+                            }
+                            "selectArrival" -> {
+                                arr = final
+                                arrivalGeoPoint = gp
+                            }
+                            else -> {
+                                interStops.add(final)
+                                interGeoPoints.add(gp)
+                            }
                         }
 
                         val startMarker = Marker(mapView)
@@ -241,8 +256,6 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
             longitude = tripListViewModel.selectedLocal.departureCoordinates?.longitude ?: 7.671299
         }
 
-        Log.d("test", "$latitude")
-
         mMapView.setExpectedCenter(GeoPoint(latitude, longitude))
         setHasOptionsMenu(true)
     }
@@ -257,9 +270,23 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
         return when (item.itemId) {
             R.id.saveButton -> {
                 when (mapModel.pathManagement) {
-                    "selectDeparture" -> tripListViewModel.selectedLocal.from = dep
-                    "selectArrival" -> tripListViewModel.selectedLocal.to = arr
-                    "selectIntStops" -> tripListViewModel.selectedLocal.intermediateStops = interStops.joinToString("\n- ","- ")
+                    "selectDeparture" -> {
+                        Log.d("test", dep)
+                        tripListViewModel.selectedLocal.from = dep
+                        tripListViewModel.selectedLocal.departureCoordinates = if(departureGeoPoint!=null) com.google.firebase.firestore.GeoPoint(
+                            departureGeoPoint!!.latitude, departureGeoPoint!!.longitude) else null
+                    }
+                    "selectArrival" -> {
+                        tripListViewModel.selectedLocal.to = arr
+                        tripListViewModel.selectedLocal.arrivalCoordinates = if(arrivalGeoPoint!=null) com.google.firebase.firestore.GeoPoint(
+                            arrivalGeoPoint!!.latitude, arrivalGeoPoint!!.longitude) else null
+                    }
+                    "selectIntStops" -> {
+                        tripListViewModel.selectedLocal.intermediateStops = interStops.joinToString("\n- ","- ")
+                        tripListViewModel.selectedLocal.intermediateCoordinates.addAll(interGeoPoints.map {
+                            com.google.firebase.firestore.GeoPoint(it.latitude,it.longitude)
+                        })
+                    }
                 }
 
                 findNavController().popBackStack()

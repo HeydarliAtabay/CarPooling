@@ -147,6 +147,11 @@ class FirestoreRepository {
         return fireStoreDB.collection("trips/${t.id}/confirmedBookings")
     }
 
+    fun getBooking(t: Trip): Query {
+        return fireStoreDB.collection("trips/${t.id}/confirmedBookings")
+            .whereEqualTo("clientEmail", currentUser.email!!)
+    }
+
     /*
     Function to set the confirmed flag on the booking "b"
      */
@@ -182,19 +187,28 @@ class FirestoreRepository {
 
             // delete the corresponding booking if both passenger and driver were rated
             val pr = transaction.get(fireStoreDB.collection("trips/${r.tripId}/confirmedBookings").
-            document(b.id)).getBoolean("passengerRated")
+                    document(b.id)).getBoolean("passengerRated")
             val dr = transaction.get(fireStoreDB.collection("trips/${r.tripId}/confirmedBookings").
-            document(b.id)).getBoolean("driverRated")
+                    document(b.id)).getBoolean("driverRated")
 
-            if (pr == true && dr == true) {
+            var flag: Boolean? = false
+
+            /*if (passenger) {
+                flag = transaction.get(fireStoreDB.collection("trips/${r.tripId}/confirmedBookings").
+                document(b.id)).getBoolean("driverRated")
+            } else {
+                flag = transaction.get(fireStoreDB.collection("trips/${r.tripId}/confirmedBookings").
+                document(b.id)).getBoolean("passengerRated")
+            }
+            if (flag == true) {
                 transaction.delete(
                     fireStoreDB.collection("trips/${r.tripId}/confirmedBookings").document(b.id)
                 )
-            } else {
+            } else {*/
                 // update the booking document setting the flag
                 transaction.update(fireStoreDB.collection("trips/${r.tripId}/confirmedBookings").document(b.id),
                     if (passenger) "passengerRated" else "driverRated", true)
-            }
+            //}
 
             // set the new rating
             transaction.set(

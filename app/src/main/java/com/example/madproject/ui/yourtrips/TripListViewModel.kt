@@ -70,7 +70,6 @@ class TripListViewModel : ViewModel() {
 
     // Flags to manage the landscape selection of the tab in OthersTripListFragment and BoughtTripListFragment
     var tabCompletedTrips = false
-    var tabCompletedTripsBooked = false
 
     // Data used to manage the booking dialog restore state from OtherTripsFragment
     var tripIdInDialog = ""

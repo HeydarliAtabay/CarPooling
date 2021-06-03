@@ -3,11 +3,14 @@ package com.example.madproject.ui.othertrips
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
+import android.text.Editable
 import android.text.InputType
+import android.text.TextWatcher
 import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.activityViewModels
@@ -16,9 +19,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.madproject.R
-import com.example.madproject.data.Filters
-import com.example.madproject.data.FirestoreRepository
-import com.example.madproject.data.Trip
+import com.example.madproject.data.*
 import com.example.madproject.lib.isFuture
 import com.example.madproject.lib.parsePrice
 import com.example.madproject.lib.parseTime
@@ -50,6 +51,7 @@ class BoughtTripsListFragment : Fragment(R.layout.fragment_trip_list) {
     private val tripListViewModel: TripListViewModel by activityViewModels()
     private val userListModel: UserListViewModel by activityViewModels()
     private val profileModel: ProfileViewModel by activityViewModels()
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -121,7 +123,8 @@ class BoughtTripsListFragment : Fragment(R.layout.fragment_trip_list) {
         } else {
             emptyList.visibility = View.VISIBLE
         }
-        recyclerView.adapter = TripsAdapter(currentList, tripListViewModel, userListModel, profileModel)
+        recyclerView.adapter =
+            TripsAdapter(currentList, tripListViewModel, userListModel, profileModel)
 
     }
 
@@ -130,9 +133,9 @@ class BoughtTripsListFragment : Fragment(R.layout.fragment_trip_list) {
         private val tripListViewModel: TripListViewModel,
         private val userListViewModel: UserListViewModel,
         private val profileViewModel: ProfileViewModel
-    ): RecyclerView.Adapter<TripsAdapter.TripViewHolder>(){
+    ) : RecyclerView.Adapter<TripsAdapter.TripViewHolder>() {
 
-        class TripViewHolder(itemView: View):RecyclerView.ViewHolder(itemView){
+        class TripViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             private val image = itemView.findViewById<ImageView>(R.id.image1)
             private val from = itemView.findViewById<TextView>(R.id.from_dest)
             private val to = itemView.findViewById<TextView>(R.id.to_dest)
@@ -141,46 +144,140 @@ class BoughtTripsListFragment : Fragment(R.layout.fragment_trip_list) {
             private val price = itemView.findViewById<TextView>(R.id.price_txt)
             private val cardButton = itemView.findViewById<Button>(R.id.editTripButton)
             private val cv = itemView.findViewById<CardView>(R.id.card_view)
+            private var dialog: AlertDialog? = null
 
             /*
             Populate the card view of each trip
              */
-            fun bind(t: Trip, tlViewModel: TripListViewModel, ulViewModel: UserListViewModel, profileViewModel: ProfileViewModel) {
+            fun bind(
+                t: Trip,
+                tlViewModel: TripListViewModel,
+                ulViewModel: UserListViewModel,
+                profileViewModel: ProfileViewModel
+            ) {
                 from.text = t.from
                 to.text = t.to
                 date.text = t.departureDate
                 time.text = t.departureTime
                 price.text = t.price
+                val booking :Booking? = profileViewModel.getBookingByTripId(t.id)
                 if (t.imageUrl != "") {
-                    Picasso.get().load(t.imageUrl).placeholder(R.drawable.car_example).error(R.drawable.car_example).into(image)
+                    Picasso.get().load(t.imageUrl).placeholder(R.drawable.car_example)
+                        .error(R.drawable.car_example).into(image)
                 } else image.setImageResource(R.drawable.car_example)
 
                 cv.setOnClickListener {
                     tlViewModel.selectedLocal = t
                     tlViewModel.comingFromUpcomingBooked = true
-                    Navigation.findNavController(itemView).navigate(R.id.action_bookedTrips_to_tripDetail)
+                    Navigation.findNavController(itemView)
+                        .navigate(R.id.action_bookedTrips_to_tripDetail)
                 }
 
-                if (tlViewModel.tabCompletedTrips)
-                    cardButton.text = "Rate Driver"
+                if (tlViewModel.tabCompletedTrips) {
+                    if (booking?.driverRated == true)
+                        cardButton.visibility = View.INVISIBLE
+                    else cardButton.text = "Rate Driver"
+                }
                 else
                     cardButton.visibility = View.INVISIBLE
 
                 cardButton.setOnClickListener {
                     tlViewModel.selectedLocal = t
-                    if (tlViewModel.tabCompletedTrips) {
-                        ulViewModel.selectedLocalTrip = t
-                        profileViewModel.comingFromPrivacy = true
-                        Navigation.findNavController(itemView).navigate(R.id.action_bookedTrips_to_userRate)
+                    //var b = ulViewModel.getBookingForDriverRating(t)
+                    if (booking != null) {
+                        openRatingDriverDialog(t, ulViewModel, booking)
+                    }
+                }
+                if (ulViewModel.tripInDialog == t.id) {
+                    if (booking != null) {
+                        openRatingDriverDialog(t, ulViewModel, booking)
                     }
                 }
             }
 
-            fun unbind() {
-                cardButton.setOnClickListener {  }
-                cv.setOnClickListener {  }
+            private fun openRatingDriverDialog(t: Trip, sharedModel: UserListViewModel, b: Booking) {
+                val ratingDialogBuilder = MaterialAlertDialogBuilder(itemView.context)
+                val ratingDialogView: View = LayoutInflater.from(itemView.context)
+                    .inflate(R.layout.rating_dialog, null, false)
+                val ratingBar = ratingDialogView.findViewById<RatingBar>(R.id.ratingStars)
+                val comment = ratingDialogView.findViewById<EditText>(R.id.ratingComment)
+
+                ratingBar.rating = sharedModel.rating
+                comment.setText(sharedModel.comment)
+
+                sharedModel.tripInDialog = t.id
+
+                // Listeners to update properly the viewModel (useful for layout orientation change)
+                ratingBar.setOnRatingBarChangeListener { _, rating, _ ->
+                    sharedModel.rating = rating
+                }
+                comment.addTextChangedListener(object : TextWatcher {
+                    override fun afterTextChanged(s: Editable?) {
+                        sharedModel.comment = s.toString()
+                    }
+
+                    override fun beforeTextChanged(
+                        s: CharSequence?,
+                        start: Int,
+                        count: Int,
+                        after: Int
+                    ) {
+                    }
+
+                    override fun onTextChanged(
+                        s: CharSequence?,
+                        start: Int,
+                        before: Int,
+                        count: Int
+                    ) {
+                    }
+                })
+
+                dialog?.dismiss()
+                dialog = ratingDialogBuilder.setView(ratingDialogView)
+                    .setTitle("Insert a new rating")
+                    .setPositiveButton("Yes") { _, _ ->
+                        FirestoreRepository().insertRating(
+                            r = Rating(
+                                tripId = t.id,
+                                rating = ratingBar.rating,
+                                comment = comment.text.toString()
+                            ),
+                            userEmail = t.ownerEmail,
+                            passenger = false,
+                            b = b
+                        ).addOnSuccessListener {
+                            Toast.makeText(
+                                itemView.context,
+                                "New rating added. Thank you for your feedback!",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }.addOnFailureListener {
+                            Toast.makeText(
+                                itemView.context,
+                                "Problems in adding the rating!",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            Log.d("test", it.message ?: "no Exc")
+                        }
+                    }
+                    .setNegativeButton("No") { _, _ ->
+                    }
+                    .setOnDismissListener {
+                        sharedModel.tripInDialog = ""
+                        sharedModel.comment = ""
+                        sharedModel.rating = 0.0F
+                    }.show()
+
             }
+
+
+        fun unbind() {
+            cardButton.setOnClickListener { }
+            cv.setOnClickListener { }
         }
+    }
+
 
         override fun onViewRecycled(holder: TripViewHolder) {
             super.onViewRecycled(holder)

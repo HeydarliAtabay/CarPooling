@@ -49,6 +49,8 @@ class TripListViewModel: ViewModel() {
     // Data used to manage the booking dialog restore state from OtherTripsFragment
     var tripIdInDialog = ""
 
+
+
     // Variable to manage the orientation of the screen in the async tasks
     var orientation = -1
 

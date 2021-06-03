@@ -1,15 +1,19 @@
 package com.example.madproject.ui.yourtrips
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
 import android.view.*
+import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.madproject.R
 import com.example.madproject.data.FirestoreRepository
+import com.example.madproject.data.Profile
+import com.example.madproject.data.Rating
 import com.example.madproject.data.Trip
 import com.example.madproject.ui.profile.ProfileViewModel
 import com.example.madproject.ui.yourtrips.interestedusers.UserListViewModel
@@ -168,6 +172,8 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
             else -> super.onOptionsItemSelected(item)
         }
     }
+
+
 
     private fun createBookingDialog() {
         sharedModel.bookingDialogOpened = true

@@ -1,5 +1,6 @@
 package com.example.madproject.ui.yourtrips.interestedusers
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -31,8 +32,9 @@ class UserListViewModel: ViewModel() {
     var confirmBookingDialogOpened = false
     var changedOrientation = false
 
-    // Data used to manage the rating dialog restore state from OtherTripsFragment
+    // Data used to manage the rating dialog restore state for the rating dialog
     var userEmailInDialog = ""
+    var tripInDialog = ""
     var rating = 0.0F
     var comment = ""
 
@@ -138,6 +140,20 @@ class UserListViewModel: ViewModel() {
         for (b in selectedConfirmedBookings)
             if (b.clientEmail == u.email) return b
         return Booking()
+    }
+
+    fun getBookingForDriverRating(t:Trip): Booking? {
+        var b: Booking? = null
+        FirestoreRepository().getBooking(t).get().addOnSuccessListener { result ->
+            if (result != null) {
+                for (document in result) {
+                    b = document.toObject(Booking::class.java)
+                    Log.d("Ciao", "${document.id} => ${document.data}")
+                    Log.d("Ciao", "Questo e' l'oggetto ${b.toString()}")
+                }
+            }
+        }
+        return b
     }
 
     fun setBookingFlag(u: Profile): Task<Void> {

@@ -56,15 +56,11 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     private var datePicker: MaterialDatePicker<Long>? = null
     private var timePicker: MaterialTimePicker? = null
     private val tripListViewModel: TripListViewModel by activityViewModels()
-    private lateinit var trip: Trip
+    private var trip: Trip = Trip()
     private var storageDir: File? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        // Removing the back navigation to show Map
-        findNavController().popBackStack(
-            R.id.showMap, true)
 
         imageCar = view.findViewById(R.id.imageCar)
         departure = view.findViewById(R.id.departure_location)
@@ -83,6 +79,8 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
 
         trip = tripListViewModel.selectedLocal
         currentPhotoPath = tripListViewModel.currentPhotoPath
+
+        Log.d("test", "${trip.id}, ${trip.departureCoordinates}")
 
         tripListViewModel.orientation = this.requireActivity().requestedOrientation
 
@@ -410,7 +408,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
                 val str = if (i < strings.size) strings[i] else ""
 
                 if (loc != str) {
-                    trip.intermediateCoordinates.remove(c)
+                    trip.intermediateCoordinates = arrayListOf()
                     break
                 }
             }

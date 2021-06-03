@@ -3,7 +3,6 @@ package com.example.madproject.ui.map
 import android.content.Context
 import android.os.Bundle
 import android.util.DisplayMetrics
-import android.util.Log
 import android.view.*
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
@@ -25,11 +24,11 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.*
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
-import org.osmdroid.views.overlay.infowindow.InfoWindow
 import java.util.*
 
 @Suppress("DEPRECATION")
 class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
+    private var count = -1
     private lateinit var mMapView: MapView
     private var mScaleBarOverlay: ScaleBarOverlay? = null
     private var mRotationGestureOverlay: RotationGestureOverlay? = null
@@ -48,6 +47,9 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+
+        // Initialize the selected trip
+        trip = tripListViewModel.selectedLocal
 
         //Note! we are programmatically construction the map view
         //be sure to handle application lifecycle correct (see note in on pause)
@@ -87,17 +89,14 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
             "selectArrival" -> (requireActivity() as MainActivity).supportActionBar?.title = "Select Destination"
             "selectIntStops" -> (requireActivity() as MainActivity).supportActionBar?.title = "Select Intermediate Stops"
         }
-
         if (tripListViewModel.pathManagementMap == "showRoute") {
-            trip = tripListViewModel.selectedLocal
             // Here we have to show the route of the trip
             Dispatchers.IO.dispatch(GlobalScope.coroutineContext) {
-
                 if ((trip.departureCoordinates != null) && (trip.arrivalCoordinates != null)) {
                     // Insert the departure coordinate
                     val depGp = GeoPoint(trip.departureCoordinates!!.latitude, trip.departureCoordinates!!.longitude)
                     val depStartMarker = Marker(mMapView)
-                    depStartMarker.title = "Departure:\n\n"+ getLocationString(trip.departureCoordinates!!.latitude,trip.departureCoordinates!!.longitude,requireContext())
+                    depStartMarker.title = "Departure:\n\n${getLocationString(trip.departureCoordinates!!.latitude,trip.departureCoordinates!!.longitude,requireContext())}"
                     depStartMarker.position = depGp
                     depStartMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                     depStartMarker.icon = ResourcesCompat.getDrawable(requireContext().resources, R.drawable.segnaposto_black_100, null)
@@ -108,7 +107,7 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
                         val gp = GeoPoint(point.latitude, point.longitude)
                         path.add(gp)
                         val startMarker = Marker(mMapView)
-                        startMarker.title = "Intermediate stop:\n\n"+ getLocationString(point.latitude,point.longitude,requireContext())
+                        startMarker.title = "Intermediate Stop:\n\n${getLocationString(point.latitude,point.longitude,requireContext())}"
                         startMarker.textLabelFontSize = 1
                         startMarker.position = gp
                         startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
@@ -120,7 +119,7 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
                     // Insert the arrival coordinate
                     val arrGp = GeoPoint(trip.arrivalCoordinates!!.latitude, trip.arrivalCoordinates!!.longitude)
                     val arrStartMarker = Marker(mMapView)
-                    arrStartMarker.title = "Arrival:\n\n"+getLocationString(trip.arrivalCoordinates!!.latitude,trip.arrivalCoordinates!!.longitude,requireContext())
+                    arrStartMarker.title = "Destination:\n\n${getLocationString(trip.arrivalCoordinates!!.latitude,trip.arrivalCoordinates!!.longitude,requireContext())}"
                     arrStartMarker.position = arrGp
                     arrStartMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                     arrStartMarker.icon = ResourcesCompat.getDrawable(requireContext().resources, R.drawable.segnaposto_red_100, null)
@@ -144,6 +143,47 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
                 }
             }
         } else {
+
+            // Set the marker if the position was earlier set
+            when (tripListViewModel.pathManagementMap) {
+                "selectDeparture" -> {
+                    if (trip.departureCoordinates != null) {
+                        val gp = GeoPoint(trip.departureCoordinates!!.latitude, trip.departureCoordinates!!.longitude)
+                        val marker = Marker(mMapView)
+                        marker.title = "Departure:\n\n${getLocationString(trip.departureCoordinates!!.latitude,trip.departureCoordinates!!.longitude,requireContext())}"
+                        marker.position = gp
+                        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                        marker.icon = ResourcesCompat.getDrawable(requireContext().resources, R.drawable.segnaposto_black_100, null)
+                        mMapView.overlays.add(marker)
+                    }
+                }
+                "selectArrival" -> {
+                    if (trip.arrivalCoordinates != null) {
+                        val gp = GeoPoint(trip.arrivalCoordinates!!.latitude, trip.arrivalCoordinates!!.longitude)
+                        val marker = Marker(mMapView)
+                        marker.title = "Destination:\n\n${getLocationString(trip.arrivalCoordinates!!.latitude,trip.arrivalCoordinates!!.longitude,requireContext())}"
+                        marker.position = gp
+                        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                        marker.icon = ResourcesCompat.getDrawable(requireContext().resources, R.drawable.segnaposto_red_100, null)
+                        mMapView.overlays.add(marker)
+                    }
+                }
+                else -> {
+                    count = trip.intermediateCoordinates.size
+
+                    for (g in trip.intermediateCoordinates) {
+                        val gp = GeoPoint(g.latitude, g.longitude)
+                        val marker = Marker(mMapView)
+                        marker.title = "Intermediate Stop:\n\n${getLocationString(g.latitude,g.longitude,requireContext())}"
+                        marker.position = gp
+                        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                        marker.icon = ResourcesCompat.getDrawable(requireContext().resources, R.drawable.segnaposto_blue_100, null)
+                        mMapView.overlays.add(marker)
+                    }
+                }
+            }
+            mMapView.invalidate()
+
             // Here we have to select a new position
             mMapView.overlays.add(object : Overlay() {
                 override fun onSingleTapConfirmed(
@@ -151,9 +191,20 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
                     mapView: MapView
                 ): Boolean {
                     Dispatchers.IO.dispatch(GlobalScope.coroutineContext) {
+                        // Search the index of the first marker added to the map
+                        var index = mapView.overlays.size - 1
+                        for ((i, m) in mapView.overlays.withIndex()) {
+                            if (m.toString().contains("Marker")) {
+                                index = i
+                                break
+                            }
+                        }
 
                         if(tripListViewModel.pathManagementMap != "selectIntStops") {
-                            mapView.overlays.removeLast()
+                            mapView.overlays.removeAt(index)
+                            mapView.invalidate()
+                        } else if (count >= 5) {
+                            mapView.overlays.removeAt(index)
                             mapView.invalidate()
                         }
 
@@ -172,8 +223,10 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
                         startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                         when (tripListViewModel.pathManagementMap) {
                             "selectDeparture" -> {
+                                count = 0
                                 dep = final
                                 departureGeoPoint = gp
+                                startMarker.title = "Departure:\n\n$final"
                                 startMarker.icon = ResourcesCompat.getDrawable(
                                     requireContext().resources,
                                     R.drawable.segnaposto_black_100,
@@ -181,8 +234,10 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
                                 )
                             }
                             "selectArrival" -> {
+                                count = 0
                                 arr = final
                                 arrivalGeoPoint = gp
+                                startMarker.title = "Destination:\n\n$final"
                                 startMarker.icon = ResourcesCompat.getDrawable(
                                     requireContext().resources,
                                     R.drawable.segnaposto_red_100,
@@ -190,8 +245,10 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
                                 )
                             }
                             else -> {
+                                if (count < 5) count++
                                 interStops.add(final)
                                 interGeoPoints.add(gp)
+                                startMarker.title = "Intermediate Stop:\n\n$final"
                                 startMarker.icon = ResourcesCompat.getDrawable(
                                     requireContext().resources,
                                     R.drawable.segnaposto_blue_100,
@@ -201,9 +258,7 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
                         }
 
                         mapView.overlays.add(startMarker)
-
                         mapView.invalidate()
-
                     }
                     return true
                 }
@@ -237,11 +292,27 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
         mMapView.controller.setZoom(zoomLevel)
         mMapView.setMapOrientation(0.0F, false)
 
+        // Default coordinates
         var latitude = java.lang.Double.valueOf("45.056628")
         var longitude = java.lang.Double.valueOf("7.671299")
-        if ((tripListViewModel.pathManagementMap == "showRoute")) {
-            latitude = tripListViewModel.selectedLocal.departureCoordinates?.latitude ?: 45.056628
-            longitude = tripListViewModel.selectedLocal.departureCoordinates?.longitude ?: 7.671299
+
+        when (tripListViewModel.pathManagementMap) {
+            "selectArrival" -> {
+                latitude = trip.arrivalCoordinates?.latitude ?: 45.056628
+                longitude = trip.arrivalCoordinates?.longitude ?: 7.671299
+            }
+            "selectIntStops" -> {
+                // focus on the first intermediate stop if present
+                if (trip.intermediateCoordinates.size > 0) {
+                    latitude = trip.intermediateCoordinates[0].latitude
+                    longitude = trip.intermediateCoordinates[0].longitude
+                }
+            }
+            else -> {
+                // "showRoute" or "selectDeparture"
+                latitude = trip.departureCoordinates?.latitude ?: 45.056628
+                longitude = trip.departureCoordinates?.longitude ?: 7.671299
+            }
         }
 
         mMapView.setExpectedCenter(GeoPoint(latitude, longitude))

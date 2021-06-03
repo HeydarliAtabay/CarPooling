@@ -2,7 +2,6 @@ package com.example.madproject.ui.yourtrips
 
 import android.content.res.ColorStateList
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.widget.ImageView
@@ -89,7 +88,6 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
         when (tripListViewModel.pathManagementTrip) {
             "comingFromOther" -> {
                 // The FAB allows to propose a booking
-
                 fabButton.setImageResource(R.drawable.plus)
                 fabButton.setOnClickListener {
                     createBookingDialog()

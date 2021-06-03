@@ -63,14 +63,12 @@
             app:tabMode="fixed">
 
             <com.google.android.material.tabs.TabItem
-                android:id="@+id/tabUpcoming"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:contentDescription="@string/upcoming_tab_id"
                 android:text="@string/upcoming_tab_text" />
 
             <com.google.android.material.tabs.TabItem
-                android:id="@+id/tabCompleted"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:contentDescription="@string/completed_tab_id"

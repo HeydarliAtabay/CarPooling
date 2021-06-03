@@ -2,7 +2,6 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/navigation"
     app:startDestination="@id/othersTripList">
 
     <fragment
@@ -144,29 +143,6 @@
             app:enterAnim="@anim/fade_in"
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/slide_in" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/interestingTrips"
-        android:name="com.example.madproject.ui.othertrips.TripsOfInterestListFragment"
-        android:label="Interesting Trips"
-        tools:layout="@layout/fragment_others_trip_list">
-        <action
-            android:id="@+id/action_interestingTrips_to_tripDetail"
-            app:destination="@id/tripDetail" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/bookedTrips"
-        android:name="com.example.madproject.ui.othertrips.BoughtTripsListFragment"
-        android:label="Booked Trips"
-        tools:layout="@layout/fragment_trip_list">
-        <action
-            android:id="@+id/action_bookedTrips_to_tripDetail"
-            app:destination="@id/tripDetail" />
-        <action
-            android:id="@+id/action_bookedTrips_to_userRate"
-            app:destination="@id/userRate" />
     </fragment>
 
     <fragment

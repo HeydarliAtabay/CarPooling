@@ -33,12 +33,6 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="MyAppBar">
-        <item name="android:background">?attr/colorPrimary</item>
-        <item name="android:textColorPrimary">?attr/colorOnPrimary</item>
-
-    </style>
-
     <style name="ImageViewBorder">
         <item name="civ_border_color">@color/black</item>
         <item name="civ_border_width">1dp</item>

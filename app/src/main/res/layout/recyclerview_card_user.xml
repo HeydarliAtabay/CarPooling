@@ -73,7 +73,6 @@
                 app:layout_constraintTop_toTopOf="@+id/imageUser">
 
                 <TextView
-                    android:id="@+id/textview1"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_marginTop="8dp"

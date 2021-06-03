@@ -115,7 +115,7 @@ class BoughtTripsListFragment : Fragment(R.layout.fragment_trip_list) {
         } else {
             emptyList.visibility = View.VISIBLE
         }
-        recyclerView.adapter = TripsAdapter(currentList, tripListViewModel, userListModel, profileModel)
+        recyclerView.adapter = TripsAdapter(currentList.sorted(), tripListViewModel, userListModel, profileModel)
 
     }
 
@@ -146,8 +146,8 @@ class BoughtTripsListFragment : Fragment(R.layout.fragment_trip_list) {
                 ulViewModel: UserListViewModel,
                 profileViewModel: ProfileViewModel
             ) {
-                from.text = t.from
-                to.text = t.to
+                from.text = t.from.substring(0, if(t.from.contains(",")) t.from.indexOf(",") else t.from.lastIndex)
+                to.text = t.to.substring(0, if(t.to.contains(",")) t.to.indexOf(",") else t.to.lastIndex)
                 date.text = t.departureDate
                 time.text = t.departureTime
                 price.text = t.price
@@ -167,16 +167,16 @@ class BoughtTripsListFragment : Fragment(R.layout.fragment_trip_list) {
                     cardButton.text = itemView.context.getString(R.string.rate_driver)
                     cardButton.setOnClickListener {
                         tlViewModel.selectedLocal = t
-                        openRatingDriverDialog(t, booking, ulViewModel, profileViewModel)
+                        openRatingDriverDialog(t, booking, ulViewModel)
                     }
                 } else cardButton.visibility = View.INVISIBLE
 
                 if (ulViewModel.tripInDialog == t.id) {
-                    openRatingDriverDialog(t, booking, ulViewModel, profileViewModel)
+                    openRatingDriverDialog(t, booking, ulViewModel)
                 }
             }
 
-            private fun openRatingDriverDialog(t: Trip, b: Booking, sharedModel: UserListViewModel, profileModel: ProfileViewModel) {
+            private fun openRatingDriverDialog(t: Trip, b: Booking, sharedModel: UserListViewModel) {
                 val ratingDialogBuilder = MaterialAlertDialogBuilder(itemView.context)
                 val ratingDialogView: View = LayoutInflater.from(itemView.context)
                     .inflate(R.layout.rating_dialog, null, false)

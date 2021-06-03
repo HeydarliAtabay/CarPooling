@@ -114,6 +114,18 @@ fun isFuture(date: String, time: String, duration: String): Boolean {
     return tripDateTime.after(current)
 }
 
+fun compareDates(date1: String, time1: String, date2: String, time2: String): Int {
+    val inputFormat = SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.ENGLISH)
+
+    val trip1DateTime = inputFormat.parse("$date1 $time1") ?: return 0
+
+    val trip2DateTime = inputFormat.parse("$date2 $time2") ?: return 0
+
+    if (trip1DateTime.after(trip2DateTime)) return -1
+    if (trip1DateTime.before(trip2DateTime)) return 1
+    return 0
+}
+
 /*
     Function to create a new image file inside "storagePath"
 */

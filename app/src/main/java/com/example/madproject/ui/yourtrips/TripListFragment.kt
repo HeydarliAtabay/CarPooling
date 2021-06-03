@@ -123,7 +123,7 @@ class TripListFragment : Fragment(R.layout.fragment_trip_list) {
             emptyList.visibility = View.VISIBLE
             emptyList2.visibility = View.VISIBLE
         }
-        recyclerView.adapter = TripsAdapter(currentList, tripListViewModel, userListModel, profileModel)
+        recyclerView.adapter = TripsAdapter(currentList.sorted(), tripListViewModel, userListModel, profileModel)
 
     }
 

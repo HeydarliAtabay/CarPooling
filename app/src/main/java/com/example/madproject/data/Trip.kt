@@ -1,8 +1,9 @@
 package com.example.madproject.data
 
+import com.example.madproject.lib.compareDates
 import com.google.firebase.firestore.GeoPoint
 
-data class Trip(var id: String = "") {
+data class Trip(var id: String = ""): Comparable<Trip> {
     var imageUrl: String = ""
     var from: String = ""
     var to: String = ""
@@ -50,6 +51,10 @@ data class Trip(var id: String = "") {
         this.departureCoordinates = departureCoo
         this.arrivalCoordinates = arrivalCoo
         this.intermediateCoordinates = intermediateCoo
+    }
+
+    override operator fun compareTo(other: Trip): Int {
+        return compareDates(this.departureDate, this.departureTime, other.departureDate, other.departureTime)
     }
 
 }

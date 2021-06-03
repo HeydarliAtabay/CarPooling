@@ -19,7 +19,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.squareup.picasso.Picasso
 
-class BoughtTripListFragment : Fragment(R.layout.fragment_trip_list) {
+class BoughtTripsListFragment : Fragment(R.layout.fragment_trip_list) {
     private var tripList = listOf<Trip>()
     private lateinit var emptyList: TextView
     private lateinit var emptyList2: TextView

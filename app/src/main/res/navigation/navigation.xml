@@ -206,7 +206,7 @@
 
     <fragment
         android:id="@+id/bookedTrips"
-        android:name="com.example.madproject.ui.othertrips.BoughtTripListFragment"
+        android:name="com.example.madproject.ui.othertrips.BoughtTripsListFragment"
         android:label="Booked Trips"
         tools:layout="@layout/fragment_trip_list">
         <action

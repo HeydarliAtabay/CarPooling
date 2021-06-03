@@ -3,6 +3,7 @@ package com.example.madproject.ui.map
 import android.content.Context
 import android.os.Bundle
 import android.util.DisplayMetrics
+import android.util.Log
 import android.view.*
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
@@ -28,6 +29,7 @@ import java.util.*
 
 @Suppress("DEPRECATION")
 class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
+    private var firstClick = false
     private var count = -1
     private lateinit var mMapView: MapView
     private var mScaleBarOverlay: ScaleBarOverlay? = null
@@ -149,6 +151,7 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
                 "selectDeparture" -> {
                     if (trip.departureCoordinates != null) {
                         val gp = GeoPoint(trip.departureCoordinates!!.latitude, trip.departureCoordinates!!.longitude)
+                        departureGeoPoint = gp
                         val marker = Marker(mMapView)
                         marker.title = "Departure:\n\n${getLocationString(trip.departureCoordinates!!.latitude,trip.departureCoordinates!!.longitude,requireContext())}"
                         marker.position = gp
@@ -160,6 +163,7 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
                 "selectArrival" -> {
                     if (trip.arrivalCoordinates != null) {
                         val gp = GeoPoint(trip.arrivalCoordinates!!.latitude, trip.arrivalCoordinates!!.longitude)
+                        arrivalGeoPoint = gp
                         val marker = Marker(mMapView)
                         marker.title = "Destination:\n\n${getLocationString(trip.arrivalCoordinates!!.latitude,trip.arrivalCoordinates!!.longitude,requireContext())}"
                         marker.position = gp
@@ -173,6 +177,7 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
 
                     for (g in trip.intermediateCoordinates) {
                         val gp = GeoPoint(g.latitude, g.longitude)
+                        interGeoPoints.add(gp)
                         val marker = Marker(mMapView)
                         marker.title = "Intermediate Stop:\n\n${getLocationString(g.latitude,g.longitude,requireContext())}"
                         marker.position = gp
@@ -192,19 +197,20 @@ class ShowMapFragment : Fragment(R.layout.fragment_show_map) {
                 ): Boolean {
                     Dispatchers.IO.dispatch(GlobalScope.coroutineContext) {
                         // Search the index of the first marker added to the map
-                        var index = mapView.overlays.size - 1
-                        for ((i, m) in mapView.overlays.withIndex()) {
-                            if (m.toString().contains("Marker")) {
-                                index = i
-                                break
-                            }
+                        val firstIndex = mapView.overlays.indexOfFirst { it.toString().contains("Marker")}
+
+                        if (tripListViewModel.pathManagementMap == "selectIntStops" && !firstClick) {
+                            mapView.overlays.removeAll { it.toString().contains("Marker") }
+                            interGeoPoints.clear()
+                            mapView.invalidate()
+                            firstClick=true
                         }
 
                         if(tripListViewModel.pathManagementMap != "selectIntStops") {
-                            mapView.overlays.removeAt(index)
+                            mapView.overlays.removeAt(firstIndex)
                             mapView.invalidate()
                         } else if (count >= 5) {
-                            mapView.overlays.removeAt(index)
+                            mapView.overlays.removeAt(firstIndex)
                             mapView.invalidate()
                         }
 

@@ -1,8 +1,8 @@
 package com.example.madproject.ui.othertrips
 
-import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.*
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
@@ -21,30 +21,8 @@ import com.example.madproject.ui.yourtrips.interestedusers.UserListViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.squareup.picasso.Picasso
-import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.example.madproject.R
 import com.example.madproject.data.*
-import com.example.madproject.lib.isFuture
-import com.example.madproject.lib.parsePrice
-import com.example.madproject.lib.parseTime
-import com.example.madproject.lib.unParseTime
-import com.example.madproject.ui.profile.ProfileViewModel
-import com.example.madproject.ui.yourtrips.TripListViewModel
-import com.example.madproject.ui.yourtrips.interestedusers.UserListViewModel
-import com.google.android.material.datepicker.CalendarConstraints
-import com.google.android.material.datepicker.DateValidatorPointForward
-import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.tabs.TabLayout
-import com.google.android.material.textfield.TextInputLayout
-import com.google.android.material.timepicker.MaterialTimePicker
-import com.google.android.material.timepicker.TimeFormat
-import com.squareup.picasso.Picasso
-import java.text.SimpleDateFormat
-import java.util.*
 
 
 class BoughtTripsListFragment : Fragment(R.layout.fragment_trip_list) {
@@ -180,7 +158,6 @@ class BoughtTripsListFragment : Fragment(R.layout.fragment_trip_list) {
 
                 cv.setOnClickListener {
                     tlViewModel.selectedLocal = t
-                    tlViewModel.comingFromUpcomingBooked = true
                     Navigation.findNavController(itemView)
                         .navigate(R.id.action_bookedTrips_to_tripDetail)
                 }
@@ -270,7 +247,6 @@ class BoughtTripsListFragment : Fragment(R.layout.fragment_trip_list) {
                                 "Problems in adding the rating!",
                                 Toast.LENGTH_SHORT
                             ).show()
-                            Log.d("test", it.message ?: "no Exc")
                         }
                     }
                     .setNegativeButton("No") { _, _ ->

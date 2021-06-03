@@ -147,6 +147,9 @@ class FirestoreRepository {
         return fireStoreDB.collection("trips/${t.id}/confirmedBookings")
     }
 
+    /*
+    Function to get the list of confirmed bookings of the trip "t" done by the current user
+     */
     fun getBooking(t: Trip): Query {
         return fireStoreDB.collection("trips/${t.id}/confirmedBookings")
             .whereEqualTo("clientEmail", currentUser.email!!)

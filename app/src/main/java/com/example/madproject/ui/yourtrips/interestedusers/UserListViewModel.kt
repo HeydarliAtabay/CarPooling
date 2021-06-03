@@ -152,20 +152,6 @@ class UserListViewModel: ViewModel() {
         return Booking()
     }
 
-    fun getBookingForDriverRating(t:Trip): Booking? {
-        var b: Booking? = null
-        FirestoreRepository().getBooking(t).get().addOnSuccessListener { result ->
-            if (result != null) {
-                for (document in result) {
-                    b = document.toObject(Booking::class.java)
-                    Log.d("Ciao", "${document.id} => ${document.data}")
-                    Log.d("Ciao", "Questo e' l'oggetto ${b.toString()}")
-                }
-            }
-        }
-        return b
-    }
-
     fun setBookingFlag(u: Profile): Task<Void> {
         val b = getBooking(u)
         return FirestoreRepository().setProposalFlag(b, selectedLocalTrip, !b.confirmed)

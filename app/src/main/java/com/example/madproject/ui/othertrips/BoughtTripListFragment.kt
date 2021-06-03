@@ -1,7 +1,6 @@
 package com.example.madproject.ui.othertrips
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.fragment.app.Fragment
@@ -41,12 +40,12 @@ class BoughtTripListFragment : Fragment(R.layout.fragment_trip_list) {
         // after going to this page from navigation drawer
         tripListViewModel.tabCompletedTrips = false
 
-        tripListViewModel.pathManagement = "boughtUpcomingTrips"
+        tripListViewModel.pathManagementTrip = "boughtUpcomingTrips"
 
         if (tripListViewModel.tabCompletedTripsBooked) {
             val tab = tabLayout.getTabAt(1)
             tab?.select()
-            tripListViewModel.pathManagement = "boughtCompletedTrips"
+            tripListViewModel.pathManagementTrip = "boughtCompletedTrips"
         }
 
         fab = view.findViewById(R.id.fab)
@@ -76,13 +75,13 @@ class BoughtTripListFragment : Fragment(R.layout.fragment_trip_list) {
                 when (tab?.contentDescription) {
                     "tabUpcoming" -> {
                         tripListViewModel.tabCompletedTripsBooked = false
-                        tripListViewModel.pathManagement = "boughtUpcomingTrips"
+                        tripListViewModel.pathManagementTrip = "boughtUpcomingTrips"
                         setSelectedList()
                     }
 
                     "tabCompleted" -> {
                         tripListViewModel.tabCompletedTripsBooked = true
-                        tripListViewModel.pathManagement = "boughtCompletedTrips"
+                        tripListViewModel.pathManagementTrip = "boughtCompletedTrips"
                         setSelectedList()
                     }
                 }

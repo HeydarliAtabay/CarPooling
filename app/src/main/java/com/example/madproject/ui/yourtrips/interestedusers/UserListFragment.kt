@@ -49,7 +49,7 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
         proposals = userListViewModel.getProposals().value ?: listOf()
 
         // If the user list refers to a "Completed trip", load the proper view
-        if (tripListViewModel.pathManagement == "tabCompleted") {
+        if (tripListViewModel.pathManagementTrip == "tabCompleted") {
 
             tabLayout.visibility = View.INVISIBLE
 
@@ -295,7 +295,7 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
                 fullName.text = u.fullName
 
                 // If the user comes to this list to rate the passengers load the proper view
-                if (tripListModel.pathManagement == "tabCompleted") {
+                if (tripListModel.pathManagementTrip == "tabCompleted") {
                     check.setBackgroundResource(R.drawable.button_state_selector)
                     check.setImageResource(R.drawable.ic_star)
                     check.setOnClickListener {
@@ -326,7 +326,7 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
 
                 cv.setOnClickListener {
                     sharedModel.selectedLocalUserEmail = u.email
-                    if (tripListModel.pathManagement == "tabCompleted") {
+                    if (tripListModel.pathManagementTrip == "tabCompleted") {
                         findNavController(itemView)
                             .navigate(R.id.action_userRate_to_showProfilePrivacy)
                     } else

@@ -90,7 +90,7 @@ class OthersTripListFragment : Fragment() {
         emptyList = view.findViewById(R.id.emptyList)
         filterDialogBuilder = MaterialAlertDialogBuilder(this.requireActivity())
 
-        if (tripListViewModel.pathManagement == "comingFromOther") tripListViewModel.pathManagement = ""
+        if (tripListViewModel.pathManagementTrip == "comingFromOther") tripListViewModel.pathManagementTrip = ""
 
         // Reset the flags that manages the tab selection in "Your Trips" and "Booked Trips",
         // after going to this page from navigation drawer
@@ -431,7 +431,7 @@ class OthersTripListFragment : Fragment() {
 
                 cv.setOnClickListener {
                     sharedModel.selectedLocal = t
-                    sharedModel.pathManagement = "comingFromOther"
+                    sharedModel.pathManagementTrip = "comingFromOther"
                     findNavController(itemView).navigate(R.id.action_othersTripList_to_tripDetail)
                 }
 

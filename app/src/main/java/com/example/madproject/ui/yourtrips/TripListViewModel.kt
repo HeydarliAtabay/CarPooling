@@ -1,6 +1,5 @@
 package com.example.madproject.ui.yourtrips
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -58,7 +57,16 @@ class TripListViewModel : ViewModel() {
             - "tabUpcoming"     -> path "Bought Trips (Upcoming trips)"
             - "interestedTrips" -> path "Interested Trips"
      */
-    var pathManagement = ""
+    var pathManagementTrip = ""
+
+    /*
+        String used to manage the path of Map Fragment. Possible values:
+            - "showRoute"       -> path "Trip Detail -> Show Map"
+            - "selectDeparture" -> path "Trip Edit -> Select Departure"
+            - "selectArrival"   -> path "Trip Edit -> Select Arrival"
+            - "selectIntStops"  -> path "Trip Edit -> Select Intermediate Trips"
+     */
+    var pathManagementMap = ""
 
     // Flags to manage the landscape selection of the tab in OthersTripListFragment and BoughtTripListFragment
     var tabCompletedTrips = false

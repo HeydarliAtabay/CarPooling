@@ -2,8 +2,8 @@ package com.example.madproject.ui.yourtrips
 
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.util.Log
 import android.view.*
-import android.widget.ImageButton
 import androidx.fragment.app.Fragment
 import android.widget.ImageView
 import android.widget.TextView
@@ -15,7 +15,6 @@ import androidx.navigation.fragment.findNavController
 import com.example.madproject.R
 import com.example.madproject.data.FirestoreRepository
 import com.example.madproject.data.Trip
-import com.example.madproject.ui.map.MapViewModel
 import com.example.madproject.ui.profile.ProfileViewModel
 import com.example.madproject.ui.yourtrips.interestedusers.UserListViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -37,10 +36,9 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
     private lateinit var additionalInfo: TextView
     private lateinit var intermediateStops: TextView
     private lateinit var fabButton: FloatingActionButton
-    private val sharedModel: TripListViewModel by activityViewModels()
+    private val tripListViewModel: TripListViewModel by activityViewModels()
     private val userListModel: UserListViewModel by activityViewModels()
     private val profileModel: ProfileViewModel by activityViewModels()
-    private val mapModel: MapViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -59,7 +57,7 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
         // reset the flag to "false", since this fragment will set it to "true" if the required navigation is selected
         profileModel.comingFromPrivacy = false
 
-        if (sharedModel.pathManagement != "comingFromOther") {
+        if (tripListViewModel.pathManagementTrip != "comingFromOther") {
             userListModel.resetFilteredUsers()
         }
 
@@ -67,11 +65,28 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
         ImageViewCompat.setImageTintList(fabButton,null)
         ImageViewCompat.setImageTintList(showMap,null)
 
-        trip = sharedModel.selectedLocal
+        trip = tripListViewModel.selectedLocal
+
+        tripListViewModel.getSelectedDB().observe(viewLifecycleOwner, {
+            if (it == null) {
+
+                if ((tripListViewModel.pathManagementTrip == "comingFromOther") ||
+                    (tripListViewModel.pathManagementTrip == "boughtUpcomingTrips") ||
+                    (tripListViewModel.pathManagementTrip == "interestedTrips")
+                ) {
+                    Toast.makeText(context, "This trip does not exist anymore!", Toast.LENGTH_SHORT).show()
+                    findNavController().popBackStack()
+                } else Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_SHORT).show()
+
+            } else {
+                trip = it
+                setValuesTrip()
+            }
+        })
 
         // Looking at this variable of the view model it is possible to find the path of the navigation
         // to this fragment. It has to have different behaviours basing on this path
-        when (sharedModel.pathManagement) {
+        when (tripListViewModel.pathManagementTrip) {
             "comingFromOther" -> {
                 // The FAB allows to propose a booking
 
@@ -108,51 +123,34 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
             }
         }
 
-        sharedModel.getSelectedDB().observe(viewLifecycleOwner, {
-            if (it == null) {
-
-                if ((sharedModel.pathManagement == "comingFromOther") ||
-                    (sharedModel.pathManagement == "boughtUpcomingTrips") ||
-                    (sharedModel.pathManagement == "interestedTrips")
-                ) {
-                    Toast.makeText(context, "This trip does not exist anymore!", Toast.LENGTH_SHORT).show()
-                    findNavController().popBackStack()
-                } else Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_SHORT).show()
-
-            } else {
-                trip = it
-                setValuesTrip()
-            }
-        })
-
         setHasOptionsMenu(true)
 
         setValuesTrip()
 
-        if (sharedModel.changedOrientationBooking) {
+        if (tripListViewModel.changedOrientationBooking) {
             createBookingDialog()
-            sharedModel.changedOrientationBooking = false
-        } else if (sharedModel.changedOrientationDelete) {
+            tripListViewModel.changedOrientationBooking = false
+        } else if (tripListViewModel.changedOrientationDelete) {
             deleteTripDialog()
-            sharedModel.changedOrientationDelete = false
+            tripListViewModel.changedOrientationDelete = false
         }
 
     }
 
     override fun onPause() {
         super.onPause()
-        if (sharedModel.bookingDialogOpened)
-            sharedModel.changedOrientationBooking = true
-        if (sharedModel.deleteDialogOpened)
-            sharedModel.changedOrientationDelete = true
+        if (tripListViewModel.bookingDialogOpened)
+            tripListViewModel.changedOrientationBooking = true
+        if (tripListViewModel.deleteDialogOpened)
+            tripListViewModel.changedOrientationDelete = true
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
-        if (sharedModel.pathManagement != "tabCompleted") {
+        if (tripListViewModel.pathManagementTrip != "tabCompleted") {
             inflater.inflate(R.menu.show_profiles, menu)
 
-            if (sharedModel.pathManagement == "tabUpcoming")
+            if (tripListViewModel.pathManagementTrip == "tabUpcoming")
                 inflater.inflate(R.menu.edit_menu, menu)
         }
     }
@@ -160,15 +158,15 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.editButton -> {
-                sharedModel.useDBImage = true
-                sharedModel.selectedLocal = trip
+                tripListViewModel.useDBImage = true
+                tripListViewModel.selectedLocal = trip
                 findNavController().navigate(R.id.action_tripDetail_to_tripEdit)
                 true
             }
             R.id.profilesButton -> {
                 // If the user comes from tabUpcoming, he has to access the booking manager of that trip
                 // Else he will navigate to the profile of the driver
-                if (sharedModel.pathManagement == "tabUpcoming") {
+                if (tripListViewModel.pathManagementTrip == "tabUpcoming") {
                     userListModel.selectedLocalTrip = trip
                     userListModel.tabBookings = false
                     profileModel.comingFromPrivacy = true
@@ -185,7 +183,7 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
     }
 
     private fun createBookingDialog() {
-        sharedModel.bookingDialogOpened = true
+        tripListViewModel.bookingDialogOpened = true
         MaterialAlertDialogBuilder(this.requireActivity())
             .setTitle("New Booking")
             .setMessage("Are you sure to book this trip?")
@@ -194,13 +192,13 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
             }
             .setNegativeButton("No") { _, _ -> }
             .setOnDismissListener {
-                sharedModel.bookingDialogOpened = false
+                tripListViewModel.bookingDialogOpened = false
             }
             .show()
     }
 
     private fun deleteTripDialog() {
-        sharedModel.deleteDialogOpened = true
+        tripListViewModel.deleteDialogOpened = true
         MaterialAlertDialogBuilder(this.requireActivity())
             .setTitle("Delete trip")
             .setMessage("Are you sure to delete this trip?")
@@ -230,7 +228,7 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
             .setNegativeButton("No") { _, _ ->
             }
             .setOnDismissListener {
-                sharedModel.deleteDialogOpened = false
+                tripListViewModel.deleteDialogOpened = false
             }
             .show()
     }
@@ -248,7 +246,8 @@ class TripDetailFragment : Fragment(R.layout.fragment_trip_detail) {
 
         showMap.setOnClickListener {
             // Navigate to the map
-            mapModel.pathManagement = "showRoute"
+            tripListViewModel.selectedLocal = trip
+            tripListViewModel.pathManagementMap = "showRoute"
             findNavController().navigate(R.id.action_tripDetail_to_showMap)
         }
 

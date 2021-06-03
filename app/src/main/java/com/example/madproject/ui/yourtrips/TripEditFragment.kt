@@ -23,7 +23,6 @@ import com.example.madproject.R
 import com.example.madproject.data.FirestoreRepository
 import com.example.madproject.data.Trip
 import com.example.madproject.lib.*
-import com.example.madproject.ui.map.MapViewModel
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -56,8 +55,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     private lateinit var intStopsButton: ImageButton
     private var datePicker: MaterialDatePicker<Long>? = null
     private var timePicker: MaterialTimePicker? = null
-    private val sharedModel: TripListViewModel by activityViewModels()
-    private val mapModel: MapViewModel by activityViewModels()
+    private val tripListViewModel: TripListViewModel by activityViewModels()
     private lateinit var trip: Trip
     private var storageDir: File? = null
 
@@ -83,22 +81,22 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         intStopsButton = view.findViewById(R.id.addIntermediateStops)
         storageDir = this.requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
 
-        trip = sharedModel.selectedLocal
-        currentPhotoPath = sharedModel.currentPhotoPath
+        trip = tripListViewModel.selectedLocal
+        currentPhotoPath = tripListViewModel.currentPhotoPath
 
-        sharedModel.orientation = this.requireActivity().requestedOrientation
+        tripListViewModel.orientation = this.requireActivity().requestedOrientation
 
         //setValues move to Resume
 
         fixEditText()
 
-        if (sharedModel.useDBImage && (currentPhotoPath != "")) {
+        if (tripListViewModel.useDBImage && (currentPhotoPath != "")) {
             File(currentPhotoPath!!).delete()
             currentPhotoPath = ""
-            sharedModel.currentPhotoPath = ""
+            tripListViewModel.currentPhotoPath = ""
         }
 
-        sharedModel.useDBImage = false
+        tripListViewModel.useDBImage = false
 
         setHasOptionsMenu(true)
 
@@ -149,7 +147,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         if (datePicker?.isVisible == true) datePicker?.dismiss()
         if (timePicker?.isVisible == true) timePicker?.dismiss()
         updateTrip()
-        sharedModel.currentPhotoPath = currentPhotoPath ?: ""
+        tripListViewModel.currentPhotoPath = currentPhotoPath ?: ""
     }
 
     override fun onCreateContextMenu(
@@ -184,34 +182,33 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         if (resultCode == AppCompatActivity.RESULT_OK) {
             when (requestCode) {
                 Requests.INTENT_CAPTURE_PHOTO.value -> {
-                    currentPhotoPath = resizeImage(this.requireActivity(), sharedModel.bigPhotoPath, storageDir?.absolutePath)
+                    currentPhotoPath = resizeImage(this.requireActivity(), tripListViewModel.bigPhotoPath, storageDir?.absolutePath)
                     imageCar.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath!!))
-                    sharedModel.bigPhotoPath = ""
+                    tripListViewModel.bigPhotoPath = ""
                 }
 
                 Requests.INTENT_PHOTO_FROM_GALLERY.value -> {
-                    Log.d("test", "returned intent")
                     val inputStream: InputStream? = data?.data?.let {
                         this.requireActivity().contentResolver.openInputStream(
                             it
                         )
                     }
                     val outputFile = createImageFile(storageDir?.absolutePath).apply {
-                        sharedModel.bigPhotoPath = absolutePath
+                        tripListViewModel.bigPhotoPath = absolutePath
                     }
                     val fileOutputStream = FileOutputStream(outputFile)
                     inputStream?.copyTo(fileOutputStream)
                     fileOutputStream.close()
                     inputStream?.close()
-                    currentPhotoPath = resizeImage(this.requireActivity(), sharedModel.bigPhotoPath, storageDir?.absolutePath)
+                    currentPhotoPath = resizeImage(this.requireActivity(), tripListViewModel.bigPhotoPath, storageDir?.absolutePath)
                     imageCar.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath!!))
-                    sharedModel.bigPhotoPath = ""
+                    tripListViewModel.bigPhotoPath = ""
                 }
             }
         } else {
             if (requestCode == Requests.INTENT_CAPTURE_PHOTO.value) {
-                File(sharedModel.bigPhotoPath).delete()
-                sharedModel.bigPhotoPath = ""
+                File(tripListViewModel.bigPhotoPath).delete()
+                tripListViewModel.bigPhotoPath = ""
             }
         }
     }
@@ -221,11 +218,14 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
      */
     private fun fixEditText() {
         departure.setOnFocusChangeListener { _, hasFocus ->
+            val til = view?.findViewById<TextInputLayout>(R.id.tilDeparture)
             if (!hasFocus) {  // lost focus
                 departure.setSelection(0, 0)
                 departure.hint = ""
+                til?.helperText = null
             }  else {
-                view?.findViewById<TextInputLayout>(R.id.tilDeparture)?.error = null
+                til?.error = null
+                til?.helperText = "Modifying the text you will not see the route"
                 departure.hint = "Departure location"
                 val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.showSoftInput(departure, InputMethodManager.SHOW_IMPLICIT)
@@ -233,12 +233,15 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         }
 
         arrival.setOnFocusChangeListener { _, hasFocus ->
+            val til = view?.findViewById<TextInputLayout>(R.id.tilArrival)
             if (!hasFocus) {  // lost focus
                 arrival.setSelection(0, 0)
                 arrival.hint = ""
+                til?.helperText = null
             } else {
-                view?.findViewById<TextInputLayout>(R.id.tilArrival)?.error = null
+                til?.error = null
                 arrival.hint = "Arrival location"
+                til?.helperText = "Modifying the text you will not see the route"
                 val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.showSoftInput(arrival, InputMethodManager.SHOW_IMPLICIT)
             }
@@ -301,10 +304,13 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         }
 
         intermediateStops.setOnFocusChangeListener { _, hasFocus ->
+            val til = view?.findViewById<TextInputLayout>(R.id.tilIntermediate)
             if (!hasFocus) {  // lost focus
                 intermediateStops.setSelection(0, 0)
                 intermediateStops.hint = ""
+                til?.helperText = null
             } else {
+                til?.helperText = "Set from the map button to see the route"
                 intermediateStops.hint = "Intermediate stops"
                 val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.showSoftInput(intermediateStops, InputMethodManager.SHOW_IMPLICIT)
@@ -385,15 +391,32 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     }
 
     private fun updateTrip() {
-
         // Check if the inserted coordinates correspond to the texts
         if (trip.departureCoordinates != null) {
-
+            if (departure.text.toString() != getLocationString(trip.departureCoordinates!!.latitude, trip.departureCoordinates!!.longitude, requireContext()))
+                trip.departureCoordinates = null
         }
 
+        if (trip.arrivalCoordinates != null) {
+            if (arrival.text.toString() != getLocationString(trip.arrivalCoordinates!!.latitude, trip.arrivalCoordinates!!.longitude, requireContext()))
+                trip.arrivalCoordinates = null
+        }
 
+        if (trip.intermediateCoordinates.size > 0) {
 
-        sharedModel.selectedLocal = Trip(
+            val strings = intermediateStops.text.toString().split("\n")
+            for ((i, c) in trip.intermediateCoordinates.withIndex()) {
+                val loc = "- ${getLocationString(c.latitude, c.longitude, requireContext())}"
+                val str = if (i < strings.size) strings[i] else ""
+
+                if (loc != str) {
+                    trip.intermediateCoordinates.remove(c)
+                    break
+                }
+            }
+        }
+
+        tripListViewModel.selectedLocal = Trip(
             id = trip.id,
             imageUrl = trip.imageUrl,
             from = departure.text.toString(),
@@ -410,11 +433,10 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
             arrivalCoo = trip.arrivalCoordinates,
             intermediateCoo = trip.intermediateCoordinates
         )
-        trip = sharedModel.selectedLocal
+        trip = tripListViewModel.selectedLocal
     }
 
     private fun setValues() {
-        Log.d("test", trip.from)
         departure.setText(trip.from)
         arrival.setText(trip.to)
         departureDate.setText(trip.departureDate)
@@ -426,17 +448,17 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         intermediateStops.setText(trip.intermediateStops)
 
         departureButton.setOnClickListener {
-            mapModel.pathManagement = "selectDeparture"
+            tripListViewModel.pathManagementMap = "selectDeparture"
             findNavController().navigate(R.id.action_tripEdit_to_showMap)
         }
 
         arrivalButton.setOnClickListener {
-            mapModel.pathManagement = "selectArrival"
+            tripListViewModel.pathManagementMap = "selectArrival"
             findNavController().navigate(R.id.action_tripEdit_to_showMap)
         }
 
         intStopsButton.setOnClickListener {
-            mapModel.pathManagement = "selectIntStops"
+            tripListViewModel.pathManagementMap = "selectIntStops"
             findNavController().navigate(R.id.action_tripEdit_to_showMap)
         }
 
@@ -444,7 +466,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
         else if ((trip.imageUrl == "") && (currentPhotoPath != "")) imageCar.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath))
         else if ((trip.imageUrl != "") && (currentPhotoPath == "")) Picasso.get().load(trip.imageUrl).placeholder(R.drawable.car_example).error(R.drawable.car_example).into(imageCar)
         else {
-            if (sharedModel.useDBImage) Picasso.get().load(trip.imageUrl).placeholder(R.drawable.car_example).error(R.drawable.car_example).into(imageCar)
+            if (tripListViewModel.useDBImage) Picasso.get().load(trip.imageUrl).placeholder(R.drawable.car_example).error(R.drawable.car_example).into(imageCar)
             else imageCar.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath))
         }
     }
@@ -470,7 +492,7 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
                 val photoFile: File? = try {
                     createImageFile(storageDir?.absolutePath).apply {
                         // Save a file: path for use with ACTION_VIEW intents
-                        sharedModel.bigPhotoPath = absolutePath
+                        tripListViewModel.bigPhotoPath = absolutePath
                     }
                 } catch (ex: IOException) {
                     // Error occurred while creating the File
@@ -530,13 +552,13 @@ class TripEditFragment : Fragment(R.layout.fragment_trip_edit) {
     Save the new values inside Firebase
      */
     private fun saveValues() {
-        sharedModel.saveTrip(trip)
+        tripListViewModel.saveTrip(trip)
             .addOnCompleteListener{
                 if (it.isSuccessful) Toast.makeText(context, "Trip information saved!", Toast.LENGTH_SHORT).show()
                 else Toast.makeText(context, "Failed saving trip!", Toast.LENGTH_SHORT).show()
-                findNavController().navigate(R.id.action_tripEdit_to_tripList)
+                findNavController().popBackStack()
                 // Restore the old orientation (disabled because of the Async task)
-                requireActivity().requestedOrientation = sharedModel.orientation
+                requireActivity().requestedOrientation = tripListViewModel.orientation
             }
     }
 

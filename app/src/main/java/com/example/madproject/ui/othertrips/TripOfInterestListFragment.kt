@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.text.InputType
-import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
@@ -59,7 +58,7 @@ class TripOfInterestListFragment : Fragment(R.layout.fragment_others_trip_list) 
         tripListViewModel.tabCompletedTrips = false
         tripListViewModel.tabCompletedTripsBooked = false
 
-        tripListViewModel.pathManagement = "interestedTrips"
+        tripListViewModel.pathManagementTrip = "interestedTrips"
 
         emptyList = view.findViewById(R.id.emptyList)
         filterDialogBuilder = MaterialAlertDialogBuilder(this.requireActivity())

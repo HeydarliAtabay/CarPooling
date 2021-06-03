@@ -188,7 +188,9 @@ class TripListViewModel : ViewModel() {
                                                 retrievedIntTrips.remove(trip)
                                             }
 
-                                            retrievedConfTrips.add(trip)
+                                            if (retrievedConfTrips.contains(trip))
+                                                retrievedConfTrips[retrievedConfTrips.indexOf(trip)] = trip
+                                            else retrievedConfTrips.add(trip)
 
                                             otherTrips.value = retrievedAvTrips
                                             interestedTrips.value = retrievedIntTrips
@@ -208,7 +210,10 @@ class TripListViewModel : ViewModel() {
                                     confirmedTrips.value = retrievedConfTrips
                                 }
 
-                                retrievedIntTrips.add(trip)
+                                if (retrievedIntTrips.contains(trip))
+                                    retrievedIntTrips[retrievedIntTrips.indexOf(trip)] = trip
+                                else retrievedIntTrips.add(trip)
+
                                 otherTrips.value = retrievedAvTrips
                                 interestedTrips.value = retrievedIntTrips
                                 confirmedTrips.value = retrievedConfTrips

@@ -1,6 +1,5 @@
 package com.example.madproject.ui.profile
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -20,12 +19,15 @@ class ProfileViewModel: ViewModel() {
         by lazy { MutableLiveData(Profile()).also { loadProfile() } }
 
 
-    private var listOfBookings : MutableLiveData<List<Booking>?> = MutableLiveData<List<Booking>?>()
-        //by lazy { MutableLiveData<List<Booking>>().also {loadBookings()}}
+    private var listOfBookings : List<Booking> = listOf()
 
     var localProfile = Profile()
 
-    private var listener: ListenerRegistration? = null
+    // Variables to manage the SnapshotListeners registrations
+    private var listener1: ListenerRegistration? = null
+    private var listener2: ListenerRegistration? = null
+    private var listenersMap1 = mutableMapOf<String, ListenerRegistration>()
+
 
     // Variables to manage the photo inside trip edit
     var currentPhotoPath = ""
@@ -48,7 +50,7 @@ class ProfileViewModel: ViewModel() {
     }
 
     private fun loadProfile() {
-        listener = FirestoreRepository().getUser().addSnapshotListener(EventListener { value, e ->
+        listener1 = FirestoreRepository().getUser().addSnapshotListener(EventListener { value, e ->
             if (e != null) {
                 yourProfile.value = null
                 return@EventListener
@@ -60,50 +62,43 @@ class ProfileViewModel: ViewModel() {
 
     //Function that loads all the expired confirmed booking for the user
     private fun loadBookings() {
-        val retrievedBookings : MutableList<Booking> = mutableListOf()
-        FirestoreRepository().getAllTrips().addSnapshotListener(EventListener {trips, e ->
-            if (e != null) {
-                listOfBookings.value = null
+        listener2 = FirestoreRepository().getAllTrips().addSnapshotListener(EventListener {docs, e ->
+            if (e != null || docs == null) {
+                listOfBookings = listOf()
                 return@EventListener
             }
 
             //List of all trips, except the ones owned by the user
-            val trips = trips?.map { t -> t.toObject(Trip::class.java) }
+            val trips = docs.map { t -> t.toObject(Trip::class.java) }
 
             //filter only past trips
-            val pastTrips = trips?.filter { t-> !isFuture(t.departureDate, t.departureTime, t.duration)}
+            val pastTrips = trips.filter { t-> !isFuture(t.departureDate, t.departureTime, t.duration)}
 
-
-            if (pastTrips != null) {
-
-                //Load all user bookings for each trip
-                for (trip in pastTrips) {
-                    FirestoreRepository().getBooking(trip).addSnapshotListener (EventListener{ booking, e2 ->
-                        if (e2 != null) {
-                            listOfBookings.value = null
-                        }
-                        if (booking != null) {
-                            for (booking in booking) {
-                                val b = booking.toObject(Booking::class.java)
-                                //add the relative booking in the temporary list
+            val retrievedBookings : MutableList<Booking> = mutableListOf()
+            //Load all user bookings for each trip
+            for (trip in pastTrips) {
+                listenersMap1[trip.id] = FirestoreRepository().getBooking(trip).addSnapshotListener { bookDocs, e2 ->
+                    if (e2 != null || bookDocs == null) {
+                        listOfBookings = listOf()
+                    } else {
+                        for (booking in bookDocs) {
+                            val b = booking.toObject(Booking::class.java)
+                            //add the relative booking in the temporary list
+                            if (retrievedBookings.contains(b))
+                                retrievedBookings[retrievedBookings.indexOf(b)] = b
+                            else
                                 retrievedBookings.add(b)
-                                Log.d("ciao", "lista dei bookings ${retrievedBookings.toString()}")
-                            }
-
-
                         }
-                    })
+                    }
                 }
-                listOfBookings.value = retrievedBookings
-                Log.d("ciao", "lista dei bookings ${retrievedBookings.toString()}")
             }
+            listOfBookings = retrievedBookings
         })
     }
 
-    fun getBookingByTripId(tripId: String): Booking? {
-        val booking = listOfBookings.value?.filter { b-> b.tripId == tripId}?.get(0)
-        Log.d("Ciao", "Bokking trovato e' ${booking.toString()}")
-        return booking
+    fun getBookingByTripId(tripId: String): Booking {
+        val booking = listOfBookings.filter { b-> b.tripId == tripId}
+        return if (booking.isNotEmpty()) booking[0] else Booking()
     }
 
     fun getDBUser() : LiveData<Profile>{
@@ -115,6 +110,10 @@ class ProfileViewModel: ViewModel() {
     }
 
     fun clearListeners() {
-        listener?.remove()
+        listener1?.remove()
+        listener2?.remove()
+        for (l in listenersMap1.values) {
+            l.remove()
+        }
     }
 }

@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.madproject.R
 import com.example.madproject.data.Filters
 import com.example.madproject.data.Trip
+import com.example.madproject.lib.isFuture
 import com.example.madproject.lib.parsePrice
 import com.example.madproject.lib.parseTime
 import com.example.madproject.lib.unParseTime
@@ -78,10 +79,14 @@ class TripOfInterestListFragment : Fragment(R.layout.fragment_others_trip_list) 
                 Toast.makeText(context, "Firebase Failure!", Toast.LENGTH_LONG).show()
             } else {
                 tripList = filteredTripList(it)
+                tripList = tripList.filter { t ->
+                    isFuture(date = t.departureDate, time = t.departureTime, duration = "")
+                }
                 if (tripList.isNotEmpty())
                     emptyList.visibility = View.INVISIBLE
                 else
                     emptyList.visibility = View.VISIBLE
+
                 recyclerView.adapter = TripsAdapter(tripList, tripListViewModel)
             }
         })
@@ -92,7 +97,10 @@ class TripOfInterestListFragment : Fragment(R.layout.fragment_others_trip_list) 
                 Toast.makeText(context, "Problem in setting the filters!", Toast.LENGTH_LONG).show()
             } else {
                 filter = it
-                val nl = filteredTripList(tripList)
+                var nl = filteredTripList(tripList)
+                nl = nl.filter { t ->
+                    isFuture(date = t.departureDate, time = t.departureTime, duration = "")
+                }
                 if (nl.isNotEmpty())
                     emptyList.visibility = View.INVISIBLE
                 else

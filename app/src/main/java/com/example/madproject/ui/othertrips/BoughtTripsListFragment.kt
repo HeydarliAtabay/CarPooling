@@ -3,6 +3,7 @@ package com.example.madproject.ui.othertrips
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
@@ -150,7 +151,7 @@ class BoughtTripsListFragment : Fragment(R.layout.fragment_trip_list) {
                 date.text = t.departureDate
                 time.text = t.departureTime
                 price.text = t.price
-                val booking :Booking? = profileViewModel.getBookingByTripId(t.id)
+                val booking :Booking = profileViewModel.getBookingByTripId(t.id)
                 if (t.imageUrl != "") {
                     Picasso.get().load(t.imageUrl).placeholder(R.drawable.car_example)
                         .error(R.drawable.car_example).into(image)
@@ -162,29 +163,20 @@ class BoughtTripsListFragment : Fragment(R.layout.fragment_trip_list) {
                         .navigate(R.id.action_bookedTrips_to_tripDetail)
                 }
 
-                if (tlViewModel.tabCompletedTrips) {
-                    if (booking?.driverRated == true)
-                        cardButton.visibility = View.INVISIBLE
-                    else cardButton.text = "Rate Driver"
-                }
-                else
-                    cardButton.visibility = View.INVISIBLE
+                if (tlViewModel.tabCompletedTripsBooked && !booking.driverRated) {
+                    cardButton.text = itemView.context.getString(R.string.rate_driver)
+                    cardButton.setOnClickListener {
+                        tlViewModel.selectedLocal = t
+                        openRatingDriverDialog(t, booking, ulViewModel, profileViewModel)
+                    }
+                } else cardButton.visibility = View.INVISIBLE
 
-                cardButton.setOnClickListener {
-                    tlViewModel.selectedLocal = t
-                    //var b = ulViewModel.getBookingForDriverRating(t)
-                    if (booking != null) {
-                        openRatingDriverDialog(t, ulViewModel, booking)
-                    }
-                }
                 if (ulViewModel.tripInDialog == t.id) {
-                    if (booking != null) {
-                        openRatingDriverDialog(t, ulViewModel, booking)
-                    }
+                    openRatingDriverDialog(t, booking, ulViewModel, profileViewModel)
                 }
             }
 
-            private fun openRatingDriverDialog(t: Trip, sharedModel: UserListViewModel, b: Booking) {
+            private fun openRatingDriverDialog(t: Trip, b: Booking, sharedModel: UserListViewModel, profileModel: ProfileViewModel) {
                 val ratingDialogBuilder = MaterialAlertDialogBuilder(itemView.context)
                 val ratingDialogView: View = LayoutInflater.from(itemView.context)
                     .inflate(R.layout.rating_dialog, null, false)
